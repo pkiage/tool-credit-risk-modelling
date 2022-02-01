@@ -1,0 +1,7 @@
+*.png
+*.pyc
+.env
+.envrc
+*.ipynb
+__pycache__
+.vs

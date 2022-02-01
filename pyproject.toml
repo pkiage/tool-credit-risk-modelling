@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "credit_risk_modelling"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+pandas = "^1.4.0"
+numpy = "^1.22.1"
+matplotlib = "^3.5.1"
+seaborn = "^0.11.2"
+notebook = "^6.4.7"
+scikit-learn = "^1.0.2"
+xgboost = "^1.5.2"
+streamlit = "^1.4.0"
+plotly = "^5.5.0"
+graphviz = "^0.19.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+black = "^21.12b0"
+flake8 = "^4.0.1"
+
+[tool.black]
+line-length = 79
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
