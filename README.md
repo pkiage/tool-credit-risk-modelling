@@ -21,6 +21,10 @@ An interactive tool demonstrating credit risk modelling.
 
 - Selecting optimal threshold using Youden's J statistic
 
+[Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/)
+
+- Project structure
+
 ## Political, Economic, Social, Technological, Legal and Environmental(PESTLE):
 
 [Europe fit for the Digital Age: Commission proposes new rules and actions for excellence and trust in Artificial Intelligence](https://ec.europa.eu/commission/presscorner/detail/en/ip_21_1682)

@@ -7,6 +7,7 @@ from src.features.build_features import initialise_data
 from src.models.xgboost_model import xgboost_class
 from src.models.logistic_model import logistic_class
 
+from src.models.util_model_comparison import model_comparison_view
 
 from src.models.util_strategy_table import strategy_table_view
 
@@ -43,6 +44,8 @@ def main():
     if "XGBoost" in models_selected_set:
         xgboost_model_class = xgboost_class(split_dataset, currency)
         model_classes["XGBoost"] = xgboost_model_class
+
+    model_comparison_view(split_dataset, model_classes)
 
     strategy_table_view(currency, model_classes)
 
