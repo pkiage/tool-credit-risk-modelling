@@ -1,5 +1,6 @@
 from typing import Union
 import pandas as pd
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 import streamlit as st
 import numpy as np
 from sklearn.metrics import (
@@ -7,24 +8,25 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 from sklearn.linear_model import LogisticRegression
+import xgboost as xgb
 from xgboost.sklearn import XGBClassifier
-from common.data import SplitDataset
-from common.util import (
+from src.features.util_build_features import SplitDataset
+"""from src.models.model_utils import (
     create_cross_validation_df,
     cross_validation_scores,
     get_df_trueStatus_probabilityDefault_threshStatus_loanAmount,
-)
-from common.views import (
+)"""
+from src.visualization.graphs_test import (
     cross_validation_graph,
 )
 
 
-def make_evaluation_view(
+def make_tests_view(
     model_name_short: str,
     model_name_generic: str,
 ):
     def view(
-        clf_gbt_model: Union[XGBClassifier, LogisticRegression],
+        clf_xgbt_model: Union[XGBClassifier, LogisticRegression],
         split_dataset: SplitDataset,
         currency: str,
         prob_thresh_selected,
@@ -40,7 +42,7 @@ def make_evaluation_view(
             train on each fold suggests performance will be stable."
         )
 
-        st.write(f"XGBoost cross validation test:")
+        st.write('xgb cross validation test:')
 
         stcol_seed, stcol_eval_metric = st.columns(2)
 
@@ -170,7 +172,7 @@ def make_evaluation_view(
             )
 
         cv_scores = cross_validation_scores(
-            clf_gbt_model,
+            clf_xgbt_model,
             split_dataset.X_test,
             split_dataset.y_test,
             nfolds_score,
@@ -325,7 +327,7 @@ def make_evaluation_view(
 
         df_trueStatus_probabilityDefault_threshStatus_loanAmount = (
             get_df_trueStatus_probabilityDefault_threshStatus_loanAmount(
-                clf_gbt_model,
+                clf_xgbt_model,
                 split_dataset.X_test,
                 split_dataset.y_test,
                 prob_thresh_selected,
@@ -406,5 +408,161 @@ def make_evaluation_view(
     return view
 
 
-decision_tree_evaluation_view = make_evaluation_view("gbt", "Decision Tree")
-logistic_evaluation_view = make_evaluation_view("lg", "Logistic Regression")
+def cross_validation_scores(model, X, y, nfold, score, seed):
+    # return cv scores of metric
+    return cross_val_score(
+        model,
+        np.ascontiguousarray(X),
+        np.ravel(np.ascontiguousarray(y)),
+        cv=StratifiedKFold(n_splits=nfold, shuffle=True, random_state=seed),
+        scoring=score,
+    )
+
+
+def create_cross_validation_df(
+    X, y, eval_metric, seed, trees, n_folds, early_stopping_rounds
+):
+    # Test data x and y
+    DTrain = xgb.DMatrix(X, label=y)
+
+    # auc or logloss
+    params = {
+        "eval_metric": eval_metric,
+        "objective": "binary:logistic",  # logistic say 0 or 1 for loan status
+        "seed": seed,
+    }
+
+    # Create the data frame of cross validations
+    cv_df = xgb.cv(
+        params,
+        DTrain,
+        num_boost_round=trees,
+        nfold=n_folds,
+        early_stopping_rounds=early_stopping_rounds,
+        shuffle=True,
+    )
+
+    return [DTrain, cv_df]
+
+
+def create_accept_rate_list(start, end, samples):
+    return np.linspace(start, end, samples, endpoint=True)
+
+
+def create_strategyTable_df(
+    start, end, samples, actual_probability_predicted_acc_rate, true, currency
+):
+    accept_rates = create_accept_rate_list(start, end, samples)
+    thresholds_strat = []
+    bad_rates_start = []
+    Avg_Loan_Amnt = actual_probability_predicted_acc_rate[true].mean()
+    num_accepted_loans_start = []
+
+    for rate in accept_rates:
+        # Calculate the threshold for the acceptance rate
+        thresh = np.quantile(
+            actual_probability_predicted_acc_rate["PROB_DEFAULT"], rate
+        ).round(3)
+        # Add the threshold value to the list of thresholds
+        thresholds_strat.append(
+            np.quantile(
+                actual_probability_predicted_acc_rate["PROB_DEFAULT"], rate
+            ).round(3)
+        )
+
+        # Reassign the loan_status value using the threshold
+        actual_probability_predicted_acc_rate[
+            "PREDICT_DEFAULT_STATUS"
+        ] = actual_probability_predicted_acc_rate["PROB_DEFAULT"].apply(
+            lambda x: 1 if x > thresh else 0
+        )
+
+        # Create a set of accepted loans using this acceptance rate
+        accepted_loans = actual_probability_predicted_acc_rate[
+            actual_probability_predicted_acc_rate["PREDICT_DEFAULT_STATUS"]
+            == 0
+        ]
+        # Calculate and append the bad rate using the acceptance rate
+        bad_rates_start.append(
+            np.sum((accepted_loans[true]) / len(accepted_loans[true])).round(3)
+        )
+        # Accepted loans
+        num_accepted_loans_start.append(len(accepted_loans))
+
+    # Calculate estimated value
+    money_accepted_loans = [
+        accepted_loans * Avg_Loan_Amnt
+        for accepted_loans in num_accepted_loans_start
+    ]
+
+    money_bad_accepted_loans = [
+        2 * money_accepted_loan * bad_rate
+        for money_accepted_loan, bad_rate in zip(
+            money_accepted_loans, bad_rates_start
+        )
+    ]
+
+    zip_object = zip(money_accepted_loans, money_bad_accepted_loans)
+    estimated_value = [
+        money_accepted_loan - money_bad_accepted_loan
+        for money_accepted_loan, money_bad_accepted_loan in zip_object
+    ]
+
+    accept_rates = ["{:.2f}".format(elem) for elem in accept_rates]
+
+    thresholds_strat = ["{:.2f}".format(elem) for elem in thresholds_strat]
+
+    bad_rates_start = ["{:.2f}".format(elem) for elem in bad_rates_start]
+
+    estimated_value = ["{:.2f}".format(elem) for elem in estimated_value]
+
+    return (
+        pd.DataFrame(
+            zip(
+                accept_rates,
+                thresholds_strat,
+                bad_rates_start,
+                num_accepted_loans_start,
+                estimated_value,
+            ),
+            columns=[
+                "Acceptance Rate",
+                "Threshold",
+                "Bad Rate",
+                "Num Accepted Loans",
+                f"Estimated Value ({currency})",
+            ],
+        )
+        .sort_values(by="Acceptance Rate", axis=0, ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def get_df_trueStatus_probabilityDefault_threshStatus_loanAmount(
+    model, X, y, threshold, loan_amount_col_name
+):
+    true_status = y.to_frame()
+
+    loan_amount = X[loan_amount_col_name]
+
+    clf_prediction_prob = model.predict_proba(np.ascontiguousarray(X))
+
+    clf_prediction_prob_df = pd.DataFrame(
+        clf_prediction_prob[:, 1], columns=["PROB_DEFAULT"]
+    )
+
+    clf_thresh_predicted_default_status = (
+        clf_prediction_prob_df["PROB_DEFAULT"]
+        .apply(lambda x: 1 if x > threshold else 0)
+        .rename("PREDICT_DEFAULT_STATUS")
+    )
+
+    return pd.concat(
+        [
+            true_status.reset_index(drop=True),
+            clf_prediction_prob_df.reset_index(drop=True),
+            clf_thresh_predicted_default_status.reset_index(drop=True),
+            loan_amount.reset_index(drop=True),
+        ],
+        axis=1,
+    )

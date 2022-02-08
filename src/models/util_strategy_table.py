@@ -2,12 +2,12 @@ from typing import OrderedDict
 import plotly.express as px
 import numpy as np
 import streamlit as st
-from common.util import create_strategyTable_df
-from views.typing import ModelView
+from src.models.util_test import create_strategyTable_df
+from src.models.util_model_class import ModelClass
 
 
 def strategy_table_view(
-    currency: str, model_views: OrderedDict[str, ModelView]
+    currency: str, model_views: OrderedDict[str, ModelClass]
 ):
     st.header("Strategy Table")
 
@@ -89,7 +89,7 @@ def strategy_table_view(
         )
 
         st.metric(
-            label=f"Total expected loss:",
+            label='Total expected loss:',
             value=f"{currency} {tot_exp_loss:,.2f}",
             delta=None,
             delta_color="normal",

@@ -1,16 +1,21 @@
 from typing import OrderedDict
 import streamlit as st
 from sklearn.metrics import roc_auc_score
-from common.data import SplitDataset
-from common.views import (
-    roc_auc_compare_n_models,
-    streamlit_chart_setting_height_width,
-    calibration_curve_report_commented_n,
+from src.features.util_build_features import SplitDataset
+from src.visualization.graphs_settings import (
+    streamlit_chart_setting_height_width
 )
-from views.typing import ModelView
+
+from src.visualization.graphs_test import (
+    roc_auc_compare_n_models,
+    calibration_curve_report_commented_n
+)
 
 
-def roc_auc_for_model(split_dataset: SplitDataset, model_view: ModelView):
+from src.models.util_model_class import ModelClass
+
+
+def roc_auc_for_model(split_dataset: SplitDataset, model_view: ModelClass):
     roc_auc_model = roc_auc_score(
         split_dataset.y_test, model_view.predicted_default_status
     )
@@ -31,7 +36,7 @@ def roc_auc_for_model(split_dataset: SplitDataset, model_view: ModelView):
 
 def model_comparison_view(
     split_dataset: SplitDataset,
-    model_views: OrderedDict[str, ModelView],
+    model_views: OrderedDict[str, ModelClass],
 ):
     st.header("Model Comparison")
 
@@ -43,7 +48,7 @@ def model_comparison_view(
             f"Receiver Operating Characteristic (ROC) Curve - {model_name}"
         )
         st.markdown(
-            f'Area Under the Receiver Operating Characteristic Curve from prediction scores from "{model_name}" model is {roc_auc_model}.\n'
+            f'Area Under the Receiver Operating Characteristic Curve from prediction scores from {model_name} model is {roc_auc_model}.\n'
         )
         st.markdown(
             f'The score of {"{:.2f}".format(roc_auc_model)} is in the {roc_auc_lvl} ROC AUC score category.'
@@ -78,4 +83,4 @@ def model_comparison_view(
 
     fig2.set_size_inches(xsize_cal, ysize_cal)
 
-    st.pyplot(fig2.figure)
+    st.pyplot(fig2)
