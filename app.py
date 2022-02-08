@@ -1,14 +1,16 @@
-from typing import OrderedDict
 import streamlit as st
-from data_setup import initialise_data
-from views.decision_tree import decisiontree_view
-from views.logistic import logistic_view
-from views.model_comparison import model_comparison_view
-from views.strategy_table import strategy_table_view
+from typing import OrderedDict
+
+
+from src.features.build_features import initialise_data
+from src.models.xgboost_model import xgboost_class
+from src.models.util_strategy_table import strategy_table_view
 
 
 def main():
     currency_options = ["USD", "KES", "GBP"]
+
+    model_options = ["XGBoost"]
 
     currency = st.sidebar.selectbox(
         label="What currency will you be using?", options=currency_options
@@ -22,30 +24,19 @@ def main():
 
     st.title("Modelling")
 
-    model_options = ["Logistic Regression", "Decision Trees"]
-
-    # Returns list
     models_selected_list = st.sidebar.multiselect(
         label="Select model", options=model_options, default=model_options
     )
 
     models_selected_set = set(models_selected_list)
-    model_views = OrderedDict()
 
-    if "Logistic Regression" in models_selected_set:
-        logistic_model_view = logistic_view(split_dataset, currency)
-        model_views["Logistic Regression"] = logistic_model_view
+    model_classes = OrderedDict()
 
-    if "Decision Trees" in models_selected_set:
-        decision_tree_model_view = decisiontree_view(split_dataset, currency)
-        model_views["Decision Trees"] = decision_tree_model_view
+    if "XGBoost" in models_selected_set:
+        xgboost_model_class = xgboost_class(split_dataset, currency)
+        model_classes["XGBoost"] = xgboost_model_class
 
-    if models_selected_list:
-        model_comparison_view(
-            split_dataset,
-            model_views,
-        )
-        strategy_table_view(currency, model_views)
+    strategy_table_view(currency, model_classes)
 
 
 if __name__ == "__main__":
