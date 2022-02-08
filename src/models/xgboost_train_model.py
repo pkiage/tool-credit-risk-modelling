@@ -56,7 +56,7 @@ def interpret_clf_xgbt_model(clf_xgbt_model):
     )
 
 
-def xgboost_train_model(split_dataset: SplitDataset, currency: str):
+def xgboost_train_model(split_dataset: SplitDataset):
     st.header("XGBoost Decision Trees")
 
     clf_xgbt_model = create_clf_xgbt_model(
