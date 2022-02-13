@@ -42,7 +42,7 @@ def make_tests_view(
             train on each fold suggests performance will be stable."
         )
 
-        st.write('xgb cross validation test:')
+        st.write('{model_name_short} cross validation test:')
 
         stcol_seed, stcol_eval_metric = st.columns(2)
 
