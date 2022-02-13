@@ -1,8 +1,15 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
 [tool.poetry]
-name = "credit_risk_modelling"
-version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+name = "cookbook-data-viz-plotly"
+version = "0.0.1"
+description = "Credit risk model builder"
+authors = ["pkiage paul.r.kiage@gmail.com"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
