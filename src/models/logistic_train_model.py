@@ -46,8 +46,6 @@ def interpret_clf_logistic_model(clf_logistic_model, split_dataset):
     )
 
     st.subheader("Logistic Regression Coefficient Values")
-    st.write(split_dataset)
-    st.write(type(split_dataset))
 
     coef_dict = create_coeff_dict_logistic_model(
         clf_logistic_model, split_dataset.X_y_train)
