@@ -43,7 +43,7 @@ def interpret_clf_xgbt_model(clf_xgbt_model):
     st.subheader("XGBoost Decision Tree Structure")
 
     (treexsize, treeysize,) = streamlit_chart_setting_height_width(
-        "Chart Settings", 15, 10, "treexsize", "treeysize"
+        "Chart Settings", 5, 5, "treexsize", "treeysize"
     )
 
     fig2 = plot_tree_gbt(treexsize, treeysize, clf_xgbt_model)
