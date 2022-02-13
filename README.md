@@ -51,6 +51,9 @@ Other:
 
 - Project structure
 
+[GraphViz Buildpack](https://github.com/weibeld/heroku-buildpack-graphviz)
+- On deployment
+
 ## Political, Economic, Social, Technological, Legal and Environmental(PESTLE):
 
 [Europe fit for the Digital Age: Commission proposes new rules and actions for excellence and trust in Artificial Intelligence](https://ec.europa.eu/commission/presscorner/detail/en/ip_21_1682)
