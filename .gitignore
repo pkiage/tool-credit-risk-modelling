@@ -1,6 +1,6 @@
 *.png
 *.pyc
-.env
+venv
 .envrc
 *.ipynb
 __pycache__
