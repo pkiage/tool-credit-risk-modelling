@@ -28,7 +28,7 @@ Documentation:
 - [ ] Add design rationale(s)
 
 Other:
-- [ ] Deploy app
+- [x] Deploy app
 - [ ] Add csv file data input
 - [ ] Add tests
 - [ ] Add test/code coverage badge
