@@ -13,6 +13,8 @@ from src.models.util_strategy_table import strategy_table_view
 
 
 def main():
+
+    st.write("Source code: https://github.com/pkiage/tool-credit-risk-modelling")
     currency_options = ["USD", "KES", "GBP"]
 
     model_options = ["XGBoost", "Logistic"]
