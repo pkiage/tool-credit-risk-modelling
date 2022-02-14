@@ -8,6 +8,6 @@ EOF
 cat << EOF > ~/.streamlit/config.toml
 [server]
 headless = true
-enableCORS = false
+enableCORS = true
 port = $PORT
 EOF
