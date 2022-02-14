@@ -13,6 +13,61 @@ Emphasis on:
 
 - [Streamlit](https://streamlit.io/)
 
+### Hardware initially built on:
+Processor: 11th Gen Intel(R) Core(TM) i7-1165G7 @2.80Ghz, 2803 Mhz, 4 Core(s), 8 Logical Processor(s)
+
+Memory (RAM): 16GB 
+
+## Local setup
+### Obtain the repo locally and open its root folder
+#### To potentially contribute
+git clone https://github.com/pkiage/tool-credit-risk-modelling.git
+
+or
+
+gh repo clone pkiage/tool-credit-risk-modelling
+
+#### Just to deploy locally
+Download ZIP
+
+### (optional) Setup virtual environment:
+python -m venv venv
+
+### (optional) Activate virtual environment:
+#### If using Unix based OS run the following in terminal:  
+.\venv\bin\activate
+
+#### If using Windows run the following in terminal:
+.\venv\Scripts\activate
+
+### Install requirements by running the following in terminal:
+#### Required packages
+pip install -r requirements.txt
+
+#### Complete graphviz installation
+https://graphviz.org/download/ 
+
+### Run the streamlit app (app.py) by running the following in terminal:
+
+streamlit run app.py
+
+## Deployed setup details
+For faster model building and testing (particularly XGBoost) a local setup is recommended.
+
+Free Heroku dyno type was used to deploy the app
+https://devcenter.heroku.com/articles/dyno-types
+
+
+Memory (RAM): 512 MB
+
+CPU Share: 1x
+
+Compute: 1x-4x 
+
+Dedicated: no
+
+Sleeps: yes
+
 # Roadmap
 Models:
 - [ ] Add LightGBM
@@ -23,7 +78,7 @@ Visualization:
 - [ ] Add decision surface plot(s)
 
 Documentation:
-- [ ] Add getting started and usage documentation
+- [x] Add getting started and usage documentation
 - [ ] Add documentation evaluating models
 - [ ] Add design rationale(s)
 
@@ -33,6 +88,8 @@ Other:
 - [ ] Add tests
 - [ ] Add test/code coverage badge
 - [ ] Add continuous integration badge
+
+
 
 # References
 
@@ -52,7 +109,7 @@ Other:
 - Project structure
 
 [GraphViz Buildpack](https://github.com/weibeld/heroku-buildpack-graphviz)
-- On deployment
+- Buildpack used for Heroku deployment
 
 ## Political, Economic, Social, Technological, Legal and Environmental(PESTLE):
 
