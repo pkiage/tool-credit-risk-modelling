@@ -52,7 +52,7 @@ https://graphviz.org/download/
 streamlit run app.py
 
 ## Deployed setup details
-For faster model building and testing (particularly XGBoost) a local setup is recommended.
+For faster model building and testing (particularly XGBoost) a local setup or on a more powerful server than free heroku dyno type is recommended.
 
 Free Heroku dyno type was used to deploy the app
 https://devcenter.heroku.com/articles/dyno-types
