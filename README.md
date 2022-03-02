@@ -134,7 +134,7 @@ Other:
 * Automated risk scoring of lending borrowing pools -> Increasingly important problem
   *  One alternative way of looking at the problem would be, looking at a function for calculating the probability of default given the pool of assets you have.
 * Managing Risk for lenders and distributing risk/ Undercollateralized Loans
-  *  Tradfi is plagued by NPAs but still ultimately fall back to some sort of credit score establishment [[Spectral finance](https://www.spectral.finance/) solving this, but still an open problem].
+  *  Tradfi is plagued by NPAs [(Nonperforming assets)] but still ultimately fall back to some sort of credit score establishment [[Spectral finance](https://www.spectral.finance/) solving this, but still an open problem].
   *  But still, most credit score methods would rely on onchain history for credit establishment, we are moving towards privacy-centric defi is this approach extendable to that idea? [Homomorphic encryption could provide a solution]
 
 
