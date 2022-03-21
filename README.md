@@ -52,10 +52,10 @@ https://graphviz.org/download/
 streamlit run app.py
 
 ## Deployed setup details
-For faster model building and testing (particularly XGBoost) a local setup or on a more powerful server than free heroku dyno type is recommended.
+For faster model building and testing (particularly XGBoost) a local setup or on a more powerful server than free heroku dyno type is recommended. ([tutorials on  servers for data science & ML](https://course.fast.ai))
 
-Free Heroku dyno type was used to deploy the app
-https://devcenter.heroku.com/articles/dyno-types
+[Free Heroku dyno type](https://devcenter.heroku.com/articles/dyno-types) was used to deploy the app
+
 
 
 Memory (RAM): 512 MB
