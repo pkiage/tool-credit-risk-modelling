@@ -146,11 +146,6 @@ Other:
 pydeps src --max-bacon=3 --cluster --max-cluster-size=3  --rankdir BT -o docs/module-dependency-graph/src.svg 
 ```
 
-```shell
-pydeps src/app.py --max-bacon=3 --cluster --max-cluster-size=3  --rankdir BT -o docs/module-dependency-graph/app.svg 
-```
-
-
 ## [code2flow](https://github.com/scottrogowski/code2flow) Call graphs for a pretty good estimate of project structure
 ### Logistic
 ```shell
