@@ -1,0 +1,27 @@
+digraph G {
+concentrate=true;
+splines="ortho";
+rankdir="LR";
+subgraph legend{
+    rank = min;
+    label = "legend";
+    Legend [shape=none, margin=0, label = <
+        <table cellspacing="0" cellpadding="0" border="1"><tr><td>Code2flow Legend</td></tr><tr><td>
+        <table cellspacing="0">
+        <tr><td>Regular function</td><td width="50px" bgcolor='#cccccc'></td></tr>
+        <tr><td>Trunk function (nothing calls this)</td><td bgcolor='#966F33'></td></tr>
+        <tr><td>Leaf function (this calls nothing else)</td><td bgcolor='#6db33f'></td></tr>
+        <tr><td>Function call</td><td><font color='black'>&#8594;</font></td></tr>
+        </table></td></tr></table>
+        >];
+}node_f7d6803b [label="40: make_prediction_view()" name="util_predict_model::make_prediction_view" shape="rect" style="rounded,filled" fillcolor="#966F33" ];
+node_55e3ab95 [label="23: probability_threshold_explainer()" name="util_predict_model::probability_threshold_explainer" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_f7d6803b -> node_55e3ab95 [color="#009E73" penwidth="2"];
+subgraph cluster_3c83f67a {
+    node_55e3ab95 node_f7d6803b;
+    label="File: util_predict_model";
+    name="util_predict_model";
+    style="filled";
+    graph[style=dotted];
+};
+}

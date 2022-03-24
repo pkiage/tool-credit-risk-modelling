@@ -1,0 +1,29 @@
+digraph G {
+concentrate=true;
+splines="ortho";
+rankdir="LR";
+subgraph legend{
+    rank = min;
+    label = "legend";
+    Legend [shape=none, margin=0, label = <
+        <table cellspacing="0" cellpadding="0" border="1"><tr><td>Code2flow Legend</td></tr><tr><td>
+        <table cellspacing="0">
+        <tr><td>Regular function</td><td width="50px" bgcolor='#cccccc'></td></tr>
+        <tr><td>Trunk function (nothing calls this)</td><td bgcolor='#966F33'></td></tr>
+        <tr><td>Leaf function (this calls nothing else)</td><td bgcolor='#6db33f'></td></tr>
+        <tr><td>Function call</td><td><font color='black'>&#8594;</font></td></tr>
+        </table></td></tr></table>
+        >];
+}node_93fbfacf [label="20: create_clf_xgbt_model()" name="xgboost_train_model::create_clf_xgbt_model" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_5dffb92a [label="30: interpret_clf_xgbt_model()" name="xgboost_train_model::interpret_clf_xgbt_model" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_bb023570 [label="59: xgboost_train_model()" name="xgboost_train_model::xgboost_train_model" shape="rect" style="rounded,filled" fillcolor="#966F33" ];
+node_bb023570 -> node_93fbfacf [color="#000000" penwidth="2"];
+node_bb023570 -> node_5dffb92a [color="#000000" penwidth="2"];
+subgraph cluster_4d7ce8f1 {
+    node_93fbfacf node_5dffb92a node_bb023570;
+    label="File: xgboost_train_model";
+    name="xgboost_train_model";
+    style="filled";
+    graph[style=dotted];
+};
+}

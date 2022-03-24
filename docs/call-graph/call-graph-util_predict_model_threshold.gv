@@ -1,0 +1,46 @@
+digraph G {
+concentrate=true;
+splines="ortho";
+rankdir="LR";
+subgraph legend{
+    rank = min;
+    label = "legend";
+    Legend [shape=none, margin=0, label = <
+        <table cellspacing="0" cellpadding="0" border="1"><tr><td>Code2flow Legend</td></tr><tr><td>
+        <table cellspacing="0">
+        <tr><td>Regular function</td><td width="50px" bgcolor='#cccccc'></td></tr>
+        <tr><td>Trunk function (nothing calls this)</td><td bgcolor='#966F33'></td></tr>
+        <tr><td>Leaf function (this calls nothing else)</td><td bgcolor='#6db33f'></td></tr>
+        <tr><td>Function call</td><td><font color='black'>&#8594;</font></td></tr>
+        </table></td></tr></table>
+        >];
+}node_1f9151c4 [label="148: J_statistic_driven_probability_threshold()" name="util_predict_model_threshold::J_statistic_driven_probability_threshold" shape="rect" style="rounded,filled" fillcolor="#966F33" ];
+node_724f6ba5 [label="274: acceptance_rate_driven_threshold()" name="util_predict_model_threshold::acceptance_rate_driven_threshold" shape="rect" style="rounded,filled" fillcolor="#966F33" ];
+node_490d9b0f [label="76: apply_threshold_to_probability_values()" name="util_predict_model_threshold::apply_threshold_to_probability_values" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_b4aaa6d8 [label="34: classification_report_per_threshold()" name="util_predict_model_threshold::classification_report_per_threshold" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_9d1be9bc [label="165: create_tradeoff_graph()" name="util_predict_model_threshold::create_tradeoff_graph" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_31401d8a [label="93: default_status_per_threshold()" name="util_predict_model_threshold::default_status_per_threshold" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_db982914 [label="85: find_best_threshold_J_statistic()" name="util_predict_model_threshold::find_best_threshold_J_statistic" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_5d83fede [label="18: model_probability_values_df()" name="util_predict_model_threshold::model_probability_values_df" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_e309a559 [label="52: thresh_classification_report_recall_accuracy()" name="util_predict_model_threshold::thresh_classification_report_recall_accuracy" shape="rect" style="rounded,filled" fillcolor="#6db33f" ];
+node_46bf610a [label="103: threshold_and_predictions()" name="util_predict_model_threshold::threshold_and_predictions" shape="rect" style="rounded,filled" fillcolor="#cccccc" ];
+node_4f2d20d8 [label="182: tradeoff_threshold()" name="util_predict_model_threshold::tradeoff_threshold" shape="rect" style="rounded,filled" fillcolor="#966F33" ];
+node_16176513 [label="131: user_defined_probability_threshold()" name="util_predict_model_threshold::user_defined_probability_threshold" shape="rect" style="rounded,filled" fillcolor="#966F33" ];
+node_1f9151c4 -> node_db982914 [color="#F0E442" penwidth="2"];
+node_1f9151c4 -> node_46bf610a [color="#F0E442" penwidth="2"];
+node_724f6ba5 -> node_490d9b0f [color="#0072B2" penwidth="2"];
+node_46bf610a -> node_490d9b0f [color="#56B4E9" penwidth="2"];
+node_46bf610a -> node_5d83fede [color="#56B4E9" penwidth="2"];
+node_4f2d20d8 -> node_b4aaa6d8 [color="#000000" penwidth="2"];
+node_4f2d20d8 -> node_9d1be9bc [color="#000000" penwidth="2"];
+node_4f2d20d8 -> node_31401d8a [color="#000000" penwidth="2"];
+node_4f2d20d8 -> node_e309a559 [color="#000000" penwidth="2"];
+node_16176513 -> node_46bf610a [color="#009E73" penwidth="2"];
+subgraph cluster_8a2f3df1 {
+    node_5d83fede node_b4aaa6d8 node_e309a559 node_490d9b0f node_db982914 node_31401d8a node_46bf610a node_16176513 node_1f9151c4 node_9d1be9bc node_4f2d20d8 node_724f6ba5;
+    label="File: util_predict_model_threshold";
+    name="util_predict_model_threshold";
+    style="filled";
+    graph[style=dotted];
+};
+}
