@@ -47,6 +47,15 @@ pip install -r requirements.txt
 #### Complete graphviz installation
 https://graphviz.org/download/ 
 
+## Build and install local package
+```shell
+python setup.py build
+```
+
+```shell
+python setup.py install
+```
+
 ### Run the streamlit app (app.py) by running the following in terminal:
 
 streamlit run app.py
@@ -128,3 +137,52 @@ Other:
 >* Clear and adequate information to the user;
 >* Appropriate human oversight measures to minimise risk;
 >* High level of robustness, security and accuracy."
+
+
+# Docs creation
+## [pydeps](https://github.com/thebjorn/pydeps) Python module depenency visualization
+
+```shell
+pydeps src --max-bacon=3 --cluster --max-cluster-size=3  --rankdir BT -o docs/module-dependency-graph/src.svg 
+```
+
+```shell
+pydeps src/app.py --max-bacon=3 --cluster --max-cluster-size=3  --rankdir BT -o docs/module-dependency-graph/app.svg 
+```
+
+
+## [code2flow](https://github.com/scottrogowski/code2flow) Call graphs for a pretty good estimate of project structure
+### Logistic
+```shell
+code2flow src/models/logistic_train_model.py -o docs/call-graph/logistic_train_model.svg
+```
+
+```shell
+code2flow src/models/logistic_model.py -o docs/call-graph/logistic_model.svg
+```
+
+### Xgboost
+```shell
+code2flow src/models/xgboost_train_model.py -o docs/call-graph/xgboost_train_model.svg
+```
+
+```shell
+code2flow src/models/xgboost_model.py -o docs/call-graph/xgboost_model.svg
+```
+
+### utils
+```shell
+code2flow src/models/util_test.py -o docs/call-graph/util_test.svg
+```
+
+```shell
+code2flow src/models/util_predict_model_threshold.py -o docs/call-graph/util_predict_model_threshold.svg
+```
+
+```shell
+code2flow src/models/util_predict_model.py -o docs/call-graph/util_predict_model.svg
+```
+
+```shell
+code2flow src/models/util_model_comparison.py -o docs/call-graph/util_model_comparison.svg
+```
