@@ -138,6 +138,13 @@ Other:
 >* Appropriate human oversight measures to minimise risk;
 >* High level of robustness, security and accuracy."
 
+[A list of open problems in DeFi](https://mirror.xyz/0xemperor.eth/0guEj0CYt5V8J5AKur2_UNKyOhONr1QJaG4NGDF0YoQ?utm_source=tldrnewsletter)
+* Automated risk scoring of lending borrowing pools -> Increasingly important problem
+  *  One alternative way of looking at the problem would be, looking at a function for calculating the probability of default given the pool of assets you have.
+* Managing Risk for lenders and distributing risk/ Undercollateralized Loans
+  *  Tradfi is plagued by NPAs [(Nonperforming assets)] but still ultimately fall back to some sort of credit score establishment [[Spectral finance](https://www.spectral.finance/) solving this, but still an open problem].
+  *  But still, most credit score methods would rely on onchain history for credit establishment, we are moving towards privacy-centric defi is this approach extendable to that idea? [Homomorphic encryption could provide a solution]
+
 
 # Docs creation
 ## [pydeps](https://github.com/thebjorn/pydeps) Python module depenency visualization
@@ -181,11 +188,4 @@ code2flow src/models/util_predict_model.py -o docs/call-graph/util_predict_model
 ```shell
 code2flow src/models/util_model_comparison.py -o docs/call-graph/util_model_comparison.svg
 ```
-[A list of open problems in DeFi](https://mirror.xyz/0xemperor.eth/0guEj0CYt5V8J5AKur2_UNKyOhONr1QJaG4NGDF0YoQ?utm_source=tldrnewsletter)
-* Automated risk scoring of lending borrowing pools -> Increasingly important problem
-  *  One alternative way of looking at the problem would be, looking at a function for calculating the probability of default given the pool of assets you have.
-* Managing Risk for lenders and distributing risk/ Undercollateralized Loans
-  *  Tradfi is plagued by NPAs [(Nonperforming assets)] but still ultimately fall back to some sort of credit score establishment [[Spectral finance](https://www.spectral.finance/) solving this, but still an open problem].
-  *  But still, most credit score methods would rely on onchain history for credit establishment, we are moving towards privacy-centric defi is this approach extendable to that idea? [Homomorphic encryption could provide a solution]
-
 
