@@ -100,6 +100,69 @@ Other:
 
 
 
+# Docs creation
+## [pydeps](https://github.com/thebjorn/pydeps) Python module depenency visualization
+
+*Delete __init__.py and __main__.py* then run the following
+
+### App and clusters
+```shell
+pydeps src/app.py --max-bacon=5 --cluster --rankdir BT -o docs/module-dependency-graph/src-app-clustered.svg
+```
+
+### App and links
+Features, models, & visualization links:
+```shell
+pydeps src/app.py --only features models visualization --max-bacon=4 --rankdir BT -o docs/module-dependency-graph/src-feature-model-visualization.svg 
+```
+
+### Only features
+```shell
+pydeps src/app.py  --only features --max-bacon=5 --cluster --max-cluster-size=3  --rankdir BT -o docs/module-dependency-graph/src-features.svg 
+```
+
+### Only models
+```shell
+pydeps src/app.py  --only models --max-bacon=5 --cluster --max-cluster-size=15  --rankdir BT -o docs/module-dependency-graph/src-models.svg 
+```
+
+## [code2flow](https://github.com/scottrogowski/code2flow) Call graphs for a pretty good estimate of project structure
+### Logistic
+```shell
+code2flow src/models/logistic_train_model.py -o docs/call-graph/logistic_train_model.svg
+```
+
+```shell
+code2flow src/models/logistic_model.py -o docs/call-graph/logistic_model.svg
+```
+
+### Xgboost
+```shell
+code2flow src/models/xgboost_train_model.py -o docs/call-graph/xgboost_train_model.svg
+```
+
+```shell
+code2flow src/models/xgboost_model.py -o docs/call-graph/xgboost_model.svg
+```
+
+### utils
+```shell
+code2flow src/models/util_test.py -o docs/call-graph/util_test.svg
+```
+
+```shell
+code2flow src/models/util_predict_model_threshold.py -o docs/call-graph/util_predict_model_threshold.svg
+```
+
+```shell
+code2flow src/models/util_predict_model.py -o docs/call-graph/util_predict_model.svg
+```
+
+```shell
+code2flow src/models/util_model_comparison.py -o docs/call-graph/util_model_comparison.svg
+```
+
+
 # References
 
 ## Inspiration:
@@ -144,48 +207,4 @@ Other:
 * Managing Risk for lenders and distributing risk/ Undercollateralized Loans
   *  Tradfi is plagued by NPAs [(Nonperforming assets)] but still ultimately fall back to some sort of credit score establishment [[Spectral finance](https://www.spectral.finance/) solving this, but still an open problem].
   *  But still, most credit score methods would rely on onchain history for credit establishment, we are moving towards privacy-centric defi is this approach extendable to that idea? [Homomorphic encryption could provide a solution]
-
-
-# Docs creation
-## [pydeps](https://github.com/thebjorn/pydeps) Python module depenency visualization
-
-```shell
-pydeps src --max-bacon=3 --cluster --max-cluster-size=3  --rankdir BT -o docs/module-dependency-graph/src.svg 
-```
-
-## [code2flow](https://github.com/scottrogowski/code2flow) Call graphs for a pretty good estimate of project structure
-### Logistic
-```shell
-code2flow src/models/logistic_train_model.py -o docs/call-graph/logistic_train_model.svg
-```
-
-```shell
-code2flow src/models/logistic_model.py -o docs/call-graph/logistic_model.svg
-```
-
-### Xgboost
-```shell
-code2flow src/models/xgboost_train_model.py -o docs/call-graph/xgboost_train_model.svg
-```
-
-```shell
-code2flow src/models/xgboost_model.py -o docs/call-graph/xgboost_model.svg
-```
-
-### utils
-```shell
-code2flow src/models/util_test.py -o docs/call-graph/util_test.svg
-```
-
-```shell
-code2flow src/models/util_predict_model_threshold.py -o docs/call-graph/util_predict_model_threshold.svg
-```
-
-```shell
-code2flow src/models/util_predict_model.py -o docs/call-graph/util_predict_model.svg
-```
-
-```shell
-code2flow src/models/util_model_comparison.py -o docs/call-graph/util_model_comparison.svg
-```
 
