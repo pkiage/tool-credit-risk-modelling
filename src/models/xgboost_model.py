@@ -1,10 +1,10 @@
-from src.features.build_features import SplitDataset
+from  features.build_features import SplitDataset
 
-from src.models.xgboost_train_model import xgboost_train_model
-from src.models.xgboost_predict_model import xgboost_predit_model
-from src.models.xgboost_test_model import xgboost_test_model
+from  models.xgboost_train_model import xgboost_train_model
+from  models.xgboost_predict_model import xgboost_predit_model
+from  models.xgboost_test_model import xgboost_test_model
 
-from src.models.util_model_class import ModelClass
+from  models.util_model_class import ModelClass
 
 
 def xgboost_class(split_dataset: SplitDataset, currency: str):

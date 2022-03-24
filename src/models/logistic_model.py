@@ -1,10 +1,10 @@
-from src.features.build_features import SplitDataset
+from  features.build_features import SplitDataset
 
-from src.models.logistic_train_model import logistic_train_model
-from src.models.logistic_predict_model import logistic_predict_model
-from src.models.logistic_test_model import logistic_test_model
+from  models.logistic_train_model import logistic_train_model
+from  models.logistic_predict_model import logistic_predict_model
+from  models.logistic_test_model import logistic_test_model
 
-from src.models.util_model_class import ModelClass
+from  models.util_model_class import ModelClass
 
 
 def logistic_class(split_dataset: SplitDataset, currency: str) -> ModelClass:

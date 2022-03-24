@@ -10,9 +10,9 @@ import pandas as pd
 
 from numpy import argmax
 
-from src.visualization.metrics import streamlit_2columns_metrics_df, streamlit_2columns_metrics_pct_df
+from  visualization.metrics import streamlit_2columns_metrics_df, streamlit_2columns_metrics_pct_df
 
-from src.visualization.graphs_threshold import acceptance_rate_driven_threshold_graph
+from  visualization.graphs_threshold import acceptance_rate_driven_threshold_graph
 
 
 def model_probability_values_df(model, X):

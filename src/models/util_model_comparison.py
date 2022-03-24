@@ -1,18 +1,18 @@
 from typing import OrderedDict
 import streamlit as st
 from sklearn.metrics import roc_auc_score
-from src.features.util_build_features import SplitDataset
-from src.visualization.graphs_settings import (
+from  features.util_build_features import SplitDataset
+from  visualization.graphs_settings import (
     streamlit_chart_setting_height_width
 )
 
-from src.visualization.graphs_test import (
+from  visualization.graphs_test import (
     roc_auc_compare_n_models,
     calibration_curve_report_commented_n
 )
 
 
-from src.models.util_model_class import ModelClass
+from  models.util_model_class import ModelClass
 
 
 def roc_auc_for_model(split_dataset: SplitDataset, model_view: ModelClass):

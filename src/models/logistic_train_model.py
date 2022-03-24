@@ -1,11 +1,11 @@
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from src.features.build_features import SplitDataset
+from  features.build_features import SplitDataset
 import streamlit as st
 import pandas as pd
 
-from src.visualization.graphs_logistic import plot_logistic_coeff_barh
+from  visualization.graphs_logistic import plot_logistic_coeff_barh
 
 
 @st.cache(suppress_st_warning=True)

@@ -6,14 +6,14 @@ import pandas as pd
 import streamlit as st
 
 
-from src.features.util_build_features import (
+from  features.util_build_features import (
     Dataset,
     SplitDataset,
     undersample_training_data,
     select_predictors,
     import_data)
 
-from src.visualization.metrics import (
+from  visualization.metrics import (
     streamlit_2columns_metrics_df_shape,
     streamlit_2columns_metrics_series,
     streamlit_2columns_metrics_pct_series,

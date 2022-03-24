@@ -10,13 +10,13 @@ from sklearn.metrics import (
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 from xgboost.sklearn import XGBClassifier
-from src.features.util_build_features import SplitDataset
-"""from src.models.model_utils import (
+from  features.util_build_features import SplitDataset
+"""from  models.model_utils import (
     create_cross_validation_df,
     cross_validation_scores,
     get_df_trueStatus_probabilityDefault_threshStatus_loanAmount,
 )"""
-from src.visualization.graphs_test import (
+from  visualization.graphs_test import (
     cross_validation_graph,
 )
 

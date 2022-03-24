@@ -4,7 +4,7 @@ from sklearn.metrics import roc_curve
 
 from typing import OrderedDict
 
-from src.models.util_model_class import ModelClass
+from  models.util_model_class import ModelClass
 
 from sklearn.calibration import calibration_curve
 

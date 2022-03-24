@@ -7,9 +7,9 @@ import pandas as pd
 from dataclasses import dataclass
 
 from xgboost import XGBClassifier
-from src.features.util_build_features import SplitDataset
+from  features.util_build_features import SplitDataset
 
-from src.models.util_predict_model_threshold import (
+from  models.util_predict_model_threshold import (
     user_defined_probability_threshold,
     J_statistic_driven_probability_threshold,
     tradeoff_threshold,

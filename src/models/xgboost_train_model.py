@@ -2,15 +2,15 @@ import pickle
 
 import numpy as np
 import xgboost as xgb
-from src.features.build_features import SplitDataset
+from  features.build_features import SplitDataset
 import streamlit as st
 
-from src.visualization.graphs_decision_tree import(plot_importance_gbt,
+from  visualization.graphs_decision_tree import(plot_importance_gbt,
                                                    plot_tree_gbt)
 
-from src.visualization.graphs_settings import streamlit_chart_setting_height_width
+from  visualization.graphs_settings import streamlit_chart_setting_height_width
 
-from src.visualization.graphs_download import (download_importance_gbt,
+from  visualization.graphs_download import (download_importance_gbt,
                                                download_tree_gbt)
 
 
