@@ -56,9 +56,9 @@ python setup.py build
 python setup.py install
 ```
 
-### Run the streamlit app (app.py) by running the following in terminal:
+### Run the streamlit app (app.py) by running the following in terminal (from repository root folder):
 
-streamlit run app.py
+streamlit run src/app.py
 
 ## Deployed setup details
 For faster model building and testing (particularly XGBoost) a local setup or on a more powerful server than free heroku dyno type is recommended. ([tutorials on  servers for data science & ML](https://course.fast.ai))
