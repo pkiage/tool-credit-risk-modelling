@@ -106,6 +106,23 @@ Sleeps: yes
 
 [Enabled Autodeploy from Github](https://devcenter.heroku.com/articles/github-integration)
 
+[Manual deploy to Heroku](https://devcenter.heroku.com/articles/git#deploy-your-code)
+
+From main branch:
+```shell
+heroku login
+
+git push heroku main
+```
+
+From branch beside main:
+
+```shell
+heroku login
+
+git push heroku branch_name:main
+```
+
 # Roadmap
 
 To view/submit ideas as well as contribute please view issues.
