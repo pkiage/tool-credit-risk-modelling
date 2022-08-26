@@ -92,6 +92,18 @@ streamlit run src/app.py
 
 For faster model building and testing (particularly XGBoost) a local setup or on a more powerful server than free heroku dyno type is recommended. ([tutorials on servers for data science & ML](https://course.fast.ai))
 
+⚠️⚠️⚠️
+
+***UPDATE: In [Heroku’s Next Chapter](https://blog.heroku.com/next-chapter) free dynos will be removed starting [November 28, 2022](https://help.heroku.com/RSBRUH58/removal-of-heroku-free-product-plans-faq)***
+
+*[Hosting Streamlit app would require](https://discuss.streamlit.io/t/can-i-host-streamlit-on-now-sh-vercel/3189) a Platform as a service (PaaS) since [Streamlit apps aren't static thus can't run on static web host](https://discuss.streamlit.io/t/hosting-streamlit-on-github-pages/356/2).*
+
+*Viable alternatives include AWS, Azure, GCP, DigitalOcean etc.* 
+
+*Platforms such as Github Pages, Netifly, & Vercel currenty mostly require the app to [output a static website](https://answers.netlify.com/t/how-to-run-streamlit-hello-on-netlify/11899/2) since most of those services will not run Python ([or any server process](https://answers.netlify.com/t/support-guide-can-i-run-a-web-server-http-listener-and-or-database-at-netlify/3078)) at browse time. Netifly for instance is designed for the [Jamstack](https://jamstack.org/) that doesn't depend on a "web server". Vercel on the other hand requires either a [`handler` that inherits from the `BaseHTTPRequestHandler` class or an app that exposes a WSGI or ASGI Application](https://vercel.com/docs/runtimes#advanced-usage/advanced-python-usage) - [Tornado](https://www.tornadoweb.org/en/stable/index.html?highlight=wsgi#threads-and-wsgi) a [dependency of Streamlit](https://openbase.com/python/streamlit/dependencies) is [currently not compatible with WSGI](https://www.reddit.com/r/learnpython/comments/grmjfo/comment/fs4elmx/).*
+
+⚠️⚠️⚠️
+
 [Free Heroku dyno type](https://devcenter.heroku.com/articles/dyno-types) was used to deploy the app
 
 Memory (RAM): 512 MB
