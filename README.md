@@ -116,9 +116,7 @@ Dedicated: no
 
 Sleeps: yes
 
-[Enabled Autodeploy from Github](https://devcenter.heroku.com/articles/github-integration)
-
-[Manual deploy to Heroku](https://devcenter.heroku.com/articles/git#deploy-your-code)
+[Enabled Autodeploy from Github](https://devcenter.heroku.com/articles/github-integration) if want to [manually deploy to Heroku](https://devcenter.heroku.com/articles/git#deploy-your-code) the steps are as follows:
 
 From main branch:
 ```shell
