@@ -5,6 +5,16 @@ FROM python:3.9
 
 RUN apt update 
 
+RUN apt install -y graphviz
+
+WORKDIR /code
+
+COPY ./requirements.txt /code/requirements.txt
+
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+COPY . .
+
 # Set up a new user named "user" with user ID 1000
 RUN useradd -m -u 1000 user
 
@@ -21,14 +31,6 @@ WORKDIR $HOME/app
 # Copy the current directory contents into the container at $HOME/app setting the owner to the user
 COPY --chown=user . $HOME/app
 
-RUN sudo apt install -y graphviz
-
-# WORKDIR /code
-
-COPY ./requirements.txt $HOME/app/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade -r $HOME/app/requirements.txt
-
-COPY . .
-
 CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0"]
+
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
