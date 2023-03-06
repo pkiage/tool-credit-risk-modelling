@@ -105,6 +105,7 @@ git remote add space https://huggingface.co/spaces/pkiage/credit_risk_modeling_d
 git push --force space main
 ```
 - [When syncing with Hugging Face via Github Actions](https://huggingface.co/docs/hub/spaces-github-actions) the [User Access Token](https://huggingface.co/docs/hub/security-tokens) created on Hugging Face (HF) should have write access
+- Run space from main branch since running from [other branches currently isn't suppported](https://discuss.huggingface.co/t/is-it-possible-to-run-apps-off-of-non-main-branches-in-a-space/18086)
 
 # Roadmap
 
