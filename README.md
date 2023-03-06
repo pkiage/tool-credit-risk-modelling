@@ -1,3 +1,14 @@
+---
+title: Credit Risk Modeling
+emoji: 📈
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 8501
+pinned: false
+license: openrail
+---
+
 # Credit Risk Modelling
 
 # About
@@ -72,68 +83,29 @@ pip install -r requirements.txt
 
 https://graphviz.org/download/
 
-## Build and install local package
-
-```shell
-python setup.py build
-```
-
-```shell
-python setup.py install
-```
 
 ### Run the streamlit app (app.py) by running the following in terminal (from repository root folder):
 
 ```shell
-streamlit run src/app.py
+streamlit app.py
 ```
 
 ## Deployed setup details
 
-For faster model building and testing (particularly XGBoost) a local setup or on a more powerful server than free heroku dyno type is recommended. ([tutorials on servers for data science & ML](https://course.fast.ai))
+**Hugging Face Space Deployment Tips**
 
-⚠️⚠️⚠️
-
-***UPDATE: In [Heroku’s Next Chapter](https://blog.heroku.com/next-chapter) free dynos will be removed starting [November 28, 2022](https://help.heroku.com/RSBRUH58/removal-of-heroku-free-product-plans-faq)***
-
-*[Hosting Streamlit app would require](https://discuss.streamlit.io/t/can-i-host-streamlit-on-now-sh-vercel/3189) a Platform as a service (PaaS) since [Streamlit apps aren't static thus can't run on static web host](https://discuss.streamlit.io/t/hosting-streamlit-on-github-pages/356/2).*
-
-*Viable alternatives include paid services such as AWS, Azure, GCP, DigitalOcean, Heroku, [Replit](https://replit.com/heroku) paid version (due to Repl Resources used) etc.* 
-
-*Platforms such as Github Pages, Netifly, & Vercel currenty mostly require the app to [output a static website](https://answers.netlify.com/t/how-to-run-streamlit-hello-on-netlify/11899/2) since most of those services will not run Python ([or any server process](https://answers.netlify.com/t/support-guide-can-i-run-a-web-server-http-listener-and-or-database-at-netlify/3078)) at browse time. Netifly for instance is designed for the [Jamstack](https://jamstack.org/) that doesn't depend on a "web server". Vercel on the other hand requires either a [`handler` that inherits from the `BaseHTTPRequestHandler` class or an app that exposes a WSGI or ASGI Application](https://vercel.com/docs/runtimes#advanced-usage/advanced-python-usage) - [Tornado](https://www.tornadoweb.org/en/stable/index.html?highlight=wsgi#threads-and-wsgi) a [dependency of Streamlit](https://openbase.com/python/streamlit/dependencies) is [currently not compatible with WSGI](https://www.reddit.com/r/learnpython/comments/grmjfo/comment/fs4elmx/).*
-
-Currently hosted on [Streamlit Community Cloud](https://blog.streamlit.io/host-your-streamlit-app-for-free/)
-
-⚠️⚠️⚠️
-
-[Free Heroku dyno type](https://devcenter.heroku.com/articles/dyno-types) was used to deploy the app
-
-Memory (RAM): 512 MB
-
-CPU Share: 1x
-
-Compute: 1x-4x
-
-Dedicated: no
-
-Sleeps: yes
-
-[Enabled Autodeploy from Github](https://devcenter.heroku.com/articles/github-integration) if want to [manually deploy to Heroku](https://devcenter.heroku.com/articles/git#deploy-your-code) the steps are as follows:
-
-From main branch:
-```shell
-heroku login
-
-git push heroku main
-```
-
-From branch beside main:
+Initial Setup
+- [When creating the Spaces Configuration Reference](https://huggingface.co/docs/hub/spaces-config-reference) check logs to specify the [Docker Space](https://huggingface.co/docs/hub/spaces-sdks-docker) app_port based on build
+- In Dockerfile bind Streamlit to a port e.g. 0.0.0.0
+- [Install Graphiz on Debian](https://installati.one/debian/11/graphviz/) rather than use Streamlit Space to solve ```failed to execute posixpath('dot'), make sure the graphviz executables are on your systems' path``` error given don't have access to terminal with Streamlit Space
 
 ```shell
-heroku login
+git remote add space https://huggingface.co/spaces/pkiage/credit_risk_modeling_demo
 
-git push heroku branch_name:main
+git push --force space main
 ```
+- [When syncing with Hugging Face via Github Actions](https://huggingface.co/docs/hub/spaces-github-actions) the [User Access Token](https://huggingface.co/docs/hub/security-tokens) created on Hugging Face (HF) should have write access
+- Run space from main branch since running from [other branches currently isn't suppported](https://discuss.huggingface.co/t/is-it-possible-to-run-apps-off-of-non-main-branches-in-a-space/18086)
 
 # Roadmap
 
@@ -223,11 +195,3 @@ code2flow src/models/util_model_comparison.py -o docs/call-graph/util_model_comp
 [A Gentle Introduction to Threshold-Moving for Imbalanced Classification](https://machinelearningmastery.com/threshold-moving-for-imbalanced-classification/)
 
 - Selecting optimal threshold using Youden's J statistic
-
-[Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/)
-
-- Project structure
-
-[GraphViz Buildpack](https://github.com/weibeld/heroku-buildpack-graphviz)
-
-- Buildpack used for Heroku deployment

@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression
 
 
 @dataclass(frozen=True)
-class ModelClass:
+class ModelView:
     model: Union[XGBClassifier, LogisticRegression]
     probability_threshold_selected: float
     predicted_default_status: pd.Series

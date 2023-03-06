@@ -1,19 +1,13 @@
-from typing import List, Union, cast, Tuple
-from dataclasses import dataclass
-from sklearn.model_selection import train_test_split
-import pandas as pd
+from typing import Tuple, cast
 
+import pandas as pd
 import streamlit as st
 
-
-from  features.util_build_features import (
-    Dataset,
-    SplitDataset,
+from common.data import Dataset, SplitDataset
+from common.util import (
     undersample_training_data,
-    select_predictors,
-    import_data)
-
-from  visualization.metrics import (
+)
+from common.views import (
     streamlit_2columns_metrics_df_shape,
     streamlit_2columns_metrics_series,
     streamlit_2columns_metrics_pct_series,
@@ -22,9 +16,22 @@ from  visualization.metrics import (
 )
 
 
+# Initialize dataframe session state
 def initialise_data() -> Tuple[Dataset, SplitDataset]:
-
-    dataset = import_data()
+    if "input_data_frame" not in st.session_state:
+        st.session_state.input_data_frame = pd.read_csv(
+            r"./data/processed/cr_loan_w2.csv"
+        )
+    if "dataset" not in st.session_state:
+        df = cast(pd.DataFrame, st.session_state.input_data_frame)
+        dataset = Dataset(
+            df=df,
+            random_state=123235,
+            test_size=40,
+        )
+        st.session_state.dataset = dataset
+    else:
+        dataset = st.session_state.dataset
 
     st.write(
         "Assuming data is already cleaned and relevant features (predictors) added."
@@ -34,11 +41,30 @@ def initialise_data() -> Tuple[Dataset, SplitDataset]:
         st.dataframe(dataset.df)
         streamlit_2columns_metrics_df_shape(dataset.df)
 
-    selected_x_values = select_predictors(dataset)
+    st.header("Predictors")
 
+    possible_columns = dataset.x_values_column_names
+
+    selected_columns = st.sidebar.multiselect(
+        label="Select Predictors",
+        options=possible_columns,
+        default=possible_columns,
+    )
+
+    selected_x_values = dataset.x_values_filtered_columns(selected_columns)
+
+    st.sidebar.metric(
+        label="# of Predictors Selected",
+        value=selected_x_values.shape[1],
+        delta=None,
+        delta_color="normal",
+    )
     with st.expander("Predictors Dataframe (X)"):
         st.dataframe(selected_x_values)
         streamlit_2columns_metrics_df_shape(selected_x_values)
+
+    # 40% of data used for training
+    # 14321 as random seed for reproducability
 
     st.header("Split Testing and Training Data")
 
@@ -62,6 +88,7 @@ def initialise_data() -> Tuple[Dataset, SplitDataset]:
 
     split_dataset = dataset.train_test_split(selected_x_values)
 
+    # Series
     true_status = split_dataset.y_test.to_frame().value_counts()
 
     st.sidebar.metric(
