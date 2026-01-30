@@ -172,3 +172,4 @@ apps/gradio/flagged/
 .claude_skills/
 claude_skills/
 skills/
+.prompts/
