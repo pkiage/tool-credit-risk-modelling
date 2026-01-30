@@ -59,7 +59,8 @@ class LoanDataset(BaseModel):
 
     Attributes:
         applications: List of loan applications.
-        labels: List of loan status labels (0=paid, 1=default) corresponding to applications.
+        labels: List of loan status labels (0=paid, 1=default) corresponding
+            to applications.
         test_size: Fraction of data reserved for testing (0.1-0.5).
         random_state: Random seed for reproducibility.
     """
