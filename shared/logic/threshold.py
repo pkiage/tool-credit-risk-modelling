@@ -40,6 +40,14 @@ def find_optimal_threshold(
             f"Array length mismatch: y_true={len(y_true)}, y_proba={len(y_proba)}"
         )
 
+    # Check for degenerate cases (all same class)
+    unique_classes = np.unique(y_true)
+    if len(unique_classes) == 1:
+        raise ValueError(
+            f"Cannot calculate ROC curve with only one class present. "
+            f"Found only class {unique_classes[0]}"
+        )
+
     # Calculate ROC curve points
     fpr, tpr, thresholds = roc_curve(y_true, y_proba)
 
@@ -53,10 +61,26 @@ def find_optimal_threshold(
 
     # Get optimal threshold and corresponding metrics
     optimal_threshold = float(thresholds[optimal_idx])
+
+    # Handle inf/nan values from edge cases
+    if not np.isfinite(optimal_threshold):
+        optimal_threshold = 0.5  # Default fallback
+
     optimal_tpr = float(tpr[optimal_idx])
     optimal_fpr = float(fpr[optimal_idx])
+
+    # Handle nan values in TPR/FPR
+    if not np.isfinite(optimal_tpr):
+        optimal_tpr = 0.0
+    if not np.isfinite(optimal_fpr):
+        optimal_fpr = 0.0
+
     optimal_tnr = 1.0 - optimal_fpr  # specificity
     optimal_j = float(youden_j[optimal_idx])
+
+    # Handle nan in Youden's J
+    if not np.isfinite(optimal_j):
+        optimal_j = 0.0
 
     # Calculate precision and F1 at optimal threshold
     y_pred = (y_proba >= optimal_threshold).astype(int)

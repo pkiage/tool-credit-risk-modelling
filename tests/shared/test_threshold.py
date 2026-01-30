@@ -56,22 +56,18 @@ class TestFindOptimalThreshold:
         y_true = np.array([0, 0, 0, 0])
         y_proba = np.array([0.1, 0.2, 0.3, 0.4])
 
-        result = find_optimal_threshold(y_true, y_proba)
-
-        # With no positive class, sensitivity should be 0 or undefined
-        # Specificity should be high
-        assert result.specificity >= 0.5
+        # Should raise error with only one class
+        with pytest.raises(ValueError, match="only one class"):
+            find_optimal_threshold(y_true, y_proba)
 
     def test_all_ones(self):
         """Test with all positive class samples."""
         y_true = np.array([1, 1, 1, 1])
         y_proba = np.array([0.6, 0.7, 0.8, 0.9])
 
-        result = find_optimal_threshold(y_true, y_proba)
-
-        # With no negative class, specificity should be 0 or undefined
-        # Sensitivity should be high
-        assert result.sensitivity >= 0.5
+        # Should raise error with only one class
+        with pytest.raises(ValueError, match="only one class"):
+            find_optimal_threshold(y_true, y_proba)
 
     def test_random_seed_consistency(self):
         """Test that results are consistent for same input."""
