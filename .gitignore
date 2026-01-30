@@ -1,31 +1,33 @@
-*.png
-*.pyc
-venv
-.envrc
+# ========================================
+# Credit Risk Modelling - .gitignore
+# ========================================
 
-# Work In Progress
-*.ipynb
-
-# Virtual environment
-venv
-
-# Byte-compiled / optimized / DLL files
+# ----------------------------------------
+# Python - Byte-compiled / optimized / DLL
+# ----------------------------------------
 __pycache__/
 *.py[cod]
-
-# C extensions
+*$py.class
 *.so
 
-# Cache and similar
-catboost_info
-learning_rate_0.05
-learning_rate_0.5
-default
-catboost_model.bin
-
-# Distribution / packaging
-.Python
+# ----------------------------------------
+# Virtual environments
+# ----------------------------------------
+.venv/
+venv/
 env/
+ENV/
+.Python
+
+# ----------------------------------------
+# uv 
+# ----------------------------------------
+.uv/
+# uv.lock  # Uncomment if you want to ignore lock file
+
+# ----------------------------------------
+# Distribution / packaging
+# ----------------------------------------
 build/
 develop-eggs/
 dist/
@@ -37,71 +39,136 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
+# ----------------------------------------
+# Testing / coverage
+# ----------------------------------------
+.pytest_cache/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
+htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
 
-# Translations
-*.mo
-*.pot
+# ----------------------------------------
+# Type checking
+# ----------------------------------------
+.mypy_cache/
+.pyright/
 
-# Django stuff:
-*.log
+# ----------------------------------------
+# Linting 
+# ----------------------------------------
+.ruff_cache/
 
-# Sphinx documentation
-docs/_build/
+# ----------------------------------------
+# Node / Next.js
+# ----------------------------------------
+node_modules/
+.pnpm-store/
+apps/web/.next/
+apps/web/out/
+.vercel/
 
-# PyBuilder
-target/
-
-# DotEnv configuration
-.env
-
-# Database
-*.db
-*.rdb
-
-# Pycharm
-.idea
-
-# VS Code
-.vscode/
-
-# Spyder
-.spyproject/
-
-# Jupyter NB Checkpoints
+# ----------------------------------------
+# Jupyter / Marimo
+# ----------------------------------------
 .ipynb_checkpoints/
+*.ipynb
+.marimo/
 
-# exclude data from source control by default
+# ----------------------------------------
+# ML artifacts
+# ----------------------------------------
+catboost_info/
+learning_rate_0.05/
+learning_rate_0.5/
+default/
+catboost_model.bin
+*.pkl
+*.joblib
+*.h5
+*.onnx
+mlruns/
+models/
+artifacts/
+
+# ----------------------------------------
+# Data
+# ----------------------------------------
 /data/
+# If you want to keep raw data tracked:
+# !/data/raw/
+# /data/processed/
+# /data/interim/
 
-# Mac OS-specific storage files
-.DS_Store
+# ----------------------------------------
+# Logs
+# ----------------------------------------
+*.log
+logs/
+pip-log.txt
+pip-delete-this-directory.txt
 
-# vim
+# ----------------------------------------
+# Environment & Secrets
+# ----------------------------------------
+.env
+.env.local
+.env.*.local
+.envrc
+*.pem
+secrets/
+
+# ----------------------------------------
+# IDE / Editors
+# ----------------------------------------
+.idea/
+.vscode/
+.spyproject/
 *.swp
 *.swo
+*~
 
-# Mypy cache
-.mypy_cache/
+# ----------------------------------------
+# OS
+# ----------------------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------------------
+# Misc
+# ----------------------------------------
+*.png
+*.db
+*.rdb
+*.mo
+*.pot
+docs/_build/
+target/
+
+# ----------------------------------------
+# Gradio
+# ----------------------------------------
+apps/gradio/flagged/
+
+# ----------------------------------------
+# Claude Code
+# ----------------------------------------
+.claudeignore
+.claude/
+.claude_skills/
+claude_skills/
+skills/
