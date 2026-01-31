@@ -49,6 +49,7 @@ def _():
     from plotly.subplots import make_subplots
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import precision_recall_curve
     from sklearn.model_selection import train_test_split
     from xgboost import XGBClassifier
 
@@ -69,6 +70,7 @@ def _():
         make_subplots,
         np,
         pd,
+        precision_recall_curve,
         px,
         train_test_split,
         undersample_majority_class,
@@ -306,9 +308,7 @@ def _(mo):
 
 
 @app.cell
-def _(go, np, probas, y_test_arr):
-    from sklearn.metrics import precision_recall_curve
-
+def _(go, np, precision_recall_curve, probas, y_test_arr):
     fig_pr = go.Figure()
 
     for _mt, _yp in probas.items():
@@ -336,7 +336,7 @@ def _(go, np, probas, y_test_arr):
         height=500,
     )
     fig_pr
-    return (fig_pr, precision_recall_curve)
+    return (fig_pr,)
 
 
 @app.cell

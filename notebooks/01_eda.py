@@ -37,6 +37,8 @@ def _(mo):
 
 @app.cell
 def _():
+    import io
+
     import numpy as np
     import pandas as pd
     import plotly.express as px
@@ -45,7 +47,7 @@ def _():
 
     from shared import constants
 
-    return constants, go, make_subplots, np, pd, px
+    return constants, go, io, make_subplots, np, pd, px
 
 
 @app.cell
@@ -59,11 +61,9 @@ def _(mo):
 
 
 @app.cell
-def _(constants, pd, upload_widget):
+def _(constants, io, pd, upload_widget):
     if upload_widget.value:
         _bytes = upload_widget.value[0].contents
-        import io
-
         df = pd.read_csv(io.BytesIO(_bytes))
     else:
         df = pd.read_csv("data/processed/cr_loan_w2.csv")
