@@ -119,7 +119,7 @@ def _(mo):
 
 
 @app.cell
-def _(df, px, target):
+def _(constants, df, px, target):
     _counts = df[target].value_counts().reset_index()
     _counts.columns = [target, "count"]
     _counts[target] = _counts[target].map({0: "Non-Default", 1: "Default"})
@@ -129,7 +129,10 @@ def _(df, px, target):
         x=target,
         y="count",
         color=target,
-        color_discrete_map={"Non-Default": "#636EFA", "Default": "#EF553B"},
+        color_discrete_map={
+            "Non-Default": constants.COLOR_PRIMARY,
+            "Default": constants.COLOR_DANGER,
+        },
         title="Loan Default Distribution",
         text="count",
     )
@@ -145,7 +148,7 @@ def _(mo):
 
 
 @app.cell
-def _(df, make_subplots, go, numeric_cols, target):
+def _(constants, df, make_subplots, go, numeric_cols, target):
     _n = len(numeric_cols)
     _cols = 2
     _rows = (_n + 1) // _cols
@@ -155,7 +158,10 @@ def _(df, make_subplots, go, numeric_cols, target):
     for _i, _col in enumerate(numeric_cols):
         _r = _i // _cols + 1
         _c = _i % _cols + 1
-        for _label, _color in [(0, "#636EFA"), (1, "#EF553B")]:
+        for _label, _color in [
+            (0, constants.COLOR_PRIMARY),
+            (1, constants.COLOR_DANGER),
+        ]:
             _vals = df.loc[df[target] == _label, _col]
             fig_numeric.add_trace(
                 go.Histogram(
@@ -203,8 +209,8 @@ def _(categorical_encoded, constants, df, make_subplots, go, target):
     for _i, (_name, _cols) in enumerate(_cat_groups.items()):
         _labels = [c.replace(_name + "_", "") for c in _cols]
         for _label_val, _color, _legend in [
-            (0, "#636EFA", "Non-Default"),
-            (1, "#EF553B", "Default"),
+            (0, constants.COLOR_PRIMARY, "Non-Default"),
+            (1, constants.COLOR_DANGER, "Default"),
         ]:
             _subset = df[df[target] == _label_val]
             _counts = [int(_subset[c].sum()) for c in _cols]
@@ -271,7 +277,7 @@ def _(df, mo, numeric_cols):
 
 
 @app.cell
-def _(df, feature_select, px, target):
+def _(constants, df, feature_select, px, target):
     _col = feature_select.value
     _df_plot = df[[_col, target]].copy()
     _df_plot["Default Status"] = _df_plot[target].map({0: "Non-Default", 1: "Default"})
@@ -281,7 +287,10 @@ def _(df, feature_select, px, target):
         x="Default Status",
         y=_col,
         color="Default Status",
-        color_discrete_map={"Non-Default": "#636EFA", "Default": "#EF553B"},
+        color_discrete_map={
+            "Non-Default": constants.COLOR_PRIMARY,
+            "Default": constants.COLOR_DANGER,
+        },
         title=f"{_col} by Default Status",
     )
     fig_relationship

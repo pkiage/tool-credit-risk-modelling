@@ -162,6 +162,7 @@ def _(mo):
 def _(
     bins_slider,
     brier_score_loss,
+    constants,
     calculate_calibration_curve,
     go,
     y_proba_uncal,
@@ -179,7 +180,7 @@ def _(
             y=_cal_curve.prob_true,
             mode="lines+markers",
             name="Uncalibrated",
-            line={"color": "#EF553B"},
+            line={"color": constants.COLOR_DANGER},
         )
     )
     fig_cal_before.add_trace(
@@ -262,6 +263,7 @@ def _(
     brier_before,
     brier_score_loss,
     calculate_calibration_curve,
+    constants,
     go,
     make_subplots,
     method_selector,
@@ -290,7 +292,7 @@ def _(
             y=_cal_before.prob_true,
             mode="lines+markers",
             name="Uncalibrated",
-            line={"color": "#EF553B"},
+            line={"color": constants.COLOR_DANGER},
         ),
         row=1,
         col=1,
@@ -314,7 +316,7 @@ def _(
             y=_cal_after.prob_true,
             mode="lines+markers",
             name="Calibrated",
-            line={"color": "#00CC96"},
+            line={"color": constants.COLOR_SUCCESS},
         ),
         row=1,
         col=2,
@@ -365,7 +367,7 @@ def _(mo):
 
 
 @app.cell
-def _(go, make_subplots, y_proba_cal, y_proba_uncal):
+def _(constants, go, make_subplots, y_proba_cal, y_proba_uncal):
     fig_dist = make_subplots(
         rows=1,
         cols=2,
@@ -376,7 +378,7 @@ def _(go, make_subplots, y_proba_cal, y_proba_uncal):
         go.Histogram(
             x=y_proba_uncal,
             nbinsx=50,
-            marker_color="#EF553B",
+            marker_color=constants.COLOR_DANGER,
             opacity=0.7,
             name="Uncalibrated",
         ),
@@ -387,7 +389,7 @@ def _(go, make_subplots, y_proba_cal, y_proba_uncal):
         go.Histogram(
             x=y_proba_cal,
             nbinsx=50,
-            marker_color="#00CC96",
+            marker_color=constants.COLOR_SUCCESS,
             opacity=0.7,
             name="Calibrated",
         ),

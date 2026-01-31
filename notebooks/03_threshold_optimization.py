@@ -152,7 +152,7 @@ def _(find_optimal_threshold, y_proba, y_test):
 
 
 @app.cell
-def _(calculate_roc_curve, go, optimal, y_proba, y_test):
+def _(calculate_roc_curve, constants, go, optimal, y_proba, y_test):
     _roc = calculate_roc_curve(y_test, y_proba)
 
     fig_roc = go.Figure()
@@ -162,7 +162,7 @@ def _(calculate_roc_curve, go, optimal, y_proba, y_test):
             y=_roc.tpr,
             mode="lines",
             name="ROC Curve",
-            line={"color": "#636EFA"},
+            line={"color": constants.COLOR_PRIMARY},
         )
     )
     # Optimal point
@@ -172,7 +172,7 @@ def _(calculate_roc_curve, go, optimal, y_proba, y_test):
             y=[optimal.sensitivity],
             mode="markers+text",
             name=f"Optimal (J={optimal.youden_j:.3f})",
-            marker={"size": 12, "color": "#EF553B"},
+            marker={"size": 12, "color": constants.COLOR_DANGER},
             text=[f"t={optimal.threshold:.3f}"],
             textposition="top right",
         )
@@ -298,7 +298,7 @@ def _(mo):
 
 
 @app.cell
-def _(calculate_roc_curve, go, np, optimal, y_proba, y_test):
+def _(calculate_roc_curve, constants, go, np, optimal, y_proba, y_test):
     _roc = calculate_roc_curve(y_test, y_proba)
     _j_values = [t - f for t, f in zip(_roc.tpr, _roc.fpr)]
 
@@ -309,13 +309,13 @@ def _(calculate_roc_curve, go, np, optimal, y_proba, y_test):
             y=_j_values[: len(_roc.thresholds)],
             mode="lines",
             name="Youden's J",
-            line={"color": "#636EFA"},
+            line={"color": constants.COLOR_PRIMARY},
         )
     )
     fig_j.add_vline(
         x=optimal.threshold,
         line_dash="dash",
-        line_color="#EF553B",
+        line_color=constants.COLOR_DANGER,
         annotation_text=f"Optimal={optimal.threshold:.3f}",
     )
     fig_j.update_layout(
@@ -357,6 +357,7 @@ def _(mo):
 @app.cell
 def _(
     calculate_confusion_matrix,
+    constants,
     fn_cost_input,
     fp_cost_input,
     go,
@@ -387,13 +388,13 @@ def _(
             y=_costs,
             mode="lines",
             name="Total Cost",
-            line={"color": "#636EFA"},
+            line={"color": constants.COLOR_PRIMARY},
         )
     )
     fig_cost.add_vline(
         x=_best_t,
         line_dash="dash",
-        line_color="#EF553B",
+        line_color=constants.COLOR_DANGER,
         annotation_text=f"Min cost @ {_best_t:.2f}",
     )
     fig_cost.update_layout(
