@@ -57,7 +57,6 @@ refactor(api): extract training service
 ### Workflow
 
 1. **Start work:**
-
    ```bash
    git checkout main && git pull
    git checkout -b feature/[description]
@@ -66,7 +65,6 @@ refactor(api): extract training service
 2. **Commit frequently** — small, atomic commits
 
 3. **Push and PR:**
-
    ```bash
    git push -u origin feature/[description]
    gh pr create --title "feat(scope): description"
@@ -74,10 +72,78 @@ refactor(api): extract training service
 
 4. **Merge** — wait for review (don't self-merge)
 
+5. **After merge — CRITICAL:**
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+   Your local main is now up-to-date with merged changes.
+
+### Branch Hygiene
+
+**IMPORTANT: Avoid losing work**
+
+| Rule | Why |
+|------|-----|
+| Always push before switching branches | Unpushed commits can be lost |
+| Always PR before deleting branch | No PR = no record of changes |
+| Always pull main after merge | Local main won't have merged code otherwise |
+| Never work directly on main | Always use feature branches |
+
+**After PR is merged:**
+```bash
+# Update local main
+git checkout main
+git pull origin main
+
+# Delete local feature branch (optional, keeps things clean)
+git branch -d feature/[old-branch]
+```
+
+**If you downloaded files to wrong branch:**
+```bash
+# Before doing anything else, commit and push
+git add .
+git commit -m "wip: save work before branch switch"
+git push origin [current-branch]
+
+# Now safe to switch
+git checkout main
+git pull
+```
+
+**Recovering lost work:**
+```bash
+# If branch was deleted but commits exist
+git reflog  # Find the commit hash
+git checkout -b recovery-branch [commit-hash]
+```
+
 ### Claude Code Git Permissions
 
 Claude can: create branches, commit, push, create PRs
 Claude should NOT: merge PRs, force push, rebase shared branches
+
+### Pre-Flight Checklist (before starting any task)
+
+```bash
+# 1. Make sure you're on main and up-to-date
+git checkout main
+git pull origin main
+
+# 2. Verify clean state
+git status  # Should show "nothing to commit, working tree clean"
+
+# 3. Create feature branch
+git checkout -b feature/[description]
+```
+
+If `git status` shows uncommitted changes, either commit them or stash:
+```bash
+git stash  # Temporarily save changes
+# ... do your work ...
+git stash pop  # Restore changes later
+```
 
 ## Current Phase Tasks
 
@@ -92,7 +158,6 @@ Claude should NOT: merge PRs, force push, rebase shared branches
 ## Conventions
 
 ### Python (apps/api/, shared/, notebooks/)
-
 - Python 3.12+
 - Pydantic v2 (not v1 syntax)
 - `uv` for dependency management
@@ -102,14 +167,12 @@ Claude should NOT: merge PRs, force push, rebase shared branches
 - Docstrings required on all public functions/classes
 
 ### TypeScript (apps/web/)
-
 - TypeScript strict mode
 - Biome for linting and formatting
 - npm for dependency management
 - Interfaces must sync with Pydantic schemas in `shared/`
 
 ### Notebooks
-
 - Marimo only (no Jupyter)
 - Store as `.py` files (not `.ipynb`)
 - Import from `shared/` for schemas and logic
@@ -127,7 +190,6 @@ Claude should NOT: merge PRs, force push, rebase shared branches
 ## Schema Sync Protocol
 
 When Pydantic schemas in `shared/` change:
-
 1. Update the schema
 2. Run `uv run pytest tests/shared/`
 3. Regenerate TS interfaces (TBD: manual or codegen)
@@ -153,7 +215,6 @@ To use a skill, Claude reads the SKILL.md and follows its structure. Skills are 
 ### Adding Skills
 
 Place skill folders in `.claude_skills/`:
-
 ```
 .claude_skills/
 ├── rfc/
