@@ -219,8 +219,10 @@ def _(calculate_confusion_matrix, go, np, threshold_slider, y_proba, y_test):
     _cm = calculate_confusion_matrix(y_test, _y_pred)
 
     _labels = ["Non-Default", "Default"]
-    _z = [[_cm.true_negatives, _cm.false_positives],
-          [_cm.false_negatives, _cm.true_positives]]
+    _z = [
+        [_cm.true_negatives, _cm.false_positives],
+        [_cm.false_negatives, _cm.true_positives],
+    ]
     _text = [
         [f"TN={_cm.true_negatives}", f"FP={_cm.false_positives}"],
         [f"FN={_cm.false_negatives}", f"TP={_cm.true_positives}"],
@@ -335,7 +337,10 @@ def _(
     for _t in _thresholds:
         _yp = (y_proba >= _t).astype(np.int_)
         _cm = calculate_confusion_matrix(y_test, _yp)
-        _total = _cm.false_positives * fp_cost_input.value + _cm.false_negatives * fn_cost_input.value
+        _total = (
+            _cm.false_positives * fp_cost_input.value
+            + _cm.false_negatives * fn_cost_input.value
+        )
         _costs.append(_total)
 
     _min_idx = int(np.argmin(_costs))

@@ -274,9 +274,7 @@ def _(df, mo, numeric_cols):
 def _(df, feature_select, px, target):
     _col = feature_select.value
     _df_plot = df[[_col, target]].copy()
-    _df_plot["Default Status"] = _df_plot[target].map(
-        {0: "Non-Default", 1: "Default"}
-    )
+    _df_plot["Default Status"] = _df_plot[target].map({0: "Non-Default", 1: "Default"})
 
     fig_relationship = px.box(
         _df_plot,

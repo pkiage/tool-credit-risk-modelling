@@ -190,9 +190,7 @@ def _(
             if hasattr(_model, "feature_importances_"):
                 _feat_imp = {
                     f: float(v)
-                    for f, v in zip(
-                        constants.ALL_FEATURES, _model.feature_importances_
-                    )
+                    for f, v in zip(constants.ALL_FEATURES, _model.feature_importances_)
                 }
 
             _config = TrainingConfig(
@@ -301,9 +299,7 @@ def _(go, np, probas, y_test_arr):
         if len(_yp) == 0:
             continue
         _prec, _rec, _ = precision_recall_curve(y_test_arr, _yp)
-        fig_pr.add_trace(
-            go.Scatter(x=_rec, y=_prec, mode="lines", name=_mt)
-        )
+        fig_pr.add_trace(go.Scatter(x=_rec, y=_prec, mode="lines", name=_mt))
 
     # Baseline = prevalence
     if len(y_test_arr) > 0:
@@ -335,9 +331,7 @@ def _(mo):
 
 @app.cell
 def _(go, make_subplots, results):
-    _with_imp = {
-        mt: r for mt, r in results.items() if r.feature_importance is not None
-    }
+    _with_imp = {mt: r for mt, r in results.items() if r.feature_importance is not None}
 
     if _with_imp:
         _n = len(_with_imp)

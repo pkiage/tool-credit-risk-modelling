@@ -36,6 +36,10 @@ select = ["E", "F", "I", "N", "W", "UP"]
 [tool.ruff.format]
 quote-style = "double"
 
+[tool.ruff.lint.per-file-ignores]
+# Marimo cell functions receive classes/uppercase vars as arguments
+"notebooks/*.py" = ["N803", "N806"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["shared", "apps"]
 
