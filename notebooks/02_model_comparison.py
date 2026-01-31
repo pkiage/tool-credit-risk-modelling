@@ -361,7 +361,7 @@ def _(go, make_subplots, results):
         )
         fig_imp
     else:
-        go.Figure()  # empty
+        fig_imp = go.Figure()
     return (fig_imp,)
 
 
