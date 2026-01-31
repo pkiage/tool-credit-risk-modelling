@@ -1,11 +1,15 @@
 """Training endpoint router."""
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from apps.api.config import Settings
 from apps.api.dependencies import get_settings
 from apps.api.services.training import train_model
 from shared.schemas.training import TrainingConfig, TrainingResult
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -72,5 +76,6 @@ async def train(
         raise HTTPException(status_code=404, detail=f"Dataset not found: {e}")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid configuration: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Training failed: {e}")
+    except Exception:
+        logger.exception("Training failed unexpectedly")
+        raise HTTPException(status_code=500, detail="Internal server error")

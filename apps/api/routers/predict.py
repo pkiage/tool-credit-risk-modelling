@@ -1,9 +1,13 @@
 """Prediction endpoint router."""
 
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from apps.api.services.inference import predict
 from shared.schemas.prediction import PredictionRequest, PredictionResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -71,5 +75,6 @@ async def make_predictions(request: PredictionRequest) -> PredictionResponse:
         return response
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
+    except Exception:
+        logger.exception("Prediction failed unexpectedly")
+        raise HTTPException(status_code=500, detail="Internal server error")
