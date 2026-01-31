@@ -15,7 +15,7 @@ def test_settings() -> Settings:
     """Create test settings."""
     return Settings(
         debug=True,
-        default_dataset_path="data/raw/cr_loan_w2.csv",
+        default_dataset_path="data/processed/cr_loan_w2.csv",
         model_artifacts_path="test_artifacts/",
         log_level="DEBUG"
     )

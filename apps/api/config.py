@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Credit Risk API"
     debug: bool = False
-    default_dataset_path: str = "data/raw/cr_loan_w2.csv"
+    default_dataset_path: str = "data/processed/cr_loan_w2.csv"
     model_artifacts_path: str = "artifacts/"
     log_level: str = "INFO"
     cors_origins: list[str] = ["*"]  # Allow all for dev, restrict in production
