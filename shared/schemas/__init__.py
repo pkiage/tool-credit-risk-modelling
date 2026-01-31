@@ -14,6 +14,7 @@ from shared.schemas.metrics import (
     ROCCurveData,
     ThresholdResult,
 )
+from shared.schemas.model import ModelMetadata, PersistResponse
 from shared.schemas.prediction import (
     PredictionRequest,
     PredictionResponse,
@@ -36,6 +37,9 @@ __all__ = [
     "ModelMetrics",
     "ROCCurveData",
     "ThresholdResult",
+    # Model
+    "ModelMetadata",
+    "PersistResponse",
     # Prediction
     "PredictionRequest",
     "PredictionResponse",

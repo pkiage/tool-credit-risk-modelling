@@ -15,6 +15,7 @@ from shared.logic.preprocessing import (
     encode_home_ownership,
     encode_loan_grade,
     encode_loan_intent,
+    loan_application_to_feature_vector,
     undersample_majority_class,
 )
 from shared.logic.threshold import evaluate_threshold, find_optimal_threshold
@@ -34,6 +35,7 @@ __all__ = [
     "encode_home_ownership",
     "encode_loan_grade",
     "encode_loan_intent",
+    "loan_application_to_feature_vector",
     "undersample_majority_class",
     # Threshold
     "evaluate_threshold",

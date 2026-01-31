@@ -1,11 +1,10 @@
 """Training configuration and result schemas."""
 
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from shared.schemas.metrics import ModelMetrics
+from shared.schemas.metrics import ModelMetrics
 
 
 class TrainingConfig(BaseModel):
@@ -46,7 +45,7 @@ class TrainingResult(BaseModel):
 
     model_id: str = Field(description="Unique model identifier")
     model_type: str = Field(description="Model type")
-    metrics: "ModelMetrics" = Field(description="Model performance metrics")
+    metrics: ModelMetrics = Field(description="Model performance metrics")
     optimal_threshold: float = Field(
         ge=0, le=1, description="Optimal classification threshold"
     )
