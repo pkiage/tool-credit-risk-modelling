@@ -79,11 +79,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         """
         return {"status": "ok", "service": settings.app_name}
 
-    # Include routers (will be added later)
-    # from apps.api.routers import train, predict, models
-    # app.include_router(train.router, prefix="/train", tags=["training"])
-    # app.include_router(predict.router, prefix="/predict", tags=["prediction"])
-    # app.include_router(models.router, prefix="/models", tags=["models"])
+    # Include routers
+    from apps.api.routers import models, predict, train
+
+    app.include_router(train.router, prefix="/train", tags=["training"])
+    app.include_router(predict.router, prefix="/predict", tags=["prediction"])
+    app.include_router(models.router, prefix="/models", tags=["models"])
 
     return app
 
