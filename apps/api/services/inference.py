@@ -8,14 +8,7 @@ from numpy.typing import NDArray
 
 from apps.api.services.audit import emit_event
 from apps.api.services.model_store import get_model
-from shared import constants
 from shared.logic.evaluation import calculate_model_confidence
-from shared.logic.preprocessing import (
-    encode_default_on_file,
-    encode_home_ownership,
-    encode_loan_grade,
-    encode_loan_intent,
-)
 from shared.schemas.audit import PredictionAuditEvent
 from shared.schemas.loan import LoanApplication
 from shared.schemas.prediction import (
@@ -131,7 +124,10 @@ def predict(request: PredictionRequest) -> PredictionResponse:
     metadata = stored_model.metadata
 
     # Use specified threshold or model's optimal threshold
-    threshold = request.threshold if request.threshold is not None else metadata.threshold
+    if request.threshold is not None:
+        threshold = request.threshold
+    else:
+        threshold = metadata.threshold
 
     # Convert applications to feature matrix
     X = np.array([
@@ -140,7 +136,8 @@ def predict(request: PredictionRequest) -> PredictionResponse:
     ])
 
     # Get predictions
-    y_proba = model.predict_proba(X)[:, 1]  # Probability of default (class 1)
+    # Probability of default (class 1)
+    y_proba = model.predict_proba(X)[:, 1]
     y_pred = (y_proba >= threshold).astype(int)
 
     # Calculate confidence scores

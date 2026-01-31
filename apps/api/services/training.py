@@ -20,7 +20,9 @@ from shared.schemas.audit import TrainingAuditEvent
 from shared.schemas.training import TrainingConfig, TrainingResult
 
 
-def load_dataset_from_csv(filepath: str) -> tuple[NDArray[np.float64], NDArray[np.int_]]:
+def load_dataset_from_csv(
+    filepath: str,
+) -> tuple[NDArray[np.float64], NDArray[np.int_]]:
     """Load dataset from CSV file.
 
     Args:
@@ -37,7 +39,9 @@ def load_dataset_from_csv(filepath: str) -> tuple[NDArray[np.float64], NDArray[n
 
     # Validate required columns exist
     if constants.TARGET_COLUMN not in df.columns:
-        raise ValueError(f"Target column '{constants.TARGET_COLUMN}' not found in dataset")
+        raise ValueError(
+            f"Target column '{constants.TARGET_COLUMN}' not found in dataset"
+        )
 
     missing_features = [f for f in constants.ALL_FEATURES if f not in df.columns]
     if missing_features:
@@ -50,7 +54,9 @@ def load_dataset_from_csv(filepath: str) -> tuple[NDArray[np.float64], NDArray[n
     return X, y
 
 
-def create_model(model_type: str) -> LogisticRegression | XGBClassifier | RandomForestClassifier:
+def create_model(
+    model_type: str,
+) -> LogisticRegression | XGBClassifier | RandomForestClassifier:
     """Create sklearn/xgboost model instance.
 
     Args:
@@ -72,7 +78,9 @@ def create_model(model_type: str) -> LogisticRegression | XGBClassifier | Random
         raise ValueError(f"Unknown model type: {model_type}")
 
 
-def train_model(config: TrainingConfig, dataset_path: str | None = None) -> TrainingResult:
+def train_model(
+    config: TrainingConfig, dataset_path: str | None = None
+) -> TrainingResult:
     """Train a credit risk model.
 
     Args:
@@ -98,7 +106,10 @@ def train_model(config: TrainingConfig, dataset_path: str | None = None) -> Trai
 
     # Load dataset
     if dataset_path is None:
-        dataset_path = constants.DEFAULT_DATASET_PATH if hasattr(constants, 'DEFAULT_DATASET_PATH') else "data/raw/cr_loan_w2.csv"
+        if hasattr(constants, 'DEFAULT_DATASET_PATH'):
+            dataset_path = constants.DEFAULT_DATASET_PATH
+        else:
+            dataset_path = "data/raw/cr_loan_w2.csv"
 
     X, y = load_dataset_from_csv(dataset_path)
 
@@ -131,7 +142,9 @@ def train_model(config: TrainingConfig, dataset_path: str | None = None) -> Trai
     if hasattr(model, "feature_importances_"):
         feature_importance = {
             feature: float(importance)
-            for feature, importance in zip(constants.ALL_FEATURES, model.feature_importances_)
+            for feature, importance in zip(
+                constants.ALL_FEATURES, model.feature_importances_
+            )
         }
 
     # Store model in memory
