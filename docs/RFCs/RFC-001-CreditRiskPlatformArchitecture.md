@@ -351,11 +351,51 @@ See inline code examples above. Full implementation in:
 
 ## Questions and Discussion Topics
 
-1. **Model persistence backend** — Local filesystem, S3, or MLflow?
-2. **Auth strategy** — None for demo, API key, or OAuth?
-3. **Chart library for Next.js** — Recharts, Plotly.js, or Nivo?
-4. **TypeScript sync** — Manual or `datamodel-code-generator`?
-5. **Gradio placement** — Standalone HF Space or embedded in Next.js?
+### 1. Model persistence backend — Local filesystem, S3, or MLflow?
+
+**Decision: Local filesystem now, evaluate MLflow for Phase 5.**
+
+- The `POST /models/{id}/persist` endpoint already writes pickle + JSON metadata to `artifacts/`. This is the right choice for Phases 2-4: zero infrastructure dependencies, easy to inspect, and sufficient for single-instance deployment.
+- S3 is premature — it adds a cloud dependency, credential management, and network latency for a single-user demo tool. If deployment targets require it later, swapping the storage backend behind `model_store.py` is straightforward.
+- MLflow is the strongest Phase 5 candidate. It provides model versioning, experiment tracking, and a model registry — all things the platform will eventually need. But it's a heavy dependency to introduce before there's a clear multi-user or experiment-comparison requirement. Evaluate when the Marimo notebook layer is complete and users are comparing multiple model runs.
+- Pickle is acceptable for Phase 2 artifacts since models are only loaded by trusted code. Phase 5 should migrate to `joblib` (faster for numpy-heavy objects) or ONNX (portable, language-agnostic).
+
+### 2. Auth strategy — None for demo, API key, or OAuth?
+
+**Decision: None for Phases 2-3. API key for Phase 4. OAuth if multi-tenant is ever needed.**
+
+- The RFC explicitly lists multi-tenant auth as a non-goal. Adding auth now would slow down iteration on the core ML workflows (Marimo, Gradio, Next.js) without protecting anything valuable — the API is local-only and trains on a bundled demo dataset.
+- Phase 4 (when Next.js ships): add a simple API key via `X-API-Key` header, validated in a FastAPI dependency. This is a ~20-line change: one `Settings` field, one `Depends()` function, one middleware. It's enough to prevent accidental public exposure if deployed behind a URL.
+- OAuth/OIDC is only justified if the platform becomes multi-tenant (multiple users, per-user model storage, RBAC). The RFC says this is a non-goal, so don't build toward it unless requirements change.
+- When auth is added, lock down CORS origins at the same time (see RFC-002 Q3).
+
+### 3. Chart library for Next.js — Recharts, Plotly.js, or Nivo?
+
+**Decision: Recharts.**
+
+- The original Streamlit app used Plotly, so there's familiarity with its chart types. However, for Next.js the tradeoffs shift:
+  - **Recharts** — Built on React primitives (SVG components), tree-shakeable, small bundle (~45KB gzipped for typical usage), composable API that feels native in JSX. Best fit for a React-first codebase. Handles the needed chart types well: ROC curves (line), confusion matrices (heatmap/table), feature importance (bar), calibration curves (line).
+  - **Plotly.js** — Full-featured but heavy (~1MB min bundle even with partial imports). The `react-plotly.js` wrapper is a thin shim over the imperative Plotly API, not a React-native experience. Overkill for the 4-5 chart types this app needs.
+  - **Nivo** — Beautiful defaults, good for dashboards, but its API is more opinionated and less composable than Recharts. Smaller community and fewer escape hatches for custom interactions.
+- If 3D plots or advanced statistical charts become necessary later, Plotly can be added for specific pages without replacing Recharts globally.
+
+### 4. TypeScript sync — Manual or `datamodel-code-generator`?
+
+**Decision: `datamodel-code-generator` with manual review.**
+
+- The `shared/schemas/` layer now has 17 Pydantic models across 6 files. Manual translation to TypeScript interfaces is error-prone and will drift as schemas evolve — this is exactly the problem the shared layer was built to prevent.
+- `datamodel-code-generator` reads Pydantic models (via JSON Schema export) and generates TypeScript interfaces. Run it as a CI check or pre-commit hook: `datamodel-codegen --input-file-type jsonschema --output apps/web/src/types/generated.ts`.
+- The "with manual review" qualifier matters: generated types should be committed to git (not generated at build time) so that diffs are visible in PRs. A developer reviews the generated output for correctness before merging, especially for union types and optional fields where codegen can produce surprising results.
+- Alternative considered: `pydantic-to-typescript` — less maintained and doesn't support Pydantic v2 well. `datamodel-code-generator` has active maintenance and Pydantic v2 support.
+
+### 5. Gradio placement — Standalone HF Space or embedded in Next.js?
+
+**Decision: Standalone HF Space.**
+
+- Gradio's purpose in this architecture is stakeholder validation — showing non-technical users (risk officers, product managers) the model behavior before the Next.js UI is ready. These users should get a direct URL they can bookmark and revisit, not a page buried inside a developer-facing Next.js shell.
+- HF Spaces provides free hosting, zero-config deployment (Dockerfile or `app.py`), and a shareable URL. The Gradio app imports from `shared/` and calls the FastAPI API — it's a thin client, not a separate backend.
+- Embedding Gradio in Next.js via iframe is possible but creates a worse experience: inconsistent styling, iframe resizing issues, and a confusing navigation model where part of the app is React and part is Gradio.
+- The two UIs serve different audiences and have different lifecycles. Gradio can be iterated on quickly for stakeholder feedback while Next.js is being built. Once Next.js ships, the Gradio app becomes a secondary demo tool (conferences, HF community) rather than the primary UI.
 
 ---
 
