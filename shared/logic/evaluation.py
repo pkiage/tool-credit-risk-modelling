@@ -36,6 +36,9 @@ def calculate_roc_curve(
     """
     fpr, tpr, thresholds = roc_curve(y_true, y_proba)
 
+    # Replace inf values with finite values for JSON serialization
+    thresholds = np.where(np.isinf(thresholds), 1.0, thresholds)
+
     return ROCCurveData(
         fpr=fpr.tolist(), tpr=tpr.tolist(), thresholds=thresholds.tolist()
     )
