@@ -5,27 +5,13 @@ import pickle
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 
 from apps.api.config import Settings
 from apps.api.dependencies import get_settings
-from apps.api.services.model_store import ModelMetadata, get_model, list_models
+from apps.api.services.model_store import get_model, list_models
+from shared.schemas.model import ModelMetadata, PersistResponse
 
 router = APIRouter()
-
-
-class PersistResponse(BaseModel):
-    """Response from model persistence operation.
-
-    Attributes:
-        model_id: ID of the persisted model.
-        path: File path where model was saved.
-        instructions: Instructions for loading the model.
-    """
-
-    model_id: str
-    path: str
-    instructions: str
 
 
 @router.get("/", response_model=list[ModelMetadata])

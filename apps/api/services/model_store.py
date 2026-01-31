@@ -4,29 +4,11 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from shared.schemas.model import ModelMetadata
+
 # In-memory model store (session-scoped, not persisted)
 # In Phase 5, this will be replaced with persistent storage (filesystem, S3, MLflow)
 _model_store: dict[str, dict[str, Any]] = {}
-
-
-class ModelMetadata(BaseModel):
-    """Metadata for a stored model.
-
-    Attributes:
-        model_id: Unique identifier for the model.
-        model_type: Type of ML model (logistic_regression, xgboost, random_forest).
-        threshold: Optimal classification threshold.
-        roc_auc: Area under ROC curve.
-        accuracy: Test set accuracy.
-        created_at: Timestamp when model was trained.
-    """
-
-    model_id: str
-    model_type: str
-    threshold: float
-    roc_auc: float
-    accuracy: float
-    created_at: str
 
 
 class StoredModel(BaseModel):
@@ -53,7 +35,6 @@ def store_model(model_id: str, model: Any, metadata: ModelMetadata) -> None:
 
     Example:
         >>> from sklearn.linear_model import LogisticRegression
-        >>> model = LogisticRegression()
         >>> metadata = ModelMetadata(
         ...     model_id="model_123",
         ...     model_type="logistic_regression",
@@ -62,7 +43,7 @@ def store_model(model_id: str, model: Any, metadata: ModelMetadata) -> None:
         ...     accuracy=0.82,
         ...     created_at="2025-01-31T00:00:00"
         ... )
-        >>> store_model("model_123", model, metadata)
+        >>> store_model("model_123", LogisticRegression(), metadata)
     """
     _model_store[model_id] = {
         "model": model,

@@ -12,8 +12,9 @@ from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 from apps.api.services.audit import emit_event
-from apps.api.services.model_store import ModelMetadata, store_model
+from apps.api.services.model_store import store_model
 from shared import constants
+from shared.schemas.model import ModelMetadata
 from shared.logic.evaluation import evaluate_model
 from shared.logic.preprocessing import undersample_majority_class
 from shared.schemas.audit import TrainingAuditEvent
@@ -106,10 +107,7 @@ def train_model(
 
     # Load dataset
     if dataset_path is None:
-        if hasattr(constants, 'DEFAULT_DATASET_PATH'):
-            dataset_path = constants.DEFAULT_DATASET_PATH
-        else:
-            dataset_path = "data/raw/cr_loan_w2.csv"
+        dataset_path = "data/processed/cr_loan_w2.csv"
 
     X, y = load_dataset_from_csv(dataset_path)
 

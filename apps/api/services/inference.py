@@ -4,95 +4,17 @@ import uuid
 from datetime import datetime
 
 import numpy as np
-from numpy.typing import NDArray
 
 from apps.api.services.audit import emit_event
 from apps.api.services.model_store import get_model
 from shared.logic.evaluation import calculate_model_confidence
+from shared.logic.preprocessing import loan_application_to_feature_vector
 from shared.schemas.audit import PredictionAuditEvent
-from shared.schemas.loan import LoanApplication
 from shared.schemas.prediction import (
     PredictionRequest,
     PredictionResponse,
     PredictionResult,
 )
-
-
-def loan_application_to_features(application: LoanApplication) -> NDArray[np.float64]:
-    """Convert LoanApplication to feature vector.
-
-    Args:
-        application: Loan application with all required fields.
-
-    Returns:
-        Feature vector matching constants.ALL_FEATURES order.
-
-    Example:
-        >>> app = LoanApplication(
-        ...     person_age=25,
-        ...     person_income=50000.0,
-        ...     person_emp_length=3.0,
-        ...     loan_amnt=10000.0,
-        ...     loan_int_rate=10.5,
-        ...     loan_percent_income=0.2,
-        ...     cb_person_cred_hist_length=5,
-        ...     person_home_ownership="RENT",
-        ...     loan_intent="EDUCATION",
-        ...     loan_grade="B",
-        ...     cb_person_default_on_file="N"
-        ... )
-        >>> features = loan_application_to_features(app)
-        >>> assert features.shape == (27,)  # 7 numeric + 20 one-hot encoded
-    """
-    # Numeric features
-    numeric_values = [
-        float(application.person_age),
-        float(application.person_income),
-        float(application.person_emp_length),
-        float(application.loan_amnt),
-        float(application.loan_int_rate),
-        float(application.loan_percent_income),
-        float(application.cb_person_cred_hist_length),
-    ]
-
-    # One-hot encode categorical features
-    # Home ownership
-    home_ownership_encoded = [0.0] * 4  # MORTGAGE, OTHER, OWN, RENT
-    home_map = {"MORTGAGE": 0, "OTHER": 1, "OWN": 2, "RENT": 3}
-    home_ownership_encoded[home_map[application.person_home_ownership]] = 1.0
-
-    # Loan intent
-    loan_intent_encoded = [0.0] * 6  # DEBTCONSOLIDATION, EDUCATION, etc.
-    intent_map = {
-        "DEBTCONSOLIDATION": 0,
-        "EDUCATION": 1,
-        "HOMEIMPROVEMENT": 2,
-        "MEDICAL": 3,
-        "PERSONAL": 4,
-        "VENTURE": 5,
-    }
-    loan_intent_encoded[intent_map[application.loan_intent]] = 1.0
-
-    # Loan grade
-    loan_grade_encoded = [0.0] * 7  # A, B, C, D, E, F, G
-    grade_map = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6}
-    loan_grade_encoded[grade_map[application.loan_grade]] = 1.0
-
-    # Default on file
-    default_encoded = [0.0, 0.0]  # N, Y
-    default_map = {"N": 0, "Y": 1}
-    default_encoded[default_map[application.cb_person_default_on_file]] = 1.0
-
-    # Combine all features
-    all_features = (
-        numeric_values
-        + home_ownership_encoded
-        + loan_intent_encoded
-        + loan_grade_encoded
-        + default_encoded
-    )
-
-    return np.array(all_features, dtype=np.float64)
 
 
 def predict(request: PredictionRequest) -> PredictionResponse:
@@ -131,7 +53,7 @@ def predict(request: PredictionRequest) -> PredictionResponse:
 
     # Convert applications to feature matrix
     X = np.array([
-        loan_application_to_features(app)
+        loan_application_to_feature_vector(app)
         for app in request.applications
     ])
 
