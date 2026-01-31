@@ -1,7 +1,16 @@
 """Data preprocessing utilities for categorical encoding."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy.typing import NDArray
+
+from shared import constants
+
+if TYPE_CHECKING:
+    from shared.schemas.loan import LoanApplication
 
 # Categorical mappings based on loan schema
 HOME_OWNERSHIP_MAP = {"RENT": 0, "OWN": 1, "MORTGAGE": 2, "OTHER": 3}
@@ -221,3 +230,67 @@ def undersample_majority_class(
     rng.shuffle(sampled_indices)
 
     return X[sampled_indices], y[sampled_indices]
+
+
+def loan_application_to_feature_vector(
+    application: LoanApplication,
+) -> NDArray[np.float64]:
+    """Convert a LoanApplication to a feature vector matching constants.ALL_FEATURES.
+
+    Derives one-hot encoding from constants.CATEGORICAL_FEATURES_ENCODED column
+    names, ensuring the feature vector always stays in sync with the training
+    data format.
+
+    Args:
+        application: Loan application with all required fields.
+
+    Returns:
+        Feature vector of shape (len(constants.ALL_FEATURES),).
+
+    Example:
+        >>> from shared.schemas.loan import LoanApplication
+        >>> app = LoanApplication(
+        ...     person_age=25, person_income=50000.0, person_emp_length=3.0,
+        ...     loan_amnt=10000.0, loan_int_rate=10.5, loan_percent_income=0.2,
+        ...     cb_person_cred_hist_length=5, person_home_ownership="RENT",
+        ...     loan_intent="EDUCATION", loan_grade="B",
+        ...     cb_person_default_on_file="N"
+        ... )
+        >>> features = loan_application_to_feature_vector(app)
+        >>> assert features.shape == (len(constants.ALL_FEATURES),)
+    """
+    # Numeric features in constants.NUMERIC_FEATURES order
+    numeric_values = [
+        float(application.person_age),
+        float(application.person_income),
+        float(application.person_emp_length),
+        float(application.loan_amnt),
+        float(application.loan_int_rate),
+        float(application.loan_percent_income),
+        float(application.cb_person_cred_hist_length),
+    ]
+
+    # Map categorical field names to their application values
+    field_values = {
+        "person_home_ownership": application.person_home_ownership,
+        "loan_intent": application.loan_intent,
+        "loan_grade": application.loan_grade,
+        "cb_person_default_on_file": application.cb_person_default_on_file,
+    }
+
+    # One-hot encode from CATEGORICAL_FEATURES_ENCODED column names
+    # Column names follow the pattern: "{field_name}_{category_value}"
+    categorical_values: list[float] = []
+    for col_name in constants.CATEGORICAL_FEATURES_ENCODED:
+        matched = False
+        for field_name, field_value in field_values.items():
+            prefix = f"{field_name}_"
+            if col_name.startswith(prefix):
+                category = col_name[len(prefix):]
+                categorical_values.append(1.0 if field_value == category else 0.0)
+                matched = True
+                break
+        if not matched:
+            raise ValueError(f"Unknown encoded column: {col_name}")
+
+    return np.array(numeric_values + categorical_values, dtype=np.float64)
