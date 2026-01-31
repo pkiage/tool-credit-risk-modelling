@@ -72,9 +72,23 @@ def _():
 
 
 @app.cell
-def _(RandomForestClassifier, constants, np, pd, train_test_split):
-    # Train a model and split a calibration set
-    _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+def _(mo):
+    upload_widget = mo.ui.file(
+        filetypes=[".csv"],
+        label="Upload custom CSV (optional — uses default dataset if empty)",
+    )
+    upload_widget
+    return (upload_widget,)
+
+
+@app.cell
+def _(RandomForestClassifier, constants, np, pd, train_test_split, upload_widget):
+    if upload_widget.value:
+        import io
+
+        _df = pd.read_csv(io.BytesIO(upload_widget.value[0].contents))
+    else:
+        _df = pd.read_csv("data/processed/cr_loan_w2.csv")
     _X = _df[constants.ALL_FEATURES].values.astype(np.float64)
     _y = _df[constants.TARGET_COLUMN].values.astype(np.int_)
 

@@ -83,6 +83,16 @@ def _(mo):
 
 
 @app.cell
+def _(mo):
+    upload_widget = mo.ui.file(
+        filetypes=[".csv"],
+        label="Upload custom CSV (optional — uses default dataset if empty)",
+    )
+    upload_widget
+    return (upload_widget,)
+
+
+@app.cell
 def _(constants, mo):
     model_selector = mo.ui.multiselect(
         options=constants.MODEL_TYPES,
@@ -134,6 +144,7 @@ def _(
     train_test_split,
     undersample_majority_class,
     undersample_toggle,
+    upload_widget,
     uuid,
 ):
     # Only run when button is pressed
@@ -147,7 +158,12 @@ def _(
         y_test_arr = np.array([])
         probas: dict[str, np.ndarray] = {}
     else:
-        _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+        if upload_widget.value:
+            import io
+
+            _df = pd.read_csv(io.BytesIO(upload_widget.value[0].contents))
+        else:
+            _df = pd.read_csv("data/processed/cr_loan_w2.csv")
         _X = _df[constants.ALL_FEATURES].values.astype(np.float64)
         _y = _df[constants.TARGET_COLUMN].values.astype(np.int_)
 
