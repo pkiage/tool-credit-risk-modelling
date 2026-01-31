@@ -1,31 +1,44 @@
-[tool.poetry]
-name = "cookbook-data-viz-plotly"
-version = "0.0.1"
-description = "Credit risk model builder demonstration"
-authors = ["pkiage paul.r.kiage@gmail.com"]
+[project]
+name = "credit-risk-modelling"
+version = "0.1.0"
+description = "Credit risk model builder — production-grade monorepo"
+authors = [{ name = "pkiage", email = "paul.r.kiage@gmail.com" }]
+requires-python = ">=3.12"
 
-[tool.poetry.dependencies]
-python = ">=3.8,<3.11"
-pandas = "^1.4.0"
-numpy = "^1.22.1"
-matplotlib = "^3.5.1"
-seaborn = "^0.11.2"
-notebook = "^6.4.7"
-scikit-learn = "^1.0.2"
-xgboost = "^1.5.2"
-streamlit = "^1.4.0"
-plotly = "^5.5.0"
-graphviz = "^0.19.1"
-pillow = ">=9.0.1"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scikit-learn>=1.5",
+    "xgboost>=2.1",
+    "plotly>=5.22",
+    "pydantic>=2.7",
+    "marimo>=0.13",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-black = "^21.12b0"
-flake8 = "^4.0.1"
+[project.optional-dependencies]
+api = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
+    "pydantic-settings>=2.4",
+]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
 
-[tool.black]
-line-length = 79
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.hatch.build.targets.wheel]
+packages = ["shared", "apps"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
