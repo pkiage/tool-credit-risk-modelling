@@ -50,7 +50,6 @@ def _():
     import pandas as pd
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-    from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import train_test_split
 
     from shared import constants
@@ -62,7 +61,6 @@ def _():
     from shared.schemas.metrics import ThresholdResult
 
     return (
-        RandomForestClassifier,
         ThresholdResult,
         calculate_confusion_matrix,
         calculate_roc_curve,
@@ -83,18 +81,28 @@ def _(mo):
         filetypes=[".csv"],
         label="Upload custom CSV (optional — uses default dataset if empty)",
     )
-    upload_widget
-    return (upload_widget,)
+    model_type_selector = mo.ui.dropdown(
+        options=["random_forest", "logistic_regression", "xgboost"],
+        value="random_forest",
+        label="Model",
+    )
+    mo.hstack([upload_widget, model_type_selector])
+    return model_type_selector, upload_widget
 
 
 @app.cell
-def _(RandomForestClassifier, constants, np, pd, train_test_split, upload_widget):
+def _(constants, model_type_selector, np, pd, train_test_split, upload_widget):
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from xgboost import XGBClassifier
+
     if upload_widget.value:
         import io
 
         _df = pd.read_csv(io.BytesIO(upload_widget.value[0].contents))
     else:
         _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+
     _X = _df[constants.ALL_FEATURES].values.astype(np.float64)
     _y = _df[constants.TARGET_COLUMN].values.astype(np.int_)
 
@@ -102,7 +110,18 @@ def _(RandomForestClassifier, constants, np, pd, train_test_split, upload_widget
         _X, _y, test_size=0.2, random_state=42, stratify=_y
     )
 
-    _model = RandomForestClassifier(**constants.RANDOM_FOREST_PARAMS)  # type: ignore
+    _factories = {
+        "logistic_regression": lambda: LogisticRegression(
+            **constants.LOGISTIC_REGRESSION_PARAMS  # type: ignore
+        ),
+        "xgboost": lambda: XGBClassifier(
+            **constants.XGBOOST_PARAMS  # type: ignore
+        ),
+        "random_forest": lambda: RandomForestClassifier(
+            **constants.RANDOM_FOREST_PARAMS  # type: ignore
+        ),
+    }
+    _model = _factories[model_type_selector.value]()
     _model.fit(_X_train, _y_train)
     y_proba = _model.predict_proba(X_test)[:, 1]
     return X_test, y_proba, y_test
