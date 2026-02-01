@@ -50,7 +50,6 @@ def _():
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
     from sklearn.calibration import CalibratedClassifierCV
-    from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import brier_score_loss
     from sklearn.model_selection import train_test_split
 
@@ -59,7 +58,6 @@ def _():
 
     return (
         CalibratedClassifierCV,
-        RandomForestClassifier,
         brier_score_loss,
         calculate_calibration_curve,
         constants,
@@ -72,9 +70,33 @@ def _():
 
 
 @app.cell
-def _(RandomForestClassifier, constants, np, pd, train_test_split):
-    # Train a model and split a calibration set
-    _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+def _(mo):
+    upload_widget = mo.ui.file(
+        filetypes=[".csv"],
+        label="Upload custom CSV (optional — uses default dataset if empty)",
+    )
+    model_type_selector = mo.ui.dropdown(
+        options=["random_forest", "logistic_regression", "xgboost"],
+        value="random_forest",
+        label="Model",
+    )
+    mo.hstack([upload_widget, model_type_selector])
+    return model_type_selector, upload_widget
+
+
+@app.cell
+def _(constants, model_type_selector, np, pd, train_test_split, upload_widget):
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from xgboost import XGBClassifier
+
+    if upload_widget.value:
+        import io
+
+        _df = pd.read_csv(io.BytesIO(upload_widget.value[0].contents))
+    else:
+        _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+
     _X = _df[constants.ALL_FEATURES].values.astype(np.float64)
     _y = _df[constants.TARGET_COLUMN].values.astype(np.int_)
 
@@ -86,7 +108,18 @@ def _(RandomForestClassifier, constants, np, pd, train_test_split):
         _X_trainval, _y_trainval, test_size=0.25, random_state=42, stratify=_y_trainval
     )
 
-    base_model = RandomForestClassifier(**constants.RANDOM_FOREST_PARAMS)  # type: ignore
+    _factories = {
+        "logistic_regression": lambda: LogisticRegression(
+            **constants.LOGISTIC_REGRESSION_PARAMS  # type: ignore
+        ),
+        "xgboost": lambda: XGBClassifier(
+            **constants.XGBOOST_PARAMS  # type: ignore
+        ),
+        "random_forest": lambda: RandomForestClassifier(
+            **constants.RANDOM_FOREST_PARAMS  # type: ignore
+        ),
+    }
+    base_model = _factories[model_type_selector.value]()
     base_model.fit(X_train, y_train)
 
     y_proba_uncal = base_model.predict_proba(X_test)[:, 1]
@@ -129,6 +162,7 @@ def _(mo):
 def _(
     bins_slider,
     brier_score_loss,
+    constants,
     calculate_calibration_curve,
     go,
     y_proba_uncal,
@@ -146,7 +180,7 @@ def _(
             y=_cal_curve.prob_true,
             mode="lines+markers",
             name="Uncalibrated",
-            line={"color": "#EF553B"},
+            line={"color": constants.COLOR_DANGER},
         )
     )
     fig_cal_before.add_trace(
@@ -229,6 +263,7 @@ def _(
     brier_before,
     brier_score_loss,
     calculate_calibration_curve,
+    constants,
     go,
     make_subplots,
     method_selector,
@@ -257,7 +292,7 @@ def _(
             y=_cal_before.prob_true,
             mode="lines+markers",
             name="Uncalibrated",
-            line={"color": "#EF553B"},
+            line={"color": constants.COLOR_DANGER},
         ),
         row=1,
         col=1,
@@ -281,7 +316,7 @@ def _(
             y=_cal_after.prob_true,
             mode="lines+markers",
             name="Calibrated",
-            line={"color": "#00CC96"},
+            line={"color": constants.COLOR_SUCCESS},
         ),
         row=1,
         col=2,
@@ -332,7 +367,7 @@ def _(mo):
 
 
 @app.cell
-def _(go, make_subplots, y_proba_cal, y_proba_uncal):
+def _(constants, go, make_subplots, y_proba_cal, y_proba_uncal):
     fig_dist = make_subplots(
         rows=1,
         cols=2,
@@ -343,7 +378,7 @@ def _(go, make_subplots, y_proba_cal, y_proba_uncal):
         go.Histogram(
             x=y_proba_uncal,
             nbinsx=50,
-            marker_color="#EF553B",
+            marker_color=constants.COLOR_DANGER,
             opacity=0.7,
             name="Uncalibrated",
         ),
@@ -354,7 +389,7 @@ def _(go, make_subplots, y_proba_cal, y_proba_uncal):
         go.Histogram(
             x=y_proba_cal,
             nbinsx=50,
-            marker_color="#00CC96",
+            marker_color=constants.COLOR_SUCCESS,
             opacity=0.7,
             name="Calibrated",
         ),

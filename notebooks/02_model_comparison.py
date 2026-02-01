@@ -49,6 +49,7 @@ def _():
     from plotly.subplots import make_subplots
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import precision_recall_curve
     from sklearn.model_selection import train_test_split
     from xgboost import XGBClassifier
 
@@ -69,6 +70,7 @@ def _():
         make_subplots,
         np,
         pd,
+        precision_recall_curve,
         px,
         train_test_split,
         undersample_majority_class,
@@ -80,6 +82,16 @@ def _():
 def _(mo):
     mo.md("## Configuration")
     return
+
+
+@app.cell
+def _(mo):
+    upload_widget = mo.ui.file(
+        filetypes=[".csv"],
+        label="Upload custom CSV (optional — uses default dataset if empty)",
+    )
+    upload_widget
+    return (upload_widget,)
 
 
 @app.cell
@@ -134,6 +146,7 @@ def _(
     train_test_split,
     undersample_majority_class,
     undersample_toggle,
+    upload_widget,
     uuid,
 ):
     # Only run when button is pressed
@@ -147,7 +160,12 @@ def _(
         y_test_arr = np.array([])
         probas: dict[str, np.ndarray] = {}
     else:
-        _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+        if upload_widget.value:
+            import io
+
+            _df = pd.read_csv(io.BytesIO(upload_widget.value[0].contents))
+        else:
+            _df = pd.read_csv("data/processed/cr_loan_w2.csv")
         _X = _df[constants.ALL_FEATURES].values.astype(np.float64)
         _y = _df[constants.TARGET_COLUMN].values.astype(np.int_)
 
@@ -290,9 +308,7 @@ def _(mo):
 
 
 @app.cell
-def _(go, np, probas, y_test_arr):
-    from sklearn.metrics import precision_recall_curve
-
+def _(go, np, precision_recall_curve, probas, y_test_arr):
     fig_pr = go.Figure()
 
     for _mt, _yp in probas.items():
@@ -320,7 +336,7 @@ def _(go, np, probas, y_test_arr):
         height=500,
     )
     fig_pr
-    return (fig_pr, precision_recall_curve)
+    return (fig_pr,)
 
 
 @app.cell
@@ -361,7 +377,7 @@ def _(go, make_subplots, results):
         )
         fig_imp
     else:
-        go.Figure()  # empty
+        fig_imp = go.Figure()
     return (fig_imp,)
 
 
