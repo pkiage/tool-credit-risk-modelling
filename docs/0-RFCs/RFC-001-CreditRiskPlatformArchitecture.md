@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Draft |
+| Status | Accepted |
 | Author(s) | Claude |
-| Updated | 2025-01-30 |
+| Updated | 2026-02-01 |
 | GitHub Issue | — |
 | Obsoletes | — |
 
@@ -180,9 +180,12 @@ class TrainingConfig(BaseModel):
 
 class TrainingResult(BaseModel):
     model_id: str
+    model_type: str
     metrics: ModelMetrics
     optimal_threshold: float
     feature_importance: dict[str, float] | None
+    training_config: TrainingConfig
+    training_time_seconds: float
 
 # shared/schemas/metrics.py
 class ThresholdResult(BaseModel):
@@ -406,3 +409,4 @@ See inline code examples above. Full implementation in:
 | Date | Author | Changes |
 |------|--------|---------|
 | 2025-01-30 | Claude | Initial draft |
+| 2026-02-01 | Claude | Update status to Accepted, sync TrainingResult schema with implementation |
