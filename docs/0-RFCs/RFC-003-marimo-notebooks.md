@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Draft |
+| Status | Accepted |
 | Author(s) | [Your Name] |
-| Updated | 2025-01-31 |
+| Updated | 2026-02-01 |
 | Depends On | RFC-001, RFC-002 |
 
 ## Objective
@@ -86,9 +86,12 @@ notebooks/
 5. Feature importance comparison
 
 **Widgets:**
-- Model type multiselect (logistic, xgboost, random_forest)
+
+- Dataset selector (default or upload)
+- Model type multiselect (logistic_regression, xgboost, random_forest)
 - Test size slider (0.1 - 0.5)
 - Random state input
+- Undersample toggle
 - Train button
 
 **Integration:**
@@ -111,9 +114,11 @@ notebooks/
 6. Business impact calculator (cost of FP vs FN)
 
 **Widgets:**
+
+- Dataset selector (default or upload)
+- Model type dropdown (logistic_regression, xgboost, random_forest)
 - Threshold slider (0.0 - 1.0)
 - Cost inputs (false positive cost, false negative cost)
-- Model selector (from trained models)
 
 ---
 
@@ -129,8 +134,10 @@ notebooks/
 5. Before/after calibration comparison
 
 **Widgets:**
-- Model selector
-- Calibration method selector
+
+- Dataset selector (default or upload)
+- Model type dropdown (logistic_regression, xgboost, random_forest)
+- Calibration method selector (sigmoid, isotonic)
 - Number of bins slider
 
 ### Code Patterns
@@ -291,19 +298,47 @@ Requirements for Molab compatibility:
 - **One concept per notebook** — keep focused
 - **Progressive disclosure** — simple first, advanced options hidden
 - **Descriptive markdown** — explain what each section does
-- **Consistent styling** — same color palette across notebooks
+- **Consistent styling** — use `shared.constants.COLOR_PRIMARY`, `COLOR_DANGER`, `COLOR_SUCCESS` for all charts
 
 ## Questions and Discussion Topics
 
-1. **Data loading** — Bundle `cr_loan_w2.csv` or require upload?
-2. **API integration** — Include API call option or keep notebooks offline-only?
-3. **Chart theme** — Match future Next.js theme or Marimo defaults?
-4. **Molab limits** — Any compute/memory constraints to design around?
+### 1. Data loading — Bundle `cr_loan_w2.csv` or require upload?
+
+**Decision: Support both — default local path with upload widget fallback.**
+
+- Every notebook loads from `data/processed/cr_loan_w2.csv` by default for zero-friction local use. All four notebooks also expose a `mo.ui.file` upload widget so users can supply a custom CSV.
+- For Molab deployment the local path won't exist, so the upload widget becomes the primary data source. This satisfies the "no local file paths" Molab compatibility requirement without forcing uploads on local developers.
+- Bundling the CSV inside the notebook (e.g. base64-encoded) was considered but rejected — it bloats the `.py` file, makes git diffs noisy, and the dataset may change independently of notebook logic.
+
+### 2. API integration — Include API call option or keep notebooks offline-only?
+
+**Decision: Keep notebooks offline-only for now. Defer API toggle to a future phase.**
+
+- Notebooks import directly from `shared/logic/` and `shared/schemas/`. This is faster (no network round-trip), works offline, and avoids a dependency on a running API server — which matters for Molab deployment and quick local exploration.
+- The API toggle described in the original RFC (Option A vs Option B) adds complexity for marginal benefit at this stage. The API is tested separately via its own integration tests (RFC-002). Notebooks don't need to be an API test harness.
+- If API validation from notebooks becomes a requirement, add it as a separate notebook (e.g. `05_api_integration.py`) rather than a toggle in existing notebooks. This keeps each notebook focused on one concept.
+
+### 3. Chart theme — Match future Next.js theme or Marimo defaults?
+
+**Decision: Define a shared color palette in `shared/constants.py`. Defer full theme matching to Next.js phase.**
+
+- Three chart colors are now defined in `shared/constants.py`: `COLOR_PRIMARY` (`#636EFA`), `COLOR_DANGER` (`#EF553B`), `COLOR_SUCCESS` (`#00CC96`). All notebooks reference these constants instead of hardcoded hex values.
+- This gives a single point of change if the palette needs to evolve. When Next.js work begins (Recharts, per RFC-001 Q3), the design system can formalize the palette and these constants can be updated to match.
+- Full Plotly theme objects (template, font, background) are not worth configuring now — Plotly's defaults are clean and the notebooks are an exploration tool, not a branded product.
+
+### 4. Molab limits — Any compute/memory constraints to design around?
+
+**Decision: No constraints to design around currently. Revisit if dataset size grows.**
+
+- The current dataset (`cr_loan_w2.csv`) is ~29K rows with 26 features. Training a random forest or XGBoost model on this takes <2 seconds on a laptop. This is well within any reasonable Molab compute budget.
+- All notebooks use PEP 723 inline script metadata for dependencies, making them independently runnable without a full monorepo install. This is the correct pattern for Molab.
+- If larger datasets are introduced, the upload widget already provides a natural boundary — users choose what to upload. Add a dataset size warning (e.g. `mo.callout` for >100K rows) only if performance complaints arise.
 
 ---
 
 ## Revision History
 
-| Date | Author | Changes |
-|------|--------|---------|
-| 2025-01-31 | — | Initial draft |
+| Date       | Author | Changes                                            |
+|------------|--------|----------------------------------------------------|
+| 2025-01-31 | —      | Initial draft                                      |
+| 2026-02-01 | Claude | Answer open questions, update widget specs to match implementation |
