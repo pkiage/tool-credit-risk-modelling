@@ -1,11 +1,15 @@
 """Training tab component for the Gradio app."""
 
+import logging
 from typing import Any
 
+import httpx
 import plotly.graph_objects as go
 
 import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
+
+logger = logging.getLogger(__name__)
 
 
 def _build_roc_plot(roc_data: dict[str, Any], model_type: str) -> go.Figure:
@@ -151,7 +155,21 @@ def create_training_tab(
                 gr.update(visible=False, value=""),
                 training_results,
             )
+        except httpx.HTTPStatusError as exc:
+            try:
+                detail = exc.response.json().get("detail", str(exc))
+            except Exception:
+                detail = str(exc)
+            return (
+                [],
+                "",
+                "",
+                None,
+                gr.update(visible=True, value=f"Training failed: {detail}"),
+                training_results,
+            )
         except Exception as exc:
+            logger.exception("Training request failed")
             return (
                 [],
                 "",

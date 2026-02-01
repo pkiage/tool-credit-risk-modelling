@@ -1,9 +1,14 @@
 """Prediction tab component for the Gradio app."""
 
+import logging
 from typing import Any
+
+import httpx
 
 import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
+
+logger = logging.getLogger(__name__)
 
 
 def _refresh_model_choices(api: CreditRiskAPI) -> list[str]:
@@ -19,6 +24,7 @@ def _refresh_model_choices(api: CreditRiskAPI) -> list[str]:
         models = api.list_models()
         return [m["model_id"] for m in models]
     except Exception:
+        logger.exception("Failed to fetch model list")
         return []
 
 
@@ -172,7 +178,19 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
                 f"{threshold:.4f}",
                 gr.update(visible=False, value=""),
             )
+        except httpx.HTTPStatusError as exc:
+            try:
+                detail = exc.response.json().get("detail", str(exc))
+            except Exception:
+                detail = str(exc)
+            return (
+                "",
+                "",
+                "",
+                gr.update(visible=True, value=f"Prediction failed: {detail}"),
+            )
         except Exception as exc:
+            logger.exception("Prediction request failed")
             return (
                 "",
                 "",
