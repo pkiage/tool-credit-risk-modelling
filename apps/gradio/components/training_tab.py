@@ -6,6 +6,7 @@ import gradio as gr
 import plotly.graph_objects as go
 
 from apps.gradio.api_client import CreditRiskAPI
+from apps.gradio.components.comparison_tab import store_training_result
 
 
 def _build_roc_plot(roc_data: dict[str, Any], model_type: str) -> go.Figure:
@@ -123,6 +124,7 @@ def create_training_tab(api: CreditRiskAPI) -> None:
                 "test_size": selected_test_size,
             }
             result = api.train(config)
+            store_training_result(result["model_id"], result)
 
             metrics = result["metrics"]
             table_data = _format_metrics_table(metrics)
