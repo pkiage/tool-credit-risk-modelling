@@ -6,7 +6,7 @@
 
 Migrating a Streamlit credit risk modeling demo to a production-grade monorepo.
 
-**Status**: Phase 1 - Foundation (bootstrapping `shared/` layer)
+**Status**: Phase 4 complete — `shared/`, `apps/api/`, `notebooks/`, and `apps/gradio/` implemented and reviewed. Next: `apps/web/` (Next.js).
 
 ## Architecture
 
@@ -183,7 +183,10 @@ git stash pop  # Restore changes later
 
 | File | Purpose |
 |------|---------|
-| `docs/RFCs/RFC-001-*.md` | Architecture decision |
+| `docs/0-RFCs/RFC-001-*.md` | Architecture decision |
+| `docs/0-RFCs/RFC-002-*.md` | API layer design |
+| `docs/0-RFCs/RFC-003-*.md` | Marimo notebooks design |
+| `docs/0-RFCs/RFC-004-*.md` | Gradio app design |
 | `shared/schemas/loan.py` | Core data models |
 | `shared/logic/threshold.py` | Youden's J implementation |
 | `data/processed/cr_loan_w2.csv` | Training dataset (one-hot encoded) |
@@ -194,8 +197,9 @@ When Pydantic schemas in `shared/` change:
 
 1. Update the schema
 2. Run `uv run pytest tests/shared/`
-3. Regenerate TS interfaces (TBD: manual or codegen)
+3. Regenerate TS interfaces via `datamodel-code-generator` (see RFC-001 Q4)
 4. Update `apps/web/` components
+5. Verify `apps/gradio/` field mappings still match API contract
 
 ## Do NOT
 
