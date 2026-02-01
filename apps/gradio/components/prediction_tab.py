@@ -75,7 +75,7 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
         with gr.Column(scale=1):
             gr.Markdown("### Model & Prediction")
             model_selector = gr.Dropdown(
-                choices=_refresh_model_choices(api),
+                choices=[],
                 label="Select Model",
                 interactive=True,
             )
