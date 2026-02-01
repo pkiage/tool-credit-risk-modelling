@@ -85,7 +85,11 @@ Three-tab interface:
 
 - Model type dropdown (logistic_regression, xgboost, random_forest)
 - Test size slider (0.1 - 0.5)
-- Dataset selector (default or file upload)
+- ~~Dataset selector (default or file upload)~~ — **Removed.** The demo always
+  uses the default dataset (`data/processed/cr_loan_w2.csv`) via the API.
+  Custom dataset upload would require file-handling in both the Gradio app
+  and the API, adding complexity without stakeholder benefit — the demo's
+  purpose is to validate model behavior on the canonical dataset.
 - Train button
 - Results display:
   - Metrics table (accuracy, precision, recall, F1, ROC-AUC)

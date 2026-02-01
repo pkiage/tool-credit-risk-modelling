@@ -25,9 +25,7 @@ class TrainingConfig(BaseModel):
         default=0.2, ge=0.1, le=0.5, description="Test set fraction"
     )
     random_state: int = Field(default=42, description="Random seed for reproducibility")
-    undersample: bool = Field(
-        default=False, description="Undersample majority class"
-    )
+    undersample: bool = Field(default=False, description="Undersample majority class")
     cv_folds: int = Field(default=5, ge=2, le=10, description="CV folds")
 
 
@@ -41,6 +39,7 @@ class TrainingResult(BaseModel):
         optimal_threshold: Optimal classification threshold based on Youden's J.
         feature_importance: Feature importance scores (None for models without this).
         training_config: Configuration used for training.
+        training_time_seconds: Wall-clock time for model training in seconds.
     """
 
     model_id: str = Field(description="Unique model identifier")
@@ -53,3 +52,6 @@ class TrainingResult(BaseModel):
         default=None, description="Feature importance scores"
     )
     training_config: TrainingConfig = Field(description="Training configuration")
+    training_time_seconds: float = Field(
+        ge=0, description="Wall-clock training time in seconds"
+    )
