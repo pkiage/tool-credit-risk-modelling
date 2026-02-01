@@ -3,7 +3,6 @@
 from typing import Any
 
 import gradio as gr
-
 from apps.gradio.api_client import CreditRiskAPI
 
 
@@ -174,7 +173,12 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
                 gr.update(visible=False, value=""),
             )
         except Exception as exc:
-            return ("", "", "", gr.update(visible=True, value=f"Prediction failed: {exc}"))
+            return (
+                "",
+                "",
+                "",
+                gr.update(visible=True, value=f"Prediction failed: {exc}"),
+            )
 
     refresh_btn.click(fn=_refresh, inputs=[], outputs=[model_selector])
 
@@ -194,5 +198,10 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
             loan_grade,
             cb_default,
         ],
-        outputs=[prediction_result, probability_display, threshold_display, error_display],
+        outputs=[
+            prediction_result,
+            probability_display,
+            threshold_display,
+            error_display,
+        ],
     )

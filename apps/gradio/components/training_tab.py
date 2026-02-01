@@ -2,9 +2,9 @@
 
 from typing import Any
 
-import gradio as gr
 import plotly.graph_objects as go
 
+import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
 from apps.gradio.components.comparison_tab import store_training_result
 
@@ -93,9 +93,7 @@ def create_training_tab(api: CreditRiskAPI) -> None:
                 label="Model Metrics",
                 interactive=False,
             )
-            threshold_display = gr.Textbox(
-                label="Optimal Threshold", interactive=False
-            )
+            threshold_display = gr.Textbox(label="Optimal Threshold", interactive=False)
             model_id_display = gr.Textbox(label="Model ID", interactive=False)
             roc_plot = gr.Plot(label="ROC Curve")
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)
@@ -154,5 +152,11 @@ def create_training_tab(api: CreditRiskAPI) -> None:
     train_btn.click(
         fn=_train,
         inputs=[model_type, test_size],
-        outputs=[metrics_table, threshold_display, model_id_display, roc_plot, error_display],
+        outputs=[
+            metrics_table,
+            threshold_display,
+            model_id_display,
+            roc_plot,
+            error_display,
+        ],
     )

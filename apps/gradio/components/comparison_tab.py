@@ -2,9 +2,9 @@
 
 from typing import Any
 
-import gradio as gr
 import plotly.graph_objects as go
 
+import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
 
 # In-memory cache of training results keyed by model_id.
@@ -38,9 +38,7 @@ def _get_model_choices(api: CreditRiskAPI) -> list[str]:
         return []
 
 
-def _build_roc_overlay(
-    selected_ids: list[str], api: CreditRiskAPI
-) -> go.Figure | None:
+def _build_roc_overlay(selected_ids: list[str], api: CreditRiskAPI) -> go.Figure | None:
     """Build an overlay ROC plot for multiple models.
 
     Args:
