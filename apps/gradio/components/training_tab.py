@@ -68,9 +68,7 @@ def _format_metrics_table(metrics: dict[str, Any]) -> list[list[str]]:
     ]
 
 
-def create_training_tab(
-    api: CreditRiskAPI, training_results_state: gr.State
-) -> None:
+def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) -> None:
     """Create the training tab UI and wire up event handlers.
 
     Args:
@@ -102,9 +100,7 @@ def create_training_tab(
                 interactive=False,
             )
             threshold_display = gr.Textbox(label="Optimal Threshold", interactive=False)
-            training_time_display = gr.Textbox(
-                label="Training Time", interactive=False
-            )
+            training_time_display = gr.Textbox(label="Training Time", interactive=False)
             model_id_display = gr.Textbox(label="Model ID", interactive=False)
             roc_plot = gr.Plot(label="ROC Curve")
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)

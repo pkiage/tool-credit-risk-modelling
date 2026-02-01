@@ -1,5 +1,7 @@
 """Gradio stakeholder demo for credit risk modeling."""
 
+from typing import Any
+
 import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
 from apps.gradio.components.comparison_tab import create_comparison_tab

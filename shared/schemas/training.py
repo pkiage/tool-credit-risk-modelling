@@ -25,9 +25,7 @@ class TrainingConfig(BaseModel):
         default=0.2, ge=0.1, le=0.5, description="Test set fraction"
     )
     random_state: int = Field(default=42, description="Random seed for reproducibility")
-    undersample: bool = Field(
-        default=False, description="Undersample majority class"
-    )
+    undersample: bool = Field(default=False, description="Undersample majority class")
     cv_folds: int = Field(default=5, ge=2, le=10, description="CV folds")
 
 

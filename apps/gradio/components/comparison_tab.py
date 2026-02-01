@@ -166,9 +166,7 @@ def _build_comparison_table(
     return rows
 
 
-def create_comparison_tab(
-    api: CreditRiskAPI, training_results_state: gr.State
-) -> None:
+def create_comparison_tab(api: CreditRiskAPI, training_results_state: gr.State) -> None:
     """Create the comparison tab UI and wire up event handlers.
 
     Args:
