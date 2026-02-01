@@ -102,6 +102,9 @@ def create_training_tab(
                 interactive=False,
             )
             threshold_display = gr.Textbox(label="Optimal Threshold", interactive=False)
+            training_time_display = gr.Textbox(
+                label="Training Time", interactive=False
+            )
             model_id_display = gr.Textbox(label="Model ID", interactive=False)
             roc_plot = gr.Plot(label="ROC Curve")
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)
@@ -113,6 +116,7 @@ def create_training_tab(
     ) -> tuple[
         Any,  # metrics_table
         str,  # threshold_display
+        str,  # training_time_display
         str,  # model_id_display
         go.Figure | None,  # roc_plot
         Any,  # error_display update
@@ -141,6 +145,7 @@ def create_training_tab(
             metrics = result["metrics"]
             table_data = _format_metrics_table(metrics)
             threshold = result["optimal_threshold"]
+            train_time = result.get("training_time_seconds", 0)
             model_id = result["model_id"]
 
             roc_fig = None
@@ -150,6 +155,7 @@ def create_training_tab(
             return (
                 table_data,
                 f"{threshold:.4f}",
+                f"{train_time:.3f}s",
                 model_id,
                 roc_fig,
                 gr.update(visible=False, value=""),
@@ -164,6 +170,7 @@ def create_training_tab(
                 [],
                 "",
                 "",
+                "",
                 None,
                 gr.update(visible=True, value=f"Training failed: {detail}"),
                 training_results,
@@ -172,6 +179,7 @@ def create_training_tab(
             logger.exception("Training request failed")
             return (
                 [],
+                "",
                 "",
                 "",
                 None,
@@ -185,6 +193,7 @@ def create_training_tab(
         outputs=[
             metrics_table,
             threshold_display,
+            training_time_display,
             model_id_display,
             roc_plot,
             error_display,
