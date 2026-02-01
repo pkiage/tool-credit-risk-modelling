@@ -200,7 +200,15 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
 
     refresh_btn.click(fn=_refresh, inputs=[], outputs=[model_selector])
 
+    def _show_predicting_status() -> Any:
+        """Show a loading message while prediction is in progress."""
+        return gr.update(visible=True, value="Predicting\u2026")
+
     predict_btn.click(
+        fn=_show_predicting_status,
+        inputs=[],
+        outputs=[error_display],
+    ).then(
         fn=_predict,
         inputs=[
             model_selector,

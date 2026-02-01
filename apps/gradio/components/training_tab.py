@@ -187,7 +187,15 @@ def create_training_tab(
                 training_results,
             )
 
+    def _show_training_status() -> Any:
+        """Show a loading message while training is in progress."""
+        return gr.update(visible=True, value="Training in progress\u2026")
+
     train_btn.click(
+        fn=_show_training_status,
+        inputs=[],
+        outputs=[error_display],
+    ).then(
         fn=_train,
         inputs=[model_type, test_size, training_results_state],
         outputs=[
