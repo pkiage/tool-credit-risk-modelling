@@ -112,3 +112,8 @@ VALID_LOAN_INTENT: list[str] = [
 ]
 VALID_LOAN_GRADE: list[str] = ["A", "B", "C", "D", "E", "F", "G"]
 VALID_DEFAULT_ON_FILE: list[str] = ["Y", "N"]
+
+# Chart color palette (shared across all notebooks and apps)
+COLOR_PRIMARY: str = "#636EFA"
+COLOR_DANGER: str = "#EF553B"
+COLOR_SUCCESS: str = "#00CC96"

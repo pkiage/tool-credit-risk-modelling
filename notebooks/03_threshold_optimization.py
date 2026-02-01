@@ -50,7 +50,6 @@ def _():
     import pandas as pd
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-    from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import train_test_split
 
     from shared import constants
@@ -62,7 +61,6 @@ def _():
     from shared.schemas.metrics import ThresholdResult
 
     return (
-        RandomForestClassifier,
         ThresholdResult,
         calculate_confusion_matrix,
         calculate_roc_curve,
@@ -78,9 +76,33 @@ def _():
 
 
 @app.cell
-def _(RandomForestClassifier, constants, np, pd, train_test_split):
-    # Train a single model for demonstration
-    _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+def _(mo):
+    upload_widget = mo.ui.file(
+        filetypes=[".csv"],
+        label="Upload custom CSV (optional — uses default dataset if empty)",
+    )
+    model_type_selector = mo.ui.dropdown(
+        options=["random_forest", "logistic_regression", "xgboost"],
+        value="random_forest",
+        label="Model",
+    )
+    mo.hstack([upload_widget, model_type_selector])
+    return model_type_selector, upload_widget
+
+
+@app.cell
+def _(constants, model_type_selector, np, pd, train_test_split, upload_widget):
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from xgboost import XGBClassifier
+
+    if upload_widget.value:
+        import io
+
+        _df = pd.read_csv(io.BytesIO(upload_widget.value[0].contents))
+    else:
+        _df = pd.read_csv("data/processed/cr_loan_w2.csv")
+
     _X = _df[constants.ALL_FEATURES].values.astype(np.float64)
     _y = _df[constants.TARGET_COLUMN].values.astype(np.int_)
 
@@ -88,7 +110,18 @@ def _(RandomForestClassifier, constants, np, pd, train_test_split):
         _X, _y, test_size=0.2, random_state=42, stratify=_y
     )
 
-    _model = RandomForestClassifier(**constants.RANDOM_FOREST_PARAMS)  # type: ignore
+    _factories = {
+        "logistic_regression": lambda: LogisticRegression(
+            **constants.LOGISTIC_REGRESSION_PARAMS  # type: ignore
+        ),
+        "xgboost": lambda: XGBClassifier(
+            **constants.XGBOOST_PARAMS  # type: ignore
+        ),
+        "random_forest": lambda: RandomForestClassifier(
+            **constants.RANDOM_FOREST_PARAMS  # type: ignore
+        ),
+    }
+    _model = _factories[model_type_selector.value]()
     _model.fit(_X_train, _y_train)
     y_proba = _model.predict_proba(X_test)[:, 1]
     return X_test, y_proba, y_test
@@ -119,7 +152,7 @@ def _(find_optimal_threshold, y_proba, y_test):
 
 
 @app.cell
-def _(calculate_roc_curve, go, optimal, y_proba, y_test):
+def _(calculate_roc_curve, constants, go, optimal, y_proba, y_test):
     _roc = calculate_roc_curve(y_test, y_proba)
 
     fig_roc = go.Figure()
@@ -129,7 +162,7 @@ def _(calculate_roc_curve, go, optimal, y_proba, y_test):
             y=_roc.tpr,
             mode="lines",
             name="ROC Curve",
-            line={"color": "#636EFA"},
+            line={"color": constants.COLOR_PRIMARY},
         )
     )
     # Optimal point
@@ -139,7 +172,7 @@ def _(calculate_roc_curve, go, optimal, y_proba, y_test):
             y=[optimal.sensitivity],
             mode="markers+text",
             name=f"Optimal (J={optimal.youden_j:.3f})",
-            marker={"size": 12, "color": "#EF553B"},
+            marker={"size": 12, "color": constants.COLOR_DANGER},
             text=[f"t={optimal.threshold:.3f}"],
             textposition="top right",
         )
@@ -265,7 +298,7 @@ def _(mo):
 
 
 @app.cell
-def _(calculate_roc_curve, go, np, optimal, y_proba, y_test):
+def _(calculate_roc_curve, constants, go, np, optimal, y_proba, y_test):
     _roc = calculate_roc_curve(y_test, y_proba)
     _j_values = [t - f for t, f in zip(_roc.tpr, _roc.fpr)]
 
@@ -276,13 +309,13 @@ def _(calculate_roc_curve, go, np, optimal, y_proba, y_test):
             y=_j_values[: len(_roc.thresholds)],
             mode="lines",
             name="Youden's J",
-            line={"color": "#636EFA"},
+            line={"color": constants.COLOR_PRIMARY},
         )
     )
     fig_j.add_vline(
         x=optimal.threshold,
         line_dash="dash",
-        line_color="#EF553B",
+        line_color=constants.COLOR_DANGER,
         annotation_text=f"Optimal={optimal.threshold:.3f}",
     )
     fig_j.update_layout(
@@ -324,6 +357,7 @@ def _(mo):
 @app.cell
 def _(
     calculate_confusion_matrix,
+    constants,
     fn_cost_input,
     fp_cost_input,
     go,
@@ -354,13 +388,13 @@ def _(
             y=_costs,
             mode="lines",
             name="Total Cost",
-            line={"color": "#636EFA"},
+            line={"color": constants.COLOR_PRIMARY},
         )
     )
     fig_cost.add_vline(
         x=_best_t,
         line_dash="dash",
-        line_color="#EF553B",
+        line_color=constants.COLOR_DANGER,
         annotation_text=f"Min cost @ {_best_t:.2f}",
     )
     fig_cost.update_layout(
