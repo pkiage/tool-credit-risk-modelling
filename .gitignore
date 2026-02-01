@@ -35,6 +35,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!apps/web/lib/
 lib64/
 parts/
 sdist/
@@ -81,6 +82,7 @@ node_modules/
 apps/web/.next/
 apps/web/out/
 .vercel/
+.next
 
 # ----------------------------------------
 # Jupyter / Marimo
@@ -147,6 +149,7 @@ secrets/
 # ----------------------------------------
 .DS_Store
 Thumbs.db
+nul
 
 # ----------------------------------------
 # Misc
