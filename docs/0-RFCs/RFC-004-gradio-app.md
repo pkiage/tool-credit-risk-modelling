@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Draft |
+| Status | Accepted |
 | Author(s) | [Your Name] |
-| Updated | 2025-01-31 |
+| Updated | 2026-02-01 |
 | Depends On | RFC-001, RFC-002 |
 
 ## Objective
@@ -316,10 +316,41 @@ pinned: false
 
 ## Questions and Discussion Topics
 
-1. **API hosting** — Where to host API for HF Spaces demo?
-2. **Offline mode** — Support direct `shared/` calls if API unavailable?
-3. **State persistence** — Remember trained models across page refresh?
-4. **Theming** — Custom theme or Gradio defaults?
+### 1. API hosting — Where to host API for HF Spaces demo?
+
+**Decision: Option A — API hosted separately. Defer until deployment is needed.**
+
+- For local development and internal demos, the API runs on `localhost:8000` alongside the Gradio app. This is the current workflow and requires no infrastructure.
+- For HF Spaces deployment, the API should be hosted on a separate service (Render, Railway, or similar) and the `CREDIT_RISK_API_URL` environment variable set in the Space's settings. This keeps the Gradio Space lightweight (only UI deps) and avoids bundling sklearn/xgboost in the Space image.
+- Bundling API + Gradio in the same Space (Option B) is possible via a multi-process Dockerfile but adds complexity for marginal benefit. The Gradio app is a thin HTTP client — it doesn't need to share a process with the API.
+- No code changes required. The `config.py` already reads `CREDIT_RISK_API_URL` from the environment with a localhost fallback.
+
+### 2. Offline mode — Support direct `shared/` calls if API unavailable?
+
+**Decision: No. Keep Gradio as a strict API client.**
+
+- Introducing direct `shared/` calls into the Gradio app would violate the core design principle of zero logic duplication. The Gradio layer would need to import sklearn, numpy, and the full training pipeline — duplicating the API's orchestration logic.
+- The Gradio app's purpose is to validate the API contract end-to-end. An offline bypass would undermine that purpose — if the demo works without the API, there's no proof the API works.
+- When the API is unreachable, the app shows a clear health-check warning banner (checked dynamically on each page load via `app.load()`). This is the correct user experience: tell the user what's wrong and how to fix it, rather than silently degrading to a different code path.
+- Notebooks (RFC-003) already provide an offline exploration path via direct `shared/logic/` imports. Users who need offline access should use Marimo notebooks.
+
+### 3. State persistence — Remember trained models across page refresh?
+
+**Decision: Session-scoped via `gr.State`. No cross-session persistence.**
+
+- Training results are stored in `gr.State` (a per-session Gradio state object), isolated per user session. This was chosen during the P4 review to prevent data leakage between concurrent users on HF Spaces — the original module-level dict was shared across all users.
+- Cross-session persistence would require either browser `localStorage` (Gradio doesn't support this natively) or server-side session storage (adds infrastructure). Neither is justified for a demo tool.
+- Models themselves are persisted server-side in the API's in-memory store (and optionally to disk via `POST /models/{id}/persist`). The API's `GET /models` endpoint provides the model list across sessions — the comparison tab's limitation is only that it needs the full `TrainingResult` (with ROC curves) which isn't returned by the list endpoint.
+- If cross-session comparison is needed in the future, the right fix is to add a `GET /models/{id}/training-result` endpoint to the API, not to persist Gradio state.
+
+### 4. Theming — Custom theme or Gradio defaults?
+
+**Decision: Gradio defaults. No custom theming.**
+
+- The RFC explicitly lists "Production-grade UI polish" as a non-goal. Theming effort is better spent on the Next.js UI (RFC-001) which is the production-facing layer.
+- Gradio's default theme is clean and functional for stakeholder demos. Custom theming would add CSS maintenance burden and diverge from Gradio's upgrade path (theme changes between Gradio versions would require manual fixes).
+- If stakeholder feedback specifically requests visual changes, apply them as targeted CSS overrides rather than a full custom theme. Gradio supports `gr.Blocks(css=...)` for surgical tweaks.
+- Color consistency with notebooks (RFC-003) is not a concern — the notebook palette (`shared/constants.py` colors) applies to Plotly charts, and the Gradio app already uses Plotly for its visualizations.
 
 ---
 
@@ -328,3 +359,4 @@ pinned: false
 | Date | Author | Changes |
 |------|--------|---------|
 | 2025-01-31 | — | Initial draft |
+| 2026-02-01 | Claude | Remove dataset selector, answer open questions, update status to Accepted |
