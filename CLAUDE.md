@@ -186,7 +186,7 @@ git stash pop  # Restore changes later
 | `docs/RFCs/RFC-001-*.md` | Architecture decision |
 | `shared/schemas/loan.py` | Core data models |
 | `shared/logic/threshold.py` | Youden's J implementation |
-| `data/raw/cr_loan_w2.csv` | Training dataset |
+| `data/processed/cr_loan_w2.csv` | Training dataset (one-hot encoded) |
 
 ## Schema Sync Protocol
 

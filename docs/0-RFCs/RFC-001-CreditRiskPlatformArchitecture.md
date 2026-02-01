@@ -214,7 +214,9 @@ class ModelMetrics(BaseModel):
 │   ├── schemas/                # Pydantic models
 │   └── logic/                  # Business logic (threshold, evaluation)
 ├── notebooks/                  # Marimo (.py files)
-├── data/raw/                   # cr_loan_w2.csv
+├── data/
+│   ├── raw/                   # Original dataset
+│   └── processed/             # cr_loan_w2.csv (one-hot encoded)
 ├── tests/
 ├── docs/
 │   ├── RFCs/
