@@ -41,6 +41,7 @@ class TrainingResult(BaseModel):
         optimal_threshold: Optimal classification threshold based on Youden's J.
         feature_importance: Feature importance scores (None for models without this).
         training_config: Configuration used for training.
+        training_time_seconds: Wall-clock time for model training in seconds.
     """
 
     model_id: str = Field(description="Unique model identifier")
@@ -53,3 +54,6 @@ class TrainingResult(BaseModel):
         default=None, description="Feature importance scores"
     )
     training_config: TrainingConfig = Field(description="Training configuration")
+    training_time_seconds: float = Field(
+        ge=0, description="Wall-clock training time in seconds"
+    )

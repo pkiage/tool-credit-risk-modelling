@@ -1,5 +1,6 @@
 """Model training service."""
 
+import time
 import uuid
 from datetime import datetime
 
@@ -126,8 +127,10 @@ def train_model(
         )
 
     # Create and train model
+    t_start = time.monotonic()
     model = create_model(config.model_type)
     model.fit(X_train, y_train)
+    training_time_seconds = time.monotonic() - t_start
 
     # Get predictions on test set
     y_proba = model.predict_proba(X_test)[:, 1]  # Probability of default (class 1)
@@ -174,5 +177,6 @@ def train_model(
         metrics=metrics,
         optimal_threshold=metrics.threshold_analysis.threshold,
         feature_importance=feature_importance,
-        training_config=config
+        training_config=config,
+        training_time_seconds=round(training_time_seconds, 3),
     )
