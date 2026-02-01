@@ -22,10 +22,7 @@ class ApiClientError extends Error {
 	}
 }
 
-async function request<T>(
-	path: string,
-	options?: RequestInit & { timeout?: number },
-): Promise<T> {
+async function request<T>(path: string, options?: RequestInit & { timeout?: number }): Promise<T> {
 	const { timeout = DEFAULT_TIMEOUT, ...fetchOptions } = options ?? {};
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -42,7 +39,10 @@ async function request<T>(
 
 		if (!response.ok) {
 			const error = await response.json().catch(() => ({ detail: response.statusText }));
-			throw new ApiClientError(error.detail || `Request failed: ${response.statusText}`, response.status);
+			throw new ApiClientError(
+				error.detail || `Request failed: ${response.statusText}`,
+				response.status,
+			);
 		}
 
 		return (await response.json()) as T;
@@ -51,10 +51,7 @@ async function request<T>(
 		if (error instanceof DOMException && error.name === "AbortError") {
 			throw new ApiClientError("Request timed out", 408);
 		}
-		throw new ApiClientError(
-			error instanceof Error ? error.message : "Network error",
-			0,
-		);
+		throw new ApiClientError(error instanceof Error ? error.message : "Network error", 0);
 	} finally {
 		clearTimeout(timeoutId);
 	}

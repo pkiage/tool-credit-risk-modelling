@@ -14,9 +14,7 @@ export function Slider({ label, displayValue, id, className = "", ...props }: Sl
 				<label htmlFor={sliderId} className="block text-sm font-medium text-gray-700">
 					{label}
 				</label>
-				{displayValue && (
-					<span className="text-sm font-medium text-blue-600">{displayValue}</span>
-				)}
+				{displayValue && <span className="text-sm font-medium text-blue-600">{displayValue}</span>}
 			</div>
 			<input
 				id={sliderId}

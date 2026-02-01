@@ -36,7 +36,7 @@ export function CalibrationPlot({ data }: CalibrationPlotProps) {
 					domain={[0, 1]}
 					label={{ value: "Fraction of Positives", angle: -90, position: "insideLeft" }}
 				/>
-				<Tooltip formatter={(value: number) => value.toFixed(4)} />
+				<Tooltip formatter={(value: number | undefined) => value?.toFixed(4) ?? ""} />
 				<ReferenceLine
 					segment={[
 						{ x: 0, y: 0 },

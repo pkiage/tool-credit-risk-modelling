@@ -49,9 +49,7 @@ export function TrainingForm({ onSubmit, loading = false }: TrainingFormProps) {
 				step={0.05}
 				value={config.test_size}
 				displayValue={`${(config.test_size * 100).toFixed(0)}%`}
-				onChange={(e) =>
-					setConfig({ ...config, test_size: Number(e.target.value) })
-				}
+				onChange={(e) => setConfig({ ...config, test_size: Number(e.target.value) })}
 			/>
 
 			<Slider
@@ -61,9 +59,7 @@ export function TrainingForm({ onSubmit, loading = false }: TrainingFormProps) {
 				step={1}
 				value={config.cv_folds}
 				displayValue={String(config.cv_folds)}
-				onChange={(e) =>
-					setConfig({ ...config, cv_folds: Number(e.target.value) })
-				}
+				onChange={(e) => setConfig({ ...config, cv_folds: Number(e.target.value) })}
 			/>
 
 			<div className="flex items-center gap-2">
@@ -72,9 +68,7 @@ export function TrainingForm({ onSubmit, loading = false }: TrainingFormProps) {
 					type="checkbox"
 					className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					checked={config.undersample}
-					onChange={(e) =>
-						setConfig({ ...config, undersample: e.target.checked })
-					}
+					onChange={(e) => setConfig({ ...config, undersample: e.target.checked })}
 				/>
 				<label htmlFor="undersample" className="text-sm font-medium text-gray-700">
 					Undersample majority class

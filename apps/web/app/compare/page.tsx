@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table } from "@/components/ui/table";
 import { MetricsBar } from "@/components/charts/metrics-bar";
 import { MultiROCCurve } from "@/components/charts/roc-curve";
-import { api, ApiClientError } from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Table } from "@/components/ui/table";
+import { ApiClientError, api } from "@/lib/api-client";
 import type { ModelMetadata, TrainingResult } from "@/lib/types";
 
 const COLORS = ["#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c"];
@@ -20,7 +20,8 @@ export default function ComparePage() {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		api.listModels()
+		api
+			.listModels()
 			.then(setModels)
 			.catch(() => setModels([]))
 			.finally(() => setModelsLoading(false));
@@ -80,7 +81,7 @@ export default function ComparePage() {
 
 	const selectedResults = Array.from(results.entries());
 
-	const metricsBarData = selectedResults.map(([id, r], idx) => ({
+	const metricsBarData = selectedResults.map(([id, r]) => ({
 		name: `${r.model_type} (${id.slice(0, 8)})`,
 		accuracy: r.metrics.accuracy,
 		precision: r.metrics.precision,
@@ -89,7 +90,7 @@ export default function ComparePage() {
 		roc_auc: r.metrics.roc_auc,
 	}));
 
-	const rocCurves = selectedResults.map(([id, r], idx) => ({
+	const rocCurves = selectedResults.map(([, r], idx) => ({
 		data: r.metrics.roc_curve,
 		label: `${r.model_type} (AUC: ${r.metrics.roc_auc.toFixed(3)})`,
 		color: COLORS[idx % COLORS.length],
@@ -134,9 +135,7 @@ export default function ComparePage() {
 		<div className="space-y-8">
 			<div>
 				<h1 className="text-2xl font-bold text-gray-900">Compare Models</h1>
-				<p className="mt-1 text-gray-600">
-					Select models to compare their performance metrics.
-				</p>
+				<p className="mt-1 text-gray-600">Select models to compare their performance metrics.</p>
 			</div>
 
 			{error && (
@@ -160,23 +159,17 @@ export default function ComparePage() {
 							/>
 							<div className="flex-1">
 								<span className="font-medium text-gray-900">{model.model_type}</span>
-								<span className="ml-2 text-sm text-gray-500">
-									{model.model_id.slice(0, 8)}
-								</span>
+								<span className="ml-2 text-sm text-gray-500">{model.model_id.slice(0, 8)}</span>
 							</div>
-							<span className="text-sm text-gray-600">
-								AUC: {model.roc_auc.toFixed(3)}
-							</span>
+							<span className="text-sm text-gray-600">AUC: {model.roc_auc.toFixed(3)}</span>
 						</label>
 					))}
 				</div>
 				<div className="mt-4">
-					<Button
-						onClick={handleCompare}
-						loading={loading}
-						disabled={selectedIds.size === 0}
-					>
-						{loading ? "Comparing..." : `Compare ${selectedIds.size} Model${selectedIds.size !== 1 ? "s" : ""}`}
+					<Button onClick={handleCompare} loading={loading} disabled={selectedIds.size === 0}>
+						{loading
+							? "Comparing..."
+							: `Compare ${selectedIds.size} Model${selectedIds.size !== 1 ? "s" : ""}`}
 					</Button>
 				</div>
 			</Card>

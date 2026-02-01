@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
 import { PredictionForm } from "@/components/forms/prediction-form";
-import { api, ApiClientError } from "@/lib/api-client";
+import { Card } from "@/components/ui/card";
+import { ApiClientError, api } from "@/lib/api-client";
 import type { LoanApplication, ModelMetadata, PredictionResponse } from "@/lib/types";
 
 export default function PredictPage() {
@@ -14,7 +14,8 @@ export default function PredictPage() {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		api.listModels()
+		api
+			.listModels()
 			.then(setModels)
 			.catch(() => setModels([]))
 			.finally(() => setModelsLoading(false));
@@ -50,9 +51,7 @@ export default function PredictPage() {
 		<div className="space-y-8">
 			<div>
 				<h1 className="text-2xl font-bold text-gray-900">Predict Default</h1>
-				<p className="mt-1 text-gray-600">
-					Submit a loan application to predict default risk.
-				</p>
+				<p className="mt-1 text-gray-600">Submit a loan application to predict default risk.</p>
 			</div>
 
 			{error && (
@@ -67,11 +66,7 @@ export default function PredictPage() {
 						{modelsLoading ? (
 							<p className="text-sm text-gray-500">Loading models...</p>
 						) : (
-							<PredictionForm
-								models={models}
-								onSubmit={handlePredict}
-								loading={loading}
-							/>
+							<PredictionForm models={models} onSubmit={handlePredict} loading={loading} />
 						)}
 					</Card>
 				</div>
@@ -131,9 +126,7 @@ export default function PredictPage() {
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-500">Confidence</span>
-										<span className="font-medium">
-											{(prediction.confidence * 100).toFixed(2)}%
-										</span>
+										<span className="font-medium">{(prediction.confidence * 100).toFixed(2)}%</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-500">Threshold</span>
@@ -175,7 +168,8 @@ export default function PredictPage() {
 					{!loading && !prediction && (
 						<Card>
 							<p className="text-center text-sm text-gray-500">
-								Fill in the loan application form and click &quot;Get Prediction&quot; to see results.
+								Fill in the loan application form and click &quot;Get Prediction&quot; to see
+								results.
 							</p>
 						</Card>
 					)}

@@ -11,14 +11,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 	error?: string;
 }
 
-export function Select({
-	label,
-	options,
-	error,
-	id,
-	className = "",
-	...props
-}: SelectProps) {
+export function Select({ label, options, error, id, className = "", ...props }: SelectProps) {
 	const selectId = id || label.toLowerCase().replace(/\s+/g, "-");
 
 	return (

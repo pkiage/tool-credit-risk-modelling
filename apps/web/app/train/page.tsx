@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { CalibrationPlot } from "@/components/charts/calibration-plot";
+import { ConfusionMatrixChart } from "@/components/charts/confusion-matrix";
+import { ROCCurve } from "@/components/charts/roc-curve";
+import { TrainingForm } from "@/components/forms/training-form";
 import { Card } from "@/components/ui/card";
 import { Table } from "@/components/ui/table";
-import { TrainingForm } from "@/components/forms/training-form";
-import { ROCCurve } from "@/components/charts/roc-curve";
-import { ConfusionMatrixChart } from "@/components/charts/confusion-matrix";
-import { CalibrationPlot } from "@/components/charts/calibration-plot";
-import { api, ApiClientError } from "@/lib/api-client";
+import { ApiClientError, api } from "@/lib/api-client";
 import type { TrainingConfig, TrainingResult } from "@/lib/types";
 
 export default function TrainPage() {
@@ -72,9 +72,7 @@ export default function TrainPage() {
 		<div className="space-y-8">
 			<div>
 				<h1 className="text-2xl font-bold text-gray-900">Train Model</h1>
-				<p className="mt-1 text-gray-600">
-					Configure and train a credit risk model.
-				</p>
+				<p className="mt-1 text-gray-600">Configure and train a credit risk model.</p>
 			</div>
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

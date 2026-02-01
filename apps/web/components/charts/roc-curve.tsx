@@ -47,8 +47,8 @@ export function ROCCurve({ data, label = "Model", color = "#2563eb" }: ROCCurveP
 					label={{ value: "True Positive Rate", angle: -90, position: "insideLeft" }}
 				/>
 				<Tooltip
-					formatter={(value: number) => value.toFixed(4)}
-					labelFormatter={(fpr: number) => `FPR: ${fpr.toFixed(4)}`}
+					formatter={(value: number | undefined) => value?.toFixed(4) ?? ""}
+					labelFormatter={(fpr) => `FPR: ${Number(fpr).toFixed(4)}`}
 				/>
 				<Legend verticalAlign="top" />
 				<ReferenceLine
@@ -74,21 +74,6 @@ export function ROCCurve({ data, label = "Model", color = "#2563eb" }: ROCCurveP
 }
 
 export function MultiROCCurve({ curves }: MultiROCCurveProps) {
-	// Merge all curves into a shared dataset keyed by index
-	const maxLen = Math.max(...curves.map((c) => c.data.fpr.length));
-	const chartData = Array.from({ length: maxLen }, (_, i) => {
-		const point: Record<string, number> = {};
-		for (const curve of curves) {
-			if (i < curve.data.fpr.length) {
-				point[`fpr_${curve.label}`] = curve.data.fpr[i];
-				point[`tpr_${curve.label}`] = curve.data.tpr[i];
-			}
-		}
-		// Use first curve's FPR as x-axis (they'll be plotted parametrically)
-		point.index = i;
-		return point;
-	});
-
 	return (
 		<ResponsiveContainer width="100%" height={350}>
 			<LineChart margin={{ top: 5, right: 20, bottom: 25, left: 10 }}>
@@ -102,7 +87,7 @@ export function MultiROCCurve({ curves }: MultiROCCurveProps) {
 					domain={[0, 1]}
 					label={{ value: "True Positive Rate", angle: -90, position: "insideLeft" }}
 				/>
-				<Tooltip formatter={(value: number) => value.toFixed(4)} />
+				<Tooltip formatter={(value: number | undefined) => value?.toFixed(4) ?? ""} />
 				<Legend verticalAlign="top" />
 				<ReferenceLine
 					segment={[

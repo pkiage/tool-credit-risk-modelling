@@ -34,7 +34,8 @@ export function Table<T extends Record<string, unknown>>({
 				</thead>
 				<tbody className="divide-y divide-gray-200 bg-white">
 					{data.map((row, i) => (
-						<tr key={`row-${i}`} className="hover:bg-gray-50">
+						// biome-ignore lint/suspicious/noArrayIndexKey: generic table has no stable row ID
+						<tr key={i} className="hover:bg-gray-50">
 							{columns.map((col) => (
 								<td key={col.key} className="whitespace-nowrap px-4 py-3 text-sm text-gray-900">
 									{col.render ? col.render(row) : String(row[col.key] ?? "")}
@@ -44,10 +45,7 @@ export function Table<T extends Record<string, unknown>>({
 					))}
 					{data.length === 0 && (
 						<tr>
-							<td
-								colSpan={columns.length}
-								className="px-4 py-8 text-center text-sm text-gray-500"
-							>
+							<td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-gray-500">
 								No data available
 							</td>
 						</tr>

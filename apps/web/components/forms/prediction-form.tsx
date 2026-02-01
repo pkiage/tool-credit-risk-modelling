@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
-import { LoanFields } from "./loan-fields";
 import type { LoanApplication, ModelMetadata } from "@/lib/types";
+import { LoanFields } from "./loan-fields";
 
 interface PredictionFormProps {
 	models: ModelMetadata[];

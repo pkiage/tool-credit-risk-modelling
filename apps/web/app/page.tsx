@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api-client";
 import type { ModelMetadata } from "@/lib/types";
@@ -11,11 +11,13 @@ export default function Home() {
 	const [models, setModels] = useState<ModelMetadata[]>([]);
 
 	useEffect(() => {
-		api.health()
+		api
+			.health()
 			.then(() => setHealthy(true))
 			.catch(() => setHealthy(false));
 
-		api.listModels()
+		api
+			.listModels()
 			.then(setModels)
 			.catch(() => setModels([]));
 	}, []);
@@ -42,28 +44,17 @@ export default function Home() {
 		<div className="space-y-8">
 			<div>
 				<h1 className="text-3xl font-bold text-gray-900">Credit Risk Platform</h1>
-				<p className="mt-2 text-gray-600">
-					Train, evaluate, and deploy credit risk models.
-				</p>
+				<p className="mt-2 text-gray-600">Train, evaluate, and deploy credit risk models.</p>
 			</div>
 
 			<div className="flex items-center gap-2">
 				<span
 					className={`inline-block h-3 w-3 rounded-full ${
-						healthy === null
-							? "bg-gray-300"
-							: healthy
-								? "bg-green-500"
-								: "bg-red-500"
+						healthy === null ? "bg-gray-300" : healthy ? "bg-green-500" : "bg-red-500"
 					}`}
 				/>
 				<span className="text-sm text-gray-600">
-					API:{" "}
-					{healthy === null
-						? "Checking..."
-						: healthy
-							? "Connected"
-							: "Unavailable"}
+					API: {healthy === null ? "Checking..." : healthy ? "Connected" : "Unavailable"}
 				</span>
 				{models.length > 0 && (
 					<span className="ml-4 text-sm text-gray-600">

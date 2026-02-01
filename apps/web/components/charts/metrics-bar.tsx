@@ -48,14 +48,10 @@ export function MetricsBar({ models }: MetricsBarProps) {
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="metric" />
 				<YAxis domain={[0, 1]} />
-				<Tooltip formatter={(value: number) => value.toFixed(4)} />
+				<Tooltip formatter={(value: number | undefined) => value?.toFixed(4) ?? ""} />
 				<Legend />
 				{models.map((model, idx) => (
-					<Bar
-						key={model.name}
-						dataKey={model.name}
-						fill={COLORS[idx % COLORS.length]}
-					/>
+					<Bar key={model.name} dataKey={model.name} fill={COLORS[idx % COLORS.length]} />
 				))}
 			</BarChart>
 		</ResponsiveContainer>
