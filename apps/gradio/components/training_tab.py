@@ -6,7 +6,6 @@ import plotly.graph_objects as go
 
 import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
-from apps.gradio.components.comparison_tab import store_training_result
 
 
 def _build_roc_plot(roc_data: dict[str, Any], model_type: str) -> go.Figure:
@@ -65,14 +64,19 @@ def _format_metrics_table(metrics: dict[str, Any]) -> list[list[str]]:
     ]
 
 
-def create_training_tab(api: CreditRiskAPI) -> None:
+def create_training_tab(
+    api: CreditRiskAPI, training_results_state: gr.State
+) -> None:
     """Create the training tab UI and wire up event handlers.
 
     Args:
         api: CreditRiskAPI client instance.
+        training_results_state: Session-scoped gr.State holding training results.
     """
     with gr.Row():
         with gr.Column(scale=1):
+            # Model types match shared.constants.MODEL_HYPERPARAMETERS keys.
+            # Update here if new model types are added to shared/.
             model_type = gr.Dropdown(
                 choices=["logistic_regression", "xgboost", "random_forest"],
                 value="logistic_regression",
@@ -99,22 +103,26 @@ def create_training_tab(api: CreditRiskAPI) -> None:
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)
 
     def _train(
-        selected_model_type: str, selected_test_size: float
+        selected_model_type: str,
+        selected_test_size: float,
+        training_results: dict[str, dict[str, Any]],
     ) -> tuple[
         Any,  # metrics_table
         str,  # threshold_display
         str,  # model_id_display
         go.Figure | None,  # roc_plot
         Any,  # error_display update
+        dict[str, dict[str, Any]],  # updated training_results_state
     ]:
         """Handle train button click.
 
         Args:
             selected_model_type: Model type from dropdown.
             selected_test_size: Test/train split ratio.
+            training_results: Session-scoped training results cache.
 
         Returns:
-            Tuple of updated component values.
+            Tuple of updated component values and updated state.
         """
         try:
             config = {
@@ -122,7 +130,9 @@ def create_training_tab(api: CreditRiskAPI) -> None:
                 "test_size": selected_test_size,
             }
             result = api.train(config)
-            store_training_result(result["model_id"], result)
+
+            # Store result in session state for comparison tab
+            training_results[result["model_id"]] = result
 
             metrics = result["metrics"]
             table_data = _format_metrics_table(metrics)
@@ -139,6 +149,7 @@ def create_training_tab(api: CreditRiskAPI) -> None:
                 model_id,
                 roc_fig,
                 gr.update(visible=False, value=""),
+                training_results,
             )
         except Exception as exc:
             return (
@@ -147,16 +158,18 @@ def create_training_tab(api: CreditRiskAPI) -> None:
                 "",
                 None,
                 gr.update(visible=True, value=f"Training failed: {exc}"),
+                training_results,
             )
 
     train_btn.click(
         fn=_train,
-        inputs=[model_type, test_size],
+        inputs=[model_type, test_size, training_results_state],
         outputs=[
             metrics_table,
             threshold_display,
             model_id_display,
             roc_plot,
             error_display,
+            training_results_state,
         ],
     )

@@ -12,6 +12,9 @@ api = CreditRiskAPI(API_BASE_URL)
 with gr.Blocks(title=APP_TITLE) as app:
     gr.Markdown(f"# {APP_TITLE}")
 
+    # Session-scoped state for training results (isolated per user session).
+    training_results_state = gr.State(value={})
+
     api_healthy = api.health()
     if not api_healthy:
         gr.Markdown(
@@ -21,11 +24,11 @@ with gr.Blocks(title=APP_TITLE) as app:
 
     with gr.Tabs():
         with gr.Tab("Train"):
-            create_training_tab(api)
+            create_training_tab(api, training_results_state)
         with gr.Tab("Predict"):
             create_prediction_tab(api)
         with gr.Tab("Compare"):
-            create_comparison_tab(api)
+            create_comparison_tab(api, training_results_state)
 
 if __name__ == "__main__":
     app.launch()

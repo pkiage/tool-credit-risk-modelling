@@ -1,5 +1,6 @@
 """Model comparison tab component for the Gradio app."""
 
+import logging
 from typing import Any
 
 import plotly.graph_objects as go
@@ -7,19 +8,7 @@ import plotly.graph_objects as go
 import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
 
-# In-memory cache of training results keyed by model_id.
-# Populated when models are trained in the same session.
-_training_results: dict[str, dict[str, Any]] = {}
-
-
-def store_training_result(model_id: str, result: dict[str, Any]) -> None:
-    """Store a training result for later comparison.
-
-    Args:
-        model_id: Model identifier.
-        result: Full TrainingResult dictionary from the API.
-    """
-    _training_results[model_id] = result
+logger = logging.getLogger(__name__)
 
 
 def _get_model_choices(api: CreditRiskAPI) -> list[str]:
@@ -35,15 +24,19 @@ def _get_model_choices(api: CreditRiskAPI) -> list[str]:
         models = api.list_models()
         return [m["model_id"] for m in models]
     except Exception:
+        logger.exception("Failed to fetch model list")
         return []
 
 
-def _build_roc_overlay(selected_ids: list[str], api: CreditRiskAPI) -> go.Figure | None:
+def _build_roc_overlay(
+    selected_ids: list[str],
+    training_results: dict[str, dict[str, Any]],
+) -> go.Figure | None:
     """Build an overlay ROC plot for multiple models.
 
     Args:
         selected_ids: List of model IDs to compare.
-        api: CreditRiskAPI client instance.
+        training_results: Session-scoped training results cache.
 
     Returns:
         Plotly Figure with overlaid ROC curves, or None on error.
@@ -52,7 +45,7 @@ def _build_roc_overlay(selected_ids: list[str], api: CreditRiskAPI) -> go.Figure
     has_curves = False
 
     for model_id in selected_ids:
-        result = _training_results.get(model_id)
+        result = training_results.get(model_id)
         if result is None:
             continue
         metrics = result.get("metrics", {})
@@ -93,11 +86,15 @@ def _build_roc_overlay(selected_ids: list[str], api: CreditRiskAPI) -> go.Figure
     return fig
 
 
-def _build_metrics_bar(selected_ids: list[str]) -> go.Figure | None:
+def _build_metrics_bar(
+    selected_ids: list[str],
+    training_results: dict[str, dict[str, Any]],
+) -> go.Figure | None:
     """Build a grouped bar chart comparing key metrics across models.
 
     Args:
         selected_ids: List of model IDs to compare.
+        training_results: Session-scoped training results cache.
 
     Returns:
         Plotly Figure with grouped bars, or None if no data.
@@ -106,7 +103,7 @@ def _build_metrics_bar(selected_ids: list[str]) -> go.Figure | None:
     traces = []
 
     for model_id in selected_ids:
-        result = _training_results.get(model_id)
+        result = training_results.get(model_id)
         if result is None:
             continue
         metrics = result.get("metrics", {})
@@ -136,18 +133,20 @@ def _build_metrics_bar(selected_ids: list[str]) -> go.Figure | None:
 
 def _build_comparison_table(
     selected_ids: list[str],
+    training_results: dict[str, dict[str, Any]],
 ) -> list[list[str]]:
     """Build a comparison table with rows per model and metric columns.
 
     Args:
         selected_ids: List of model IDs to compare.
+        training_results: Session-scoped training results cache.
 
     Returns:
         List of rows: [model_type, accuracy, precision, recall, f1, roc_auc, threshold].
     """
     rows: list[list[str]] = []
     for model_id in selected_ids:
-        result = _training_results.get(model_id)
+        result = training_results.get(model_id)
         if result is None:
             continue
         metrics = result.get("metrics", {})
@@ -167,15 +166,18 @@ def _build_comparison_table(
     return rows
 
 
-def create_comparison_tab(api: CreditRiskAPI) -> None:
+def create_comparison_tab(
+    api: CreditRiskAPI, training_results_state: gr.State
+) -> None:
     """Create the comparison tab UI and wire up event handlers.
 
     Args:
         api: CreditRiskAPI client instance.
+        training_results_state: Session-scoped gr.State holding training results.
     """
     with gr.Row():
         model_multiselect = gr.Dropdown(
-            choices=_get_model_choices(api),
+            choices=[],
             multiselect=True,
             label="Select Models to Compare",
             interactive=True,
@@ -206,11 +208,13 @@ def create_comparison_tab(api: CreditRiskAPI) -> None:
 
     def _compare(
         selected: list[str],
+        training_results: dict[str, dict[str, Any]],
     ) -> tuple[go.Figure | None, go.Figure | None, list[list[str]], Any]:
         """Compare selected models.
 
         Args:
             selected: List of selected model IDs.
+            training_results: Session-scoped training results cache.
 
         Returns:
             Tuple of (roc_figure, bar_figure, table_rows, error_update).
@@ -224,7 +228,7 @@ def create_comparison_tab(api: CreditRiskAPI) -> None:
             )
 
         # Check which models have cached results
-        missing = [mid for mid in selected if mid not in _training_results]
+        missing = [mid for mid in selected if mid not in training_results]
         if missing:
             return (
                 None,
@@ -239,9 +243,9 @@ def create_comparison_tab(api: CreditRiskAPI) -> None:
                 ),
             )
 
-        roc_fig = _build_roc_overlay(selected, api)
-        bar_fig = _build_metrics_bar(selected)
-        table = _build_comparison_table(selected)
+        roc_fig = _build_roc_overlay(selected, training_results)
+        bar_fig = _build_metrics_bar(selected, training_results)
+        table = _build_comparison_table(selected, training_results)
 
         return (roc_fig, bar_fig, table, gr.update(visible=False, value=""))
 
@@ -249,6 +253,6 @@ def create_comparison_tab(api: CreditRiskAPI) -> None:
 
     model_multiselect.change(
         fn=_compare,
-        inputs=[model_multiselect],
+        inputs=[model_multiselect, training_results_state],
         outputs=[roc_overlay, metrics_bar, comparison_table, error_display],
     )
