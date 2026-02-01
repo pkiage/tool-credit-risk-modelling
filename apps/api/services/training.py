@@ -1,5 +1,6 @@
 """Model training service."""
 
+import time
 import uuid
 from datetime import datetime
 
@@ -14,10 +15,10 @@ from xgboost import XGBClassifier
 from apps.api.services.audit import emit_event
 from apps.api.services.model_store import store_model
 from shared import constants
-from shared.schemas.model import ModelMetadata
 from shared.logic.evaluation import evaluate_model
 from shared.logic.preprocessing import undersample_majority_class
 from shared.schemas.audit import TrainingAuditEvent
+from shared.schemas.model import ModelMetadata
 from shared.schemas.training import TrainingConfig, TrainingResult
 
 
@@ -113,10 +114,7 @@ def train_model(
 
     # Split dataset
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y,
-        test_size=config.test_size,
-        random_state=config.random_state,
-        stratify=y
+        X, y, test_size=config.test_size, random_state=config.random_state, stratify=y
     )
 
     # Undersample if requested
@@ -126,8 +124,10 @@ def train_model(
         )
 
     # Create and train model
+    t_start = time.monotonic()
     model = create_model(config.model_type)
     model.fit(X_train, y_train)
+    training_time_seconds = time.monotonic() - t_start
 
     # Get predictions on test set
     y_proba = model.predict_proba(X_test)[:, 1]  # Probability of default (class 1)
@@ -152,7 +152,7 @@ def train_model(
         threshold=metrics.threshold_analysis.threshold,
         roc_auc=metrics.roc_auc,
         accuracy=metrics.accuracy,
-        created_at=timestamp
+        created_at=timestamp,
     )
     store_model(model_id, model, metadata)
 
@@ -163,7 +163,7 @@ def train_model(
         model_type=config.model_type,
         training_config=config.model_dump(),
         dataset_size=len(X),
-        test_accuracy=metrics.accuracy
+        test_accuracy=metrics.accuracy,
     )
     emit_event(audit_event)
 
@@ -174,5 +174,6 @@ def train_model(
         metrics=metrics,
         optimal_threshold=metrics.threshold_analysis.threshold,
         feature_importance=feature_importance,
-        training_config=config
+        training_config=config,
+        training_time_seconds=round(training_time_seconds, 3),
     )
