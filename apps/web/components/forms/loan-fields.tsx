@@ -56,7 +56,7 @@ export function LoanFields({ values, onChange, errors = {} }: LoanFieldsProps) {
 			<Input
 				label="Annual Income"
 				type="number"
-				min={0}
+				min={1}
 				step={1000}
 				value={values.person_income}
 				onChange={(e) => onChange("person_income", Number(e.target.value))}
@@ -74,7 +74,7 @@ export function LoanFields({ values, onChange, errors = {} }: LoanFieldsProps) {
 			<Input
 				label="Loan Amount"
 				type="number"
-				min={0}
+				min={1}
 				step={500}
 				value={values.loan_amnt}
 				onChange={(e) => onChange("loan_amnt", Number(e.target.value))}
@@ -83,7 +83,7 @@ export function LoanFields({ values, onChange, errors = {} }: LoanFieldsProps) {
 			<Input
 				label="Interest Rate (%)"
 				type="number"
-				min={0}
+				min={0.01}
 				max={100}
 				step={0.01}
 				value={values.loan_int_rate}

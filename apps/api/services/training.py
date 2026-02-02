@@ -154,7 +154,19 @@ def train_model(
         accuracy=metrics.accuracy,
         created_at=timestamp,
     )
-    store_model(model_id, model, metadata)
+
+    # Build training result
+    training_result = TrainingResult(
+        model_id=model_id,
+        model_type=config.model_type,
+        metrics=metrics,
+        optimal_threshold=metrics.threshold_analysis.threshold,
+        feature_importance=feature_importance,
+        training_config=config,
+        training_time_seconds=round(training_time_seconds, 3),
+    )
+
+    store_model(model_id, model, metadata, training_result=training_result)
 
     # Emit audit event
     audit_event = TrainingAuditEvent(
@@ -167,13 +179,4 @@ def train_model(
     )
     emit_event(audit_event)
 
-    # Return training result
-    return TrainingResult(
-        model_id=model_id,
-        model_type=config.model_type,
-        metrics=metrics,
-        optimal_threshold=metrics.threshold_analysis.threshold,
-        feature_importance=feature_importance,
-        training_config=config,
-        training_time_seconds=round(training_time_seconds, 3),
-    )
+    return training_result

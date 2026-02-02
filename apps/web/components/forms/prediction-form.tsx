@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import type { LoanApplication, ModelMetadata } from "@/lib/types";
+import { validateLoanApplication } from "@/lib/validation";
 import { LoanFields } from "./loan-fields";
 
 interface PredictionFormProps {
@@ -29,14 +30,30 @@ const defaultApplication: LoanApplication = {
 export function PredictionForm({ models, onSubmit, loading = false }: PredictionFormProps) {
 	const [modelId, setModelId] = useState(models[0]?.model_id ?? "");
 	const [application, setApplication] = useState<LoanApplication>(defaultApplication);
+	const [errors, setErrors] = useState<Partial<Record<keyof LoanApplication, string>>>({});
 
 	const handleFieldChange = (field: keyof LoanApplication, value: string | number) => {
 		setApplication({ ...application, [field]: value });
+		if (errors[field]) {
+			setErrors((prev) => {
+				const next = { ...prev };
+				delete next[field];
+				return next;
+			});
+		}
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!modelId) return;
+
+		const validationErrors = validateLoanApplication(application);
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors);
+			return;
+		}
+
+		setErrors({});
 		onSubmit(modelId, application);
 	};
 
@@ -62,7 +79,7 @@ export function PredictionForm({ models, onSubmit, loading = false }: Prediction
 				onChange={(e) => setModelId(e.target.value)}
 			/>
 
-			<LoanFields values={application} onChange={handleFieldChange} />
+			<LoanFields values={application} onChange={handleFieldChange} errors={errors} />
 
 			<Button type="submit" loading={loading} className="w-full">
 				{loading ? "Predicting..." : "Get Prediction"}
