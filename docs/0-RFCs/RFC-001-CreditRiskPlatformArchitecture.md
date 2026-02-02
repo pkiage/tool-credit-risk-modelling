@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Accepted |
+| Status | Implemented |
 | Author(s) | Claude |
 | Updated | 2026-02-01 |
 | GitHub Issue | — |

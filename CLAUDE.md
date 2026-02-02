@@ -6,7 +6,7 @@
 
 Migrating a Streamlit credit risk modeling demo to a production-grade monorepo.
 
-**Status**: Phase 4 complete — `shared/`, `apps/api/`, `notebooks/`, and `apps/gradio/` implemented and reviewed. Next: `apps/web/` (Next.js).
+**Status**: Phase 7 (cleanup & hardening). All layers implemented: `shared/`, `apps/api/`, `notebooks/`, `apps/gradio/`, `apps/web/`.
 
 ## Architecture
 
@@ -183,10 +183,10 @@ git stash pop  # Restore changes later
 
 | File | Purpose |
 |------|---------|
-| `docs/0-RFCs/RFC-001-*.md` | Architecture decision |
+| `docs/0-RFCs/RFC-001-*.md` | Platform architecture |
 | `docs/0-RFCs/RFC-002-*.md` | API layer design |
-| `docs/0-RFCs/RFC-003-*.md` | Marimo notebooks design |
-| `docs/0-RFCs/RFC-004-*.md` | Gradio app design |
+| `docs/0-RFCs/RFC-006-*.md` | Auth & security |
+| `docs/1-ADRs/` | Architecture decision records (ADR-001 through ADR-008) |
 | `shared/schemas/loan.py` | Core data models |
 | `shared/logic/threshold.py` | Youden's J implementation |
 | `data/processed/cr_loan_w2.csv` | Training dataset (one-hot encoded) |
