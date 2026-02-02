@@ -71,11 +71,11 @@ def create_model(
         ValueError: If model_type is not recognized.
     """
     if model_type == "logistic_regression":
-        return LogisticRegression(**constants.LOGISTIC_REGRESSION_PARAMS)  # type: ignore
+        return LogisticRegression(**constants.LOGISTIC_REGRESSION_PARAMS)  # type: ignore[arg-type]  # dict unpacking
     elif model_type == "xgboost":
-        return XGBClassifier(**constants.XGBOOST_PARAMS)  # type: ignore
+        return XGBClassifier(**constants.XGBOOST_PARAMS)  # type: ignore[arg-type]  # dict unpacking
     elif model_type == "random_forest":
-        return RandomForestClassifier(**constants.RANDOM_FOREST_PARAMS)  # type: ignore
+        return RandomForestClassifier(**constants.RANDOM_FOREST_PARAMS)  # type: ignore[arg-type]  # dict unpacking
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
