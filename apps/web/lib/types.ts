@@ -130,8 +130,6 @@ export interface ModelMetadata {
 	created_at: string;
 }
 
-export interface ModelSummary extends ModelMetadata {}
-
 // === API response types ===
 
 export interface HealthResponse {
