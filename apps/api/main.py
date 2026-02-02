@@ -6,8 +6,10 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
 
 from apps.api.config import Settings
+from apps.api.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 
 # Configure logging
 logging.basicConfig(
@@ -59,6 +61,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         debug=settings.debug,
         lifespan=lifespan,
     )
+
+    # Configure rate limiting
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
     # Configure CORS
     app.add_middleware(

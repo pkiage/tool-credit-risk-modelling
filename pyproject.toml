@@ -20,6 +20,9 @@ api = [
     "fastapi>=0.115",
     "uvicorn>=0.34",
     "pydantic-settings>=2.4",
+    "slowapi>=0.1.9",
+    "structlog>=25.0",
+    "joblib>=1.4",
 ]
 dev = [
     "pytest>=8.3",

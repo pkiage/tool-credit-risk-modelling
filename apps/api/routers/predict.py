@@ -2,9 +2,10 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from apps.api.auth import verify_api_key
+from apps.api.middleware.rate_limit import limiter
 from apps.api.services.inference import predict
 from shared.schemas.prediction import PredictionRequest, PredictionResponse
 
@@ -14,8 +15,10 @@ router = APIRouter()
 
 
 @router.post("/", response_model=PredictionResponse)
+@limiter.limit("100/minute")
 async def make_predictions(
-    request: PredictionRequest,
+    request: Request,
+    prediction_request: PredictionRequest,
     _api_key: str = Depends(verify_api_key),
 ) -> PredictionResponse:
     """Make predictions for loan applications.
@@ -75,7 +78,7 @@ async def make_predictions(
         ```
     """
     try:
-        response = predict(request)
+        response = predict(prediction_request)
         return response
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
