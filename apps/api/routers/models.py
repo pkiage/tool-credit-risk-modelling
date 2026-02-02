@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from apps.api.auth import verify_api_key
 from apps.api.config import Settings
 from apps.api.dependencies import get_settings
 from apps.api.services.model_store import get_model, get_training_result, list_models
@@ -89,7 +90,8 @@ async def get_model_results(model_id: str) -> TrainingResult:
 @router.post("/{model_id}/persist", response_model=PersistResponse)
 async def persist_model(
     model_id: str,
-    settings: Settings = Depends(get_settings)
+    settings: Settings = Depends(get_settings),
+    _api_key: str = Depends(verify_api_key),
 ) -> PersistResponse:
     """Persist a trained model to disk.
 

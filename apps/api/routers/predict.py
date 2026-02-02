@@ -2,8 +2,9 @@
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from apps.api.auth import verify_api_key
 from apps.api.services.inference import predict
 from shared.schemas.prediction import PredictionRequest, PredictionResponse
 
@@ -13,7 +14,10 @@ router = APIRouter()
 
 
 @router.post("/", response_model=PredictionResponse)
-async def make_predictions(request: PredictionRequest) -> PredictionResponse:
+async def make_predictions(
+    request: PredictionRequest,
+    _api_key: str = Depends(verify_api_key),
+) -> PredictionResponse:
     """Make predictions for loan applications.
 
     Args:
