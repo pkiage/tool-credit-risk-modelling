@@ -38,9 +38,7 @@ with gr.Blocks(title=APP_TITLE) as app:
         api.set_api_key("")
         return "", "Invalid key"
 
-    verify_btn.click(
-        _verify_key, [api_key_input], [api_key_input, auth_status]
-    )
+    verify_btn.click(_verify_key, [api_key_input], [api_key_input, auth_status])
 
     # Dynamic health banner — checked on each page load, not just at startup.
     api_status = gr.Markdown(visible=False)

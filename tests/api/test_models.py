@@ -16,8 +16,7 @@ def test_list_models_empty(client: TestClient):
 
 
 def test_list_models_after_training(
-    client: TestClient,
-    sample_training_config: TrainingConfig
+    client: TestClient, sample_training_config: TrainingConfig
 ):
     """Test listing models after training."""
     # Train a model
@@ -64,8 +63,7 @@ def test_list_multiple_models(client: TestClient):
 
 
 def test_get_model_metadata_success(
-    client: TestClient,
-    sample_training_config: TrainingConfig
+    client: TestClient, sample_training_config: TrainingConfig
 ):
     """Test getting metadata for a specific model."""
     # Train model
@@ -93,8 +91,7 @@ def test_get_model_metadata_not_found(client: TestClient):
 
 
 def test_persist_model_success(
-    client: TestClient,
-    sample_training_config: TrainingConfig
+    client: TestClient, sample_training_config: TrainingConfig
 ):
     """Test persisting a model to disk."""
     # Train model

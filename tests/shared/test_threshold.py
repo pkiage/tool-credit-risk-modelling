@@ -84,7 +84,9 @@ class TestFindOptimalThreshold:
         """Test with extremely imbalanced data."""
         # 95% negative, 5% positive
         y_true = np.array([0] * 95 + [1] * 5)
-        y_proba = np.concatenate([np.random.uniform(0, 0.5, 95), np.random.uniform(0.5, 1, 5)])
+        y_proba = np.concatenate(
+            [np.random.uniform(0, 0.5, 95), np.random.uniform(0.5, 1, 5)]
+        )
 
         result = find_optimal_threshold(y_true, y_proba)
 

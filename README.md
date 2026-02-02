@@ -49,14 +49,27 @@ uv run python -m apps.gradio.app
 
 ## Documentation
 
+### RFCs (Architecture)
+
 - [RFC-001: Platform Architecture](docs/0-RFCs/RFC-001-CreditRiskPlatformArchitecture.md)
 - [RFC-002: API Layer](docs/0-RFCs/RFC-002-api-layer.md)
-- [RFC-003: Marimo Notebooks](docs/0-RFCs/RFC-003-marimo-notebooks.md)
-- [RFC-004: Gradio App](docs/0-RFCs/RFC-004-gradio-app.md)
-- [RFC-005: Next.js UI](docs/0-RFCs/RFC-005-nextjs-ui.md)
 - [RFC-006: Auth & Polish](docs/0-RFCs/RFC-006-auth-polish.md)
+
+### ADRs (Decisions)
+
+- [ADR-001: Shared Layer Foundation](docs/1-ADRs/ADR-001-shared-layer-foundation.md)
+- [ADR-002: Pydantic as Contract](docs/1-ADRs/ADR-002-pydantic-as-contract.md)
+- [ADR-003: Marimo over Jupyter](docs/1-ADRs/ADR-003-marimo-over-jupyter.md)
+- [ADR-004: API Key Authentication](docs/1-ADRs/ADR-004-api-key-authentication.md)
+- [ADR-005: Model Persistence](docs/1-ADRs/ADR-005-model-persistence-strategy.md)
+- [ADR-006: UI Progression](docs/1-ADRs/ADR-006-ui-progression.md)
+- [ADR-007: Chart Library](docs/1-ADRs/ADR-007-chart-library.md)
+- [ADR-008: Monorepo Structure](docs/1-ADRs/ADR-008-monorepo-structure.md)
+
+### Other
+
 - [Deployment Guide](docs/DEPLOYMENT.md)
-- [ADRs](docs/1-ADRs/)
+- [Environment Variables](docs/ENV_VARS.md)
 
 ## Contributing
 

@@ -119,9 +119,7 @@ class TestLoanDataset:
 
     def test_valid_loan_dataset(self, sample_loan_applications):
         """Test creating a valid loan dataset."""
-        dataset = LoanDataset(
-            applications=sample_loan_applications, labels=[0, 0, 1]
-        )
+        dataset = LoanDataset(applications=sample_loan_applications, labels=[0, 0, 1])
         assert len(dataset) == 3
         assert dataset.test_size == 0.2
         assert dataset.random_state == 42

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Accepted |
+| Status | Implemented |
 | Author(s) | [Your Name] |
 | Updated | 2026-02-01 |
 | Depends On | RFC-001 |

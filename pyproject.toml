@@ -40,8 +40,11 @@ select = ["E", "F", "I", "N", "W", "UP"]
 quote-style = "double"
 
 [tool.ruff.lint.per-file-ignores]
-# Marimo cell functions receive classes/uppercase vars as arguments
+# ML convention: X, X_train, X_test are standard feature matrix names
 "notebooks/*.py" = ["N803", "N806"]
+"apps/api/services/*.py" = ["N806"]
+"shared/logic/preprocessing.py" = ["N803"]
+"tests/**/*.py" = ["N806"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["shared", "apps"]
@@ -49,3 +52,11 @@ packages = ["shared", "apps"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.3",
+    "deptry>=0.24.0",
+    "httpx>=0.28.1",
+    "pip-audit>=2.10.0",
+]

@@ -95,10 +95,7 @@ def list_models() -> list[ModelMetadata]:
         >>> print(len(models))
         1
     """
-    return [
-        ModelMetadata(**stored["metadata"])
-        for stored in _model_store.values()
-    ]
+    return [ModelMetadata(**stored["metadata"]) for stored in _model_store.values()]
 
 
 def get_training_result(model_id: str) -> TrainingResult | None:

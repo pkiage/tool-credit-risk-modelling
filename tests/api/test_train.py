@@ -5,7 +5,9 @@ from fastapi.testclient import TestClient
 from shared.schemas.training import TrainingConfig
 
 
-def test_train_model_success(client: TestClient, sample_training_config: TrainingConfig):
+def test_train_model_success(
+    client: TestClient, sample_training_config: TrainingConfig
+):
     """Test successful model training."""
     response = client.post("/train/", json=sample_training_config.model_dump())
 
@@ -61,10 +63,7 @@ def test_train_random_forest_model(client: TestClient):
 
 def test_train_with_undersampling(client: TestClient):
     """Test training with undersampling enabled."""
-    config = TrainingConfig(
-        model_type="logistic_regression",
-        undersample=True
-    )
+    config = TrainingConfig(model_type="logistic_regression", undersample=True)
     response = client.post("/train/", json=config.model_dump())
 
     assert response.status_code == 200
@@ -77,7 +76,7 @@ def test_train_invalid_model_type(client: TestClient):
     invalid_config = {
         "model_type": "invalid_model",
         "test_size": 0.2,
-        "random_state": 42
+        "random_state": 42,
     }
     response = client.post("/train/", json=invalid_config)
 
@@ -89,7 +88,7 @@ def test_train_invalid_test_size(client: TestClient):
     invalid_config = {
         "model_type": "logistic_regression",
         "test_size": 0.9,  # Too large
-        "random_state": 42
+        "random_state": 42,
     }
     response = client.post("/train/", json=invalid_config)
 

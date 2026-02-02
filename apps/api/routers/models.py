@@ -120,9 +120,7 @@ async def persist_model(
         raise HTTPException(status_code=404, detail=f"Model not found: {model_id}")
 
     try:
-        model_store = PersistentModelStore(
-            base_path=settings.model_artifacts_path
-        )
+        model_store = PersistentModelStore(base_path=settings.model_artifacts_path)
         path = model_store.save(
             model_id,
             stored_model.model,

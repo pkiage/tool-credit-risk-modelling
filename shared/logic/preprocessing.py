@@ -286,7 +286,7 @@ def loan_application_to_feature_vector(
         for field_name, field_value in field_values.items():
             prefix = f"{field_name}_"
             if col_name.startswith(prefix):
-                category = col_name[len(prefix):]
+                category = col_name[len(prefix) :]
                 categorical_values.append(1.0 if field_value == category else 0.0)
                 matched = True
                 break
