@@ -9,7 +9,7 @@ from shared.schemas.training import TrainingConfig
 def test_predict_success(
     client: TestClient,
     sample_training_config: TrainingConfig,
-    sample_loan_application: LoanApplication
+    sample_loan_application: LoanApplication,
 ):
     """Test successful prediction."""
     # First train a model
@@ -22,7 +22,7 @@ def test_predict_success(
         "model_id": model_id,
         "applications": [sample_loan_application.model_dump()],
         "threshold": None,
-        "include_probabilities": True
+        "include_probabilities": True,
     }
     response = client.post("/predict/", json=prediction_request)
 
@@ -55,8 +55,7 @@ def test_predict_success(
 
 
 def test_predict_multiple_applications(
-    client: TestClient,
-    sample_training_config: TrainingConfig
+    client: TestClient, sample_training_config: TrainingConfig
 ):
     """Test prediction with multiple loan applications."""
     # Train model
@@ -76,7 +75,7 @@ def test_predict_multiple_applications(
             person_home_ownership="RENT",
             loan_intent="EDUCATION",
             loan_grade="B",
-            cb_person_default_on_file="N"
+            cb_person_default_on_file="N",
         ),
         LoanApplication(
             person_age=35,
@@ -89,13 +88,13 @@ def test_predict_multiple_applications(
             person_home_ownership="OWN",
             loan_intent="HOMEIMPROVEMENT",
             loan_grade="A",
-            cb_person_default_on_file="N"
-        )
+            cb_person_default_on_file="N",
+        ),
     ]
 
     prediction_request = {
         "model_id": model_id,
-        "applications": [app.model_dump() for app in applications]
+        "applications": [app.model_dump() for app in applications],
     }
     response = client.post("/predict/", json=prediction_request)
 
@@ -108,7 +107,7 @@ def test_predict_multiple_applications(
 def test_predict_custom_threshold(
     client: TestClient,
     sample_training_config: TrainingConfig,
-    sample_loan_application: LoanApplication
+    sample_loan_application: LoanApplication,
 ):
     """Test prediction with custom threshold."""
     # Train model
@@ -119,7 +118,7 @@ def test_predict_custom_threshold(
     prediction_request = {
         "model_id": model_id,
         "applications": [sample_loan_application.model_dump()],
-        "threshold": 0.7  # Custom threshold
+        "threshold": 0.7,  # Custom threshold
     }
     response = client.post("/predict/", json=prediction_request)
 
@@ -129,13 +128,12 @@ def test_predict_custom_threshold(
 
 
 def test_predict_model_not_found(
-    client: TestClient,
-    sample_loan_application: LoanApplication
+    client: TestClient, sample_loan_application: LoanApplication
 ):
     """Test prediction with non-existent model."""
     prediction_request = {
         "model_id": "nonexistent_model",
-        "applications": [sample_loan_application.model_dump()]
+        "applications": [sample_loan_application.model_dump()],
     }
     response = client.post("/predict/", json=prediction_request)
 
@@ -156,10 +154,10 @@ def test_predict_invalid_application(client: TestClient):
         "applications": [
             {
                 "person_age": 25,
-                "person_income": 50000.0
+                "person_income": 50000.0,
                 # Missing other required fields
             }
-        ]
+        ],
     }
     response = client.post("/predict/", json=prediction_request)
 
@@ -174,10 +172,7 @@ def test_predict_empty_applications(client: TestClient):
     model_id = train_response.json()["model_id"]
 
     # Empty applications list
-    prediction_request = {
-        "model_id": model_id,
-        "applications": []
-    }
+    prediction_request = {"model_id": model_id, "applications": []}
     response = client.post("/predict/", json=prediction_request)
 
     assert response.status_code == 422  # Validation error

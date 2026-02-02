@@ -1,7 +1,6 @@
 """Tests for evaluation logic."""
 
 import numpy as np
-import pytest
 
 from shared.logic.evaluation import (
     calculate_calibration_curve,
@@ -195,7 +194,10 @@ class TestEvaluateModel:
         # Same inputs should give same results
         assert metrics1.accuracy == metrics2.accuracy
         assert metrics1.roc_auc == metrics2.roc_auc
-        assert metrics1.threshold_analysis.threshold == metrics2.threshold_analysis.threshold
+        assert (
+            metrics1.threshold_analysis.threshold
+            == metrics2.threshold_analysis.threshold
+        )
 
 
 class TestCalculateModelConfidence:

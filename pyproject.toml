@@ -44,6 +44,7 @@ quote-style = "double"
 "notebooks/*.py" = ["N803", "N806"]
 "apps/api/services/*.py" = ["N806"]
 "shared/logic/preprocessing.py" = ["N803"]
+"tests/**/*.py" = ["N806"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["shared", "apps"]
@@ -54,5 +55,6 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "deptry>=0.24.0",
     "httpx>=0.28.1",
 ]

@@ -44,9 +44,7 @@ class PredictionResult(BaseModel):
 
     application: LoanApplication = Field(description="Loan application")
     predicted_default: bool = Field(description="Predicted default indicator")
-    default_probability: float = Field(
-        ge=0, le=1, description="Probability of default"
-    )
+    default_probability: float = Field(ge=0, le=1, description="Probability of default")
     confidence: float = Field(
         ge=0, le=1, description="Prediction confidence (distance from threshold)"
     )

@@ -88,9 +88,7 @@ class CreditRiskAPI:
         Raises:
             httpx.HTTPStatusError: If the API returns an error status.
         """
-        response = self.client.get(
-            f"{self.base_url}/models", headers=self._headers()
-        )
+        response = self.client.get(f"{self.base_url}/models", headers=self._headers())
         response.raise_for_status()
         return response.json()
 

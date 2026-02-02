@@ -52,10 +52,9 @@ def predict(request: PredictionRequest) -> PredictionResponse:
         threshold = metadata.threshold
 
     # Convert applications to feature matrix
-    X = np.array([
-        loan_application_to_feature_vector(app)
-        for app in request.applications
-    ])
+    X = np.array(
+        [loan_application_to_feature_vector(app) for app in request.applications]
+    )
 
     # Get predictions
     # Probability of default (class 1)
@@ -71,7 +70,7 @@ def predict(request: PredictionRequest) -> PredictionResponse:
             application=app,
             predicted_default=bool(pred),
             default_probability=float(proba),
-            confidence=float(conf)
+            confidence=float(conf),
         )
         for app, pred, proba, conf in zip(
             request.applications, y_pred, y_proba, confidence_scores
@@ -89,7 +88,7 @@ def predict(request: PredictionRequest) -> PredictionResponse:
         num_predictions=len(predictions),
         threshold_used=threshold,
         predicted_defaults=predicted_defaults,
-        avg_default_probability=float(np.mean(y_proba))
+        avg_default_probability=float(np.mean(y_proba)),
     )
     emit_event(audit_event)
 
@@ -102,5 +101,5 @@ def predict(request: PredictionRequest) -> PredictionResponse:
         timestamp=datetime.now(),
         total_applications=len(predictions),
         predicted_defaults=predicted_defaults,
-        predicted_approvals=predicted_approvals
+        predicted_approvals=predicted_approvals,
     )
