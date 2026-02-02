@@ -158,20 +158,24 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 training_results,
             )
         except httpx.HTTPStatusError as exc:
-            try:
-                detail = exc.response.json().get("detail", str(exc))
-            except Exception:
-                detail = str(exc)
+            logger.exception("Training HTTP error")
+            status = exc.response.status_code
+            if status == 401:
+                msg = "Authentication failed. Please check your API key."
+            elif status == 429:
+                msg = "Rate limit exceeded. Please try again later."
+            else:
+                msg = "Training request failed. Please try again."
             return (
                 [],
                 "",
                 "",
                 "",
                 None,
-                gr.update(visible=True, value=f"Training failed: {detail}"),
+                gr.update(visible=True, value=msg),
                 training_results,
             )
-        except Exception as exc:
+        except Exception:
             logger.exception("Training request failed")
             return (
                 [],
@@ -179,7 +183,10 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 "",
                 "",
                 None,
-                gr.update(visible=True, value=f"Training failed: {exc}"),
+                gr.update(
+                    visible=True,
+                    value="An unexpected error occurred. Please try again.",
+                ),
                 training_results,
             )
 

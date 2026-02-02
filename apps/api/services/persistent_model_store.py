@@ -1,11 +1,14 @@
 """Persistent filesystem-based model storage service."""
 
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import joblib
+
+_MODEL_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 
 
 class PersistentModelStore:
@@ -26,6 +29,19 @@ class PersistentModelStore:
         self.base_path = Path(base_path)
         self.base_path.mkdir(parents=True, exist_ok=True)
 
+    @staticmethod
+    def _validate_model_id(model_id: str) -> None:
+        """Validate model_id to prevent path traversal.
+
+        Args:
+            model_id: Model identifier to validate.
+
+        Raises:
+            ValueError: If model_id contains invalid characters.
+        """
+        if not _MODEL_ID_PATTERN.match(model_id):
+            raise ValueError("Invalid model_id format: must match [a-zA-Z0-9_-]+")
+
     def save(self, model_id: str, model: Any, metadata: dict[str, Any]) -> str:
         """Save a model and its metadata to disk.
 
@@ -36,7 +52,11 @@ class PersistentModelStore:
 
         Returns:
             File path of the saved model.
+
+        Raises:
+            ValueError: If model_id contains invalid characters.
         """
+        self._validate_model_id(model_id)
         model_path = self.base_path / f"{model_id}.joblib"
         meta_path = self.base_path / f"{model_id}.json"
 
@@ -58,7 +78,9 @@ class PersistentModelStore:
 
         Raises:
             FileNotFoundError: If the model file does not exist.
+            ValueError: If model_id contains invalid characters.
         """
+        self._validate_model_id(model_id)
         model_path = self.base_path / f"{model_id}.joblib"
         meta_path = self.base_path / f"{model_id}.json"
 
@@ -93,7 +115,11 @@ class PersistentModelStore:
 
         Returns:
             True if files were removed.
+
+        Raises:
+            ValueError: If model_id contains invalid characters.
         """
+        self._validate_model_id(model_id)
         model_path = self.base_path / f"{model_id}.joblib"
         meta_path = self.base_path / f"{model_id}.json"
 

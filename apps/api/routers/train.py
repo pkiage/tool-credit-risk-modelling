@@ -77,10 +77,12 @@ async def train(
     try:
         result = train_model(config, dataset_path=settings.default_dataset_path)
         return result
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=f"Dataset not found: {e}")
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid configuration: {e}")
+    except FileNotFoundError:
+        logger.exception("Dataset not found during training")
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    except ValueError:
+        logger.exception("Invalid training configuration")
+        raise HTTPException(status_code=400, detail="Invalid training configuration")
     except Exception:
         logger.exception("Training failed unexpectedly")
         raise HTTPException(status_code=500, detail="Internal server error")

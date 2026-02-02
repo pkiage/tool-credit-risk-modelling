@@ -36,6 +36,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting Credit Risk API...")
     logger.info(f"Environment: {'development' if app.debug else 'production'}")
 
+    settings = Settings()
+
+    # Security warnings
+    if not settings.require_auth:
+        logger.warning(
+            "Auth DISABLED. Set CREDIT_RISK_REQUIRE_AUTH=true for production."
+        )
+
+    if "*" in settings.cors_origins:
+        if settings.require_auth:
+            logger.error(
+                "CORS wildcard '*' used with authentication enabled. "
+                "Set CREDIT_RISK_CORS_ORIGINS to specific origins for production."
+            )
+        else:
+            logger.warning(
+                "CORS allows all origins ('*'). "
+                "Set CREDIT_RISK_CORS_ORIGINS to restrict in production."
+            )
+
     yield
 
     # Shutdown
