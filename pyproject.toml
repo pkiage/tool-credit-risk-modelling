@@ -54,6 +54,18 @@ packages = ["shared", "apps"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.deptry]
+# apps/ and shared/ are local packages, not external dependencies
+ignore_modules = ["apps", "shared"]
+
+[tool.deptry.per_rule_ignores]
+# CLI tools are invoked, not imported
+DEP002 = ["uvicorn", "pytest", "pytest-cov", "ruff", "bandit", "deptry", "pip-audit"]
+# Gradio app has its own requirements.txt (deploys separately to HF Spaces)
+DEP001 = ["gradio"]
+# httpx is a dev dep for test client; Gradio installs it via its own requirements.txt
+DEP004 = ["httpx"]
+
 [dependency-groups]
 dev = [
     "bandit>=1.9.3",
