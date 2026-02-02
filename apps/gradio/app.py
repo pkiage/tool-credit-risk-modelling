@@ -3,7 +3,6 @@
 from typing import Any
 
 import gradio as gr
-
 from apps.gradio.api_client import CreditRiskAPI
 from apps.gradio.components.comparison_tab import create_comparison_tab
 from apps.gradio.components.prediction_tab import create_prediction_tab

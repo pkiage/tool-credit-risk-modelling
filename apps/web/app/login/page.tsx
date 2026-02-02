@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
 	const [apiKey, setApiKey] = useState("");
@@ -29,6 +29,7 @@ export default function LoginPage() {
 				throw new Error("Invalid API key");
 			}
 
+			// biome-ignore lint/suspicious/noDocumentCookie: cookie-based auth requires direct cookie access
 			document.cookie = `api_key=${apiKey}; path=/; max-age=86400`;
 			router.push("/");
 		} catch {

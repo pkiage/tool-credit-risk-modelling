@@ -1,7 +1,7 @@
 """Persistent filesystem-based model storage service."""
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -40,7 +40,7 @@ class PersistentModelStore:
         model_path = self.base_path / f"{model_id}.joblib"
         meta_path = self.base_path / f"{model_id}.json"
 
-        metadata["saved_at"] = datetime.now(tz=timezone.utc).isoformat()
+        metadata["saved_at"] = datetime.now(tz=UTC).isoformat()
 
         joblib.dump(model, model_path)
         meta_path.write_text(json.dumps(metadata, indent=2, default=str))

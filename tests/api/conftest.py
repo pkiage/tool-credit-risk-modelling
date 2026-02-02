@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from apps.api.config import Settings
 from apps.api.main import create_app
+from apps.api.middleware.rate_limit import limiter
 from apps.api.services.model_store import clear_all_models
 from shared.schemas.loan import LoanApplication
 from shared.schemas.training import TrainingConfig
@@ -17,7 +18,7 @@ def test_settings() -> Settings:
         debug=True,
         default_dataset_path="data/processed/cr_loan_w2.csv",
         model_artifacts_path="test_artifacts/",
-        log_level="DEBUG"
+        log_level="DEBUG",
     )
 
 
@@ -37,8 +38,9 @@ def client(test_settings: Settings) -> TestClient:
 
 @pytest.fixture(autouse=True)
 def clear_models():
-    """Clear model store before each test."""
+    """Clear model store and rate limiter before each test."""
     clear_all_models()
+    limiter.reset()
     yield
     clear_all_models()
 
@@ -51,7 +53,7 @@ def sample_training_config() -> TrainingConfig:
         test_size=0.2,
         random_state=42,
         undersample=False,
-        cv_folds=5
+        cv_folds=5,
     )
 
 
@@ -69,5 +71,5 @@ def sample_loan_application() -> LoanApplication:
         person_home_ownership="RENT",
         loan_intent="EDUCATION",
         loan_grade="B",
-        cb_person_default_on_file="N"
+        cb_person_default_on_file="N",
     )

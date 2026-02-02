@@ -114,8 +114,8 @@ def test_persist_model_success(
 
     assert data["model_id"] == model_id
     assert model_id in data["path"]
-    assert ".pkl" in data["path"]
-    assert "pickle" in data["instructions"].lower()
+    assert ".joblib" in data["path"]
+    assert "joblib" in data["instructions"].lower()
     assert "load" in data["instructions"].lower()
 
 
