@@ -40,8 +40,10 @@ select = ["E", "F", "I", "N", "W", "UP"]
 quote-style = "double"
 
 [tool.ruff.lint.per-file-ignores]
-# Marimo cell functions receive classes/uppercase vars as arguments
+# ML convention: X, X_train, X_test are standard feature matrix names
 "notebooks/*.py" = ["N803", "N806"]
+"apps/api/services/*.py" = ["N806"]
+"shared/logic/preprocessing.py" = ["N803"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["shared", "apps"]
