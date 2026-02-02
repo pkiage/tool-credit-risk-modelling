@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "../logout-button";
 import { Nav } from "./nav";
 
 export function Header() {
@@ -8,7 +9,10 @@ export function Header() {
 				<Link href="/" className="text-xl font-bold text-gray-900">
 					Credit Risk Platform
 				</Link>
-				<Nav />
+				<div className="flex items-center gap-4">
+					<Nav />
+					<LogoutButton />
+				</div>
 			</div>
 		</header>
 	);
