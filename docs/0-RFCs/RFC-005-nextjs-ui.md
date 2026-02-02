@@ -431,13 +431,24 @@ NEXT_PUBLIC_API_URL=https://api.your-domain.com
 - **Error boundaries** — Graceful error handling
 - **Accessible** — ARIA labels, keyboard navigation
 
-## Questions and Discussion Topics
+## Questions and Discussion Topics (Resolved)
 
-1. **Component library** — shadcn/ui, Radix, or custom?
-2. **Data fetching** — Plain fetch, SWR, or React Query?
-3. **Form library** — react-hook-form + zod, or Formik?
-4. **Charts** — Recharts, Nivo, or Plotly.js?
-5. **State management** — React context, Zustand, or none?
+1. **Component library** — **Decision: Custom Tailwind components.** Keeps the dependency footprint minimal. Revisit shadcn/ui if component count grows significantly.
+2. **Data fetching** — **Decision: Plain fetch with typed wrapper (`lib/api-client.ts`).** Native AbortController handles timeouts. Add SWR/React Query if caching or automatic refetching becomes needed.
+3. **Form library** — **Decision: Controlled components with manual validation (`lib/validation.ts`).** Validation mirrors Pydantic constraints from `shared/schemas/loan.py`. Keeps bundle size small; consider react-hook-form + zod if form complexity grows.
+4. **Charts** — **Decision: Recharts 3.7.0.** React-native, good TypeScript support, lightweight. Handles all four chart types (ROC, calibration, confusion matrix, metrics bar).
+5. **State management** — **Decision: Local state only (useState).** No shared cross-page state exists. Add Zustand or React context only when a concrete need arises.
+
+### Deferred Scope
+
+The following RFC-specified items were intentionally deferred from the initial implementation:
+
+- `hooks/` directory (use-train, use-predict, use-models) — state is managed inline in pages
+- `lib/utils.ts` helper module — no utility functions needed yet
+- `app/api/health/route.ts` proxy endpoint — client calls API directly
+- Export CSV button on Compare page
+- Dataset upload option on Train page
+- Training history list on Train page
 
 ---
 
@@ -446,3 +457,4 @@ NEXT_PUBLIC_API_URL=https://api.your-domain.com
 | Date | Author | Changes |
 |------|--------|---------|
 | 2025-01-31 | — | Initial draft |
+| 2026-02-02 | — | Resolved open questions, documented deferred scope |
