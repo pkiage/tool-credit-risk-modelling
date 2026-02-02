@@ -1,6 +1,21 @@
-# Notebooks
+# Marimo Notebooks
 
 Interactive Marimo notebooks for credit risk model exploration.
+
+## Prerequisites
+
+```bash
+# Activate your virtual environment first
+source .venv/bin/activate  # macOS/Linux
+.venv\Scripts\Activate.ps1  # Windows PowerShell
+
+# Install marimo
+pip install marimo
+```
+
+> **Windows:** If `marimo` isn't recognized, use `python -m marimo` instead, or [add Python Scripts to your PATH](https://docs.python.org/3/using/windows.html#finding-the-python-executable).
+>
+> **macOS/Linux:** You may need `pip3` and `python3` on systems where Python 2 is the default.
 
 ## Notebooks
 

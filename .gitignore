@@ -90,6 +90,7 @@ apps/web/out/
 .ipynb_checkpoints/
 *.ipynb
 .marimo/
+__marimo__
 
 # ----------------------------------------
 # ML artifacts
