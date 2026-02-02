@@ -1,5 +1,7 @@
 """Model management endpoint router."""
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from apps.api.auth import verify_api_key
@@ -9,6 +11,8 @@ from apps.api.services.model_store import get_model, get_training_result, list_m
 from apps.api.services.persistent_model_store import PersistentModelStore
 from shared.schemas.model import ModelMetadata, PersistResponse
 from shared.schemas.training import TrainingResult
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -153,8 +157,9 @@ predictions = (y_proba >= threshold).astype(int)
             instructions=instructions,
         )
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to persist model %s", model_id)
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to persist model: {e}",
+            detail="Failed to persist model",
         )

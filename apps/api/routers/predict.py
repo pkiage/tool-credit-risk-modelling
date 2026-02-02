@@ -80,8 +80,9 @@ async def make_predictions(
     try:
         response = predict(prediction_request)
         return response
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError:
+        logger.exception("Prediction validation error")
+        raise HTTPException(status_code=404, detail="Model not found or invalid input")
     except Exception:
         logger.exception("Prediction failed unexpectedly")
         raise HTTPException(status_code=500, detail="Internal server error")
