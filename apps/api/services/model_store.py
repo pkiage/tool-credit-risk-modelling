@@ -5,6 +5,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from shared.schemas.model import ModelMetadata
+from shared.schemas.training import TrainingResult
 
 # In-memory model store (session-scoped, not persisted)
 # In Phase 5, this will be replaced with persistent storage (filesystem, S3, MLflow)
@@ -25,13 +26,19 @@ class StoredModel(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
 
-def store_model(model_id: str, model: Any, metadata: ModelMetadata) -> None:
+def store_model(
+    model_id: str,
+    model: Any,
+    metadata: ModelMetadata,
+    training_result: TrainingResult | None = None,
+) -> None:
     """Store a trained model in memory.
 
     Args:
         model_id: Unique identifier for the model.
         model: Trained model object (sklearn/xgboost).
         metadata: Model metadata.
+        training_result: Full training result with metrics (optional).
 
     Example:
         >>> from sklearn.linear_model import LogisticRegression
@@ -48,6 +55,7 @@ def store_model(model_id: str, model: Any, metadata: ModelMetadata) -> None:
     _model_store[model_id] = {
         "model": model,
         "metadata": metadata.model_dump(),
+        "training_result": training_result.model_dump() if training_result else None,
     }
 
 
@@ -91,6 +99,22 @@ def list_models() -> list[ModelMetadata]:
         ModelMetadata(**stored["metadata"])
         for stored in _model_store.values()
     ]
+
+
+def get_training_result(model_id: str) -> TrainingResult | None:
+    """Retrieve stored training result for a model.
+
+    Args:
+        model_id: Model identifier.
+
+    Returns:
+        TrainingResult if stored, None if model not found or result not stored.
+    """
+    stored_data = _model_store.get(model_id)
+    if stored_data is None or stored_data.get("training_result") is None:
+        return None
+
+    return TrainingResult(**stored_data["training_result"])
 
 
 def delete_model(model_id: str) -> bool:

@@ -8,8 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from apps.api.config import Settings
 from apps.api.dependencies import get_settings
-from apps.api.services.model_store import get_model, list_models
+from apps.api.services.model_store import get_model, get_training_result, list_models
 from shared.schemas.model import ModelMetadata, PersistResponse
+from shared.schemas.training import TrainingResult
 
 router = APIRouter()
 
@@ -56,6 +57,33 @@ async def get_model_metadata(model_id: str) -> ModelMetadata:
         raise HTTPException(status_code=404, detail=f"Model not found: {model_id}")
 
     return stored_model.metadata
+
+
+@router.get("/{model_id}/results", response_model=TrainingResult)
+async def get_model_results(model_id: str) -> TrainingResult:
+    """Get full training results for a stored model.
+
+    Args:
+        model_id: Model identifier.
+
+    Returns:
+        Full training result including metrics, ROC curve, confusion matrix, etc.
+
+    Raises:
+        HTTPException: If model not found or training results not available.
+    """
+    stored_model = get_model(model_id)
+    if stored_model is None:
+        raise HTTPException(status_code=404, detail=f"Model not found: {model_id}")
+
+    result = get_training_result(model_id)
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Training results not available for model: {model_id}",
+        )
+
+    return result
 
 
 @router.post("/{model_id}/persist", response_model=PersistResponse)
