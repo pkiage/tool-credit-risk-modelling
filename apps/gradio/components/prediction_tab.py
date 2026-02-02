@@ -179,23 +179,32 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
                 gr.update(visible=False, value=""),
             )
         except httpx.HTTPStatusError as exc:
-            try:
-                detail = exc.response.json().get("detail", str(exc))
-            except Exception:
-                detail = str(exc)
+            logger.exception("Prediction HTTP error")
+            status = exc.response.status_code
+            if status == 401:
+                msg = "Authentication failed. Please check your API key."
+            elif status == 404:
+                msg = "Model not found. Please select a valid model."
+            elif status == 429:
+                msg = "Rate limit exceeded. Please try again later."
+            else:
+                msg = "Prediction request failed. Please try again."
             return (
                 "",
                 "",
                 "",
-                gr.update(visible=True, value=f"Prediction failed: {detail}"),
+                gr.update(visible=True, value=msg),
             )
-        except Exception as exc:
+        except Exception:
             logger.exception("Prediction request failed")
             return (
                 "",
                 "",
                 "",
-                gr.update(visible=True, value=f"Prediction failed: {exc}"),
+                gr.update(
+                    visible=True,
+                    value="An unexpected error occurred. Please try again.",
+                ),
             )
 
     refresh_btn.click(fn=_refresh, inputs=[], outputs=[model_selector])
