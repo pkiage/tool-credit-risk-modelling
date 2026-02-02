@@ -85,6 +85,10 @@ export const api = {
 		return request<ModelMetadata>(`/models/${modelId}`);
 	},
 
+	getModelResults: async (modelId: string): Promise<TrainingResult> => {
+		return request<TrainingResult>(`/models/${modelId}/results`);
+	},
+
 	persistModel: async (modelId: string): Promise<PersistResponse> => {
 		return request<PersistResponse>(`/models/${modelId}/persist`, {
 			method: "POST",

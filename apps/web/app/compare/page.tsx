@@ -11,6 +11,8 @@ import type { ModelMetadata, TrainingResult } from "@/lib/types";
 
 const COLORS = ["#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c"];
 
+type CompareMode = "stored" | "retrain";
+
 export default function ComparePage() {
 	const [models, setModels] = useState<ModelMetadata[]>([]);
 	const [modelsLoading, setModelsLoading] = useState(true);
@@ -18,6 +20,8 @@ export default function ComparePage() {
 	const [results, setResults] = useState<Map<string, TrainingResult>>(new Map());
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [mode, setMode] = useState<CompareMode>("stored");
+	const [unavailableIds, setUnavailableIds] = useState<Set<string>>(new Set());
 
 	useEffect(() => {
 		api
@@ -43,31 +47,14 @@ export default function ComparePage() {
 		if (selectedIds.size === 0) return;
 		setLoading(true);
 		setError(null);
+		setUnavailableIds(new Set());
 
 		try {
-			const trainPromises = Array.from(selectedIds).map(async (id) => {
-				// Re-train each model to get full results with ROC curves
-				const model = models.find((m) => m.model_id === id);
-				if (!model) return null;
-
-				const result = await api.train({
-					model_type: model.model_type as TrainingResult["training_config"]["model_type"],
-					test_size: 0.2,
-					random_state: 42,
-					undersample: false,
-					cv_folds: 5,
-				});
-				return [id, result] as const;
-			});
-
-			const entries = await Promise.all(trainPromises);
-			const newResults = new Map<string, TrainingResult>();
-			for (const entry of entries) {
-				if (entry) {
-					newResults.set(entry[0], entry[1]);
-				}
+			if (mode === "stored") {
+				await fetchStoredResults();
+			} else {
+				await retrainModels();
 			}
-			setResults(newResults);
 		} catch (err) {
 			if (err instanceof ApiClientError) {
 				setError(err.message);
@@ -77,6 +64,63 @@ export default function ComparePage() {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const fetchStoredResults = async () => {
+		const promises = Array.from(selectedIds).map(async (id) => {
+			try {
+				const result = await api.getModelResults(id);
+				return [id, result] as const;
+			} catch {
+				return [id, null] as const;
+			}
+		});
+
+		const entries = await Promise.all(promises);
+		const newResults = new Map<string, TrainingResult>();
+		const missing = new Set<string>();
+
+		for (const [id, result] of entries) {
+			if (result) {
+				newResults.set(id, result);
+			} else {
+				missing.add(id);
+			}
+		}
+
+		setResults(newResults);
+		setUnavailableIds(missing);
+
+		if (missing.size > 0 && newResults.size === 0) {
+			setError(
+				"No stored results available for the selected models. Try using Re-train mode instead.",
+			);
+		}
+	};
+
+	const retrainModels = async () => {
+		const promises = Array.from(selectedIds).map(async (id) => {
+			const model = models.find((m) => m.model_id === id);
+			if (!model) return null;
+
+			const result = await api.train({
+				model_type: model.model_type as TrainingResult["training_config"]["model_type"],
+				test_size: 0.2,
+				random_state: 42,
+				undersample: false,
+				cv_folds: 5,
+			});
+			return [id, result] as const;
+		});
+
+		const entries = await Promise.all(promises);
+		const newResults = new Map<string, TrainingResult>();
+		for (const entry of entries) {
+			if (entry) {
+				newResults.set(entry[0], entry[1]);
+			}
+		}
+		setResults(newResults);
 	};
 
 	const selectedResults = Array.from(results.entries());
@@ -161,18 +205,69 @@ export default function ComparePage() {
 								<span className="font-medium text-gray-900">{model.model_type}</span>
 								<span className="ml-2 text-sm text-gray-500">{model.model_id.slice(0, 8)}</span>
 							</div>
-							<span className="text-sm text-gray-600">AUC: {model.roc_auc.toFixed(3)}</span>
+							<div className="text-right text-sm">
+								<span className="text-gray-600">AUC: {model.roc_auc.toFixed(3)}</span>
+								<span className="ml-3 text-gray-400">{formatTimestamp(model.created_at)}</span>
+							</div>
 						</label>
 					))}
 				</div>
-				<div className="mt-4">
+
+				<div className="mt-4 flex items-center gap-4">
+					<div className="flex rounded-lg border border-gray-200">
+						<button
+							type="button"
+							className={`rounded-l-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+								mode === "stored"
+									? "bg-blue-600 text-white"
+									: "bg-white text-gray-700 hover:bg-gray-50"
+							}`}
+							onClick={() => setMode("stored")}
+						>
+							Stored Results
+						</button>
+						<button
+							type="button"
+							className={`rounded-r-lg border-l border-gray-200 px-3 py-1.5 text-sm font-medium transition-colors ${
+								mode === "retrain"
+									? "bg-blue-600 text-white"
+									: "bg-white text-gray-700 hover:bg-gray-50"
+							}`}
+							onClick={() => setMode("retrain")}
+						>
+							Re-train
+						</button>
+					</div>
+
 					<Button onClick={handleCompare} loading={loading} disabled={selectedIds.size === 0}>
 						{loading
 							? "Comparing..."
 							: `Compare ${selectedIds.size} Model${selectedIds.size !== 1 ? "s" : ""}`}
 					</Button>
 				</div>
+
+				{mode === "stored" && (
+					<p className="mt-2 text-xs text-gray-400">
+						Uses metrics from original training. Results may not be available for older models.
+					</p>
+				)}
+				{mode === "retrain" && (
+					<p className="mt-2 text-xs text-gray-400">
+						Re-trains each model type with default config. Creates new models with fresh metrics.
+					</p>
+				)}
 			</Card>
+
+			{unavailableIds.size > 0 && (
+				<div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+					Stored results unavailable for{" "}
+					{Array.from(unavailableIds)
+						.map((id) => id.slice(0, 8))
+						.join(", ")}
+					. These models were trained before results storage was enabled. Use Re-train mode to
+					compare them.
+				</div>
+			)}
 
 			{selectedResults.length > 0 && (
 				<>
@@ -205,4 +300,18 @@ export default function ComparePage() {
 			)}
 		</div>
 	);
+}
+
+function formatTimestamp(iso: string): string {
+	try {
+		const date = new Date(iso);
+		return date.toLocaleString(undefined, {
+			month: "short",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	} catch {
+		return iso;
+	}
 }
