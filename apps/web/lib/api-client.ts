@@ -22,10 +22,18 @@ class ApiClientError extends Error {
 	}
 }
 
+function getApiKey(): string | null {
+	if (typeof document === "undefined") return null;
+	const match = document.cookie.match(/api_key=([^;]+)/);
+	return match ? match[1] : null;
+}
+
 async function request<T>(path: string, options?: RequestInit & { timeout?: number }): Promise<T> {
 	const { timeout = DEFAULT_TIMEOUT, ...fetchOptions } = options ?? {};
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+	const apiKey = getApiKey();
 
 	try {
 		const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -33,9 +41,17 @@ async function request<T>(path: string, options?: RequestInit & { timeout?: numb
 			signal: controller.signal,
 			headers: {
 				"Content-Type": "application/json",
+				...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
 				...fetchOptions?.headers,
 			},
 		});
+
+		if (response.status === 401) {
+			if (typeof window !== "undefined") {
+				window.location.href = "/login";
+			}
+			throw new ApiClientError("Unauthorized", 401);
+		}
 
 		if (!response.ok) {
 			const error = await response.json().catch(() => ({ detail: response.statusText }));

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Draft |
-| Author(s) | [Your Name] |
-| Updated | 2025-01-31 |
+| Status | Accepted |
+| Author(s) | pkiage |
+| Updated | 2026-02-02 |
 | Depends On | RFC-001, RFC-002, RFC-004, RFC-005 |
 
 ## Objective

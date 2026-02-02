@@ -2,10 +2,12 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
+from apps.api.auth import verify_api_key
 from apps.api.config import Settings
 from apps.api.dependencies import get_settings
+from apps.api.middleware.rate_limit import limiter
 from apps.api.services.training import train_model
 from shared.schemas.training import TrainingConfig, TrainingResult
 
@@ -15,9 +17,12 @@ router = APIRouter()
 
 
 @router.post("/", response_model=TrainingResult)
+@limiter.limit("10/hour")
 async def train(
+    request: Request,
     config: TrainingConfig,
-    settings: Settings = Depends(get_settings)
+    settings: Settings = Depends(get_settings),
+    _api_key: str = Depends(verify_api_key),
 ) -> TrainingResult:
     """Train a credit risk model.
 

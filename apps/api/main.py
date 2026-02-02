@@ -1,13 +1,16 @@
 """FastAPI application factory and configuration."""
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
 
 from apps.api.config import Settings
+from apps.api.logging_config import setup_logging
+from apps.api.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 
 # Configure logging
 logging.basicConfig(
@@ -51,6 +54,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     if settings is None:
         settings = Settings()
 
+    # Set up structured logging
+    setup_logging(log_level=settings.log_level)
+
     # Create FastAPI app
     app = FastAPI(
         title=settings.app_name,
@@ -60,13 +66,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
 
+    # Configure rate limiting
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+
     # Configure CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "DELETE"],
+        allow_headers=["Authorization", "Content-Type"],
     )
 
     # Health check endpoint
@@ -80,8 +90,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok", "service": settings.app_name}
 
     # Include routers
-    from apps.api.routers import models, predict, train
+    from apps.api.routers import auth, models, predict, train
 
+    app.include_router(auth.router, prefix="/auth", tags=["auth"])
     app.include_router(train.router, prefix="/train", tags=["training"])
     app.include_router(predict.router, prefix="/predict", tags=["prediction"])
     app.include_router(models.router, prefix="/models", tags=["models"])
