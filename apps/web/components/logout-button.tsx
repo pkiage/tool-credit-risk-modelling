@@ -7,7 +7,7 @@ export function LogoutButton() {
 
 	const handleLogout = () => {
 		// biome-ignore lint/suspicious/noDocumentCookie: cookie-based auth requires direct cookie access
-		document.cookie = "api_key=; path=/; max-age=0";
+		document.cookie = "api_key=; path=/; max-age=0; SameSite=Strict; Secure";
 		router.push("/login");
 	};
 

@@ -30,7 +30,7 @@ export default function LoginPage() {
 			}
 
 			// biome-ignore lint/suspicious/noDocumentCookie: cookie-based auth requires direct cookie access
-			document.cookie = `api_key=${apiKey}; path=/; max-age=86400`;
+			document.cookie = `api_key=${apiKey}; path=/; max-age=86400; SameSite=Strict; Secure`;
 			router.push("/");
 		} catch {
 			setError("Invalid API key. Please try again.");
