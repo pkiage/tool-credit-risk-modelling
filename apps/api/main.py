@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 
 from apps.api.config import Settings
+from apps.api.logging_config import setup_logging
 from apps.api.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 
 # Configure logging
@@ -52,6 +53,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     """
     if settings is None:
         settings = Settings()
+
+    # Set up structured logging
+    setup_logging(log_level=settings.log_level)
 
     # Create FastAPI app
     app = FastAPI(

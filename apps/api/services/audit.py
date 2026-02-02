@@ -1,16 +1,20 @@
-"""Audit event logging service."""
+"""Audit event logging service using structlog."""
 
 import json
 import logging
 
+import structlog
+
 from shared.schemas.audit import AuditEvent
 
-# Configure audit logger
-logger = logging.getLogger("audit")
+# Structured logger for console/JSON output
+struct_logger = structlog.get_logger("audit")
+# Stdlib logger for the audit file handler (configured in logging_config)
+file_logger = logging.getLogger("audit")
 
 
 def emit_event(event: AuditEvent) -> None:
-    """Emit an audit event to structured logging.
+    """Emit an audit event to structured logging and the audit log file.
 
     Args:
         event: Audit event to log.
@@ -27,5 +31,15 @@ def emit_event(event: AuditEvent) -> None:
         ... )
         >>> emit_event(event)
     """
-    # Log event as structured JSON
-    logger.info(json.dumps(event.model_dump(), default=str))
+    event_data = event.model_dump()
+
+    # Structured log via structlog
+    struct_logger.info(
+        event.event_type,
+        event_id=event.event_id,
+        model_id=event.model_id,
+        user_id=event.user_id,
+    )
+
+    # Audit file log as JSON line
+    file_logger.info(json.dumps(event_data, default=str))
