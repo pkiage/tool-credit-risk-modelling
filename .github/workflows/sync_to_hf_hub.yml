@@ -1,20 +1,68 @@
-name: Sync to Hugging Face hub
+name: Deploy Gradio to HF Spaces
+
 on:
   push:
     branches: [main]
-
-  # to run this workflow manually from the Actions tab
+    paths: [apps/gradio/**]
   workflow_dispatch:
 
 jobs:
-  sync-to-hub:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-          lfs: true
-      - name: Push to hub
+          python-version: "3.12"
+
+      # Create Space (if it doesn't exist) and set secrets via HF API
+      - name: Setup HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://pkiage:$HF_TOKEN@huggingface.co/spaces/pkiage/credit_risk_modeling_demo main
+          CREDIT_RISK_API_URL: ${{ secrets.CREDIT_RISK_API_URL }}
+        run: |
+          pip install huggingface_hub
+          python << 'SETUP'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.environ["HF_TOKEN"]
+          api_url = os.environ["CREDIT_RISK_API_URL"]
+
+          api = HfApi(token=token)
+          api.create_repo(
+              "pkiage/credit_risk_modeling_demo",
+              repo_type="space",
+              space_sdk="gradio",
+              exist_ok=True,
+          )
+          api.add_space_secret(
+              "pkiage/credit_risk_modeling_demo",
+              "CREDIT_RISK_API_URL",
+              api_url,
+          )
+          print("HF Space ready with CREDIT_RISK_API_URL secret set")
+          SETUP
+
+      # Copy apps/gradio/* and rewrite monorepo imports for flat layout
+      - name: Prepare deployment
+        run: |
+          mkdir -p /tmp/hf-deploy
+          cp -r apps/gradio/* /tmp/hf-deploy/
+          cd /tmp/hf-deploy
+          sed -i 's/from apps\.gradio\./from /g' app.py
+          sed -i 's/from apps\.gradio\./from /g' components/*.py
+
+      # Push to HF Spaces
+      - name: Deploy to HF Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd /tmp/hf-deploy
+          git init
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add .
+          git commit -m "Deploy from ${{ github.sha }}"
+          git push --force https://pkiage:$HF_TOKEN@huggingface.co/spaces/pkiage/credit_risk_modeling_demo main
