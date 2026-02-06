@@ -5,6 +5,7 @@ colorFrom: blue
 colorTo: green
 sdk: gradio
 sdk_version: 4.0.0
+python_version: "3.12"
 app_file: app.py
 pinned: false
 ---
@@ -12,6 +13,8 @@ pinned: false
 # Credit Risk Model Demo
 
 Interactive demo for training and evaluating credit risk models.
+
+**Live demo:** [huggingface.co/spaces/pkiage/credit_risk_modeling_demo](https://huggingface.co/spaces/pkiage/credit_risk_modeling_demo)
 
 ## Local Development
 
