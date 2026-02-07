@@ -110,6 +110,24 @@ class CreditRiskAPI:
         response.raise_for_status()
         return response.json()
 
+    def get_model_results(self, model_id: str) -> dict[str, Any]:
+        """Get full training results for a specific model.
+
+        Args:
+            model_id: Model identifier.
+
+        Returns:
+            TrainingResult dictionary with metrics, ROC curve, etc.
+
+        Raises:
+            httpx.HTTPStatusError: If the API returns an error status.
+        """
+        response = self.client.get(
+            f"{self.base_url}/models/{model_id}/results", headers=self._headers()
+        )
+        response.raise_for_status()
+        return response.json()
+
     def verify_key(self) -> bool:
         """Verify the current API key against the auth endpoint.
 
