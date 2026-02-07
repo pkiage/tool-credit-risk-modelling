@@ -6,7 +6,8 @@ from datetime import datetime
 import numpy as np
 
 from apps.api.services.audit import emit_event
-from apps.api.services.model_store import get_model
+from apps.api.services.model_store import get_feature_columns, get_model
+from shared import constants
 from shared.logic.evaluation import calculate_model_confidence
 from shared.logic.preprocessing import loan_application_to_feature_vector
 from shared.schemas.audit import PredictionAuditEvent
@@ -51,10 +52,16 @@ def predict(request: PredictionRequest) -> PredictionResponse:
     else:
         threshold = metadata.threshold
 
-    # Convert applications to feature matrix
-    X = np.array(
-        [loan_application_to_feature_vector(app) for app in request.applications]
-    )
+    # Convert applications to feature matrix, subsetting to model's training columns
+    feature_columns = get_feature_columns(request.model_id)
+    full_vectors = [
+        loan_application_to_feature_vector(app) for app in request.applications
+    ]
+    if feature_columns is not None and feature_columns != constants.ALL_FEATURES:
+        col_indices = [constants.ALL_FEATURES.index(c) for c in feature_columns]
+        X = np.array(full_vectors)[:, col_indices]
+    else:
+        X = np.array(full_vectors)
 
     # Get predictions
     # Probability of default (class 1)

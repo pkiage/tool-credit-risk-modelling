@@ -24,18 +24,21 @@ from shared.schemas.training import TrainingConfig, TrainingResult
 
 def load_dataset_from_csv(
     filepath: str,
-) -> tuple[NDArray[np.float64], NDArray[np.int_]]:
-    """Load dataset from CSV file.
+    selected_features: list[str] | None = None,
+) -> tuple[NDArray[np.float64], NDArray[np.int_], list[str]]:
+    """Load dataset from CSV file with optional feature subsetting.
 
     Args:
         filepath: Path to CSV file.
+        selected_features: Encoded column names to include. None = all features.
 
     Returns:
-        Tuple of (X, y) where X is feature matrix and y is target labels.
+        Tuple of (X, y, feature_names) where X is feature matrix, y is target
+        labels, and feature_names is the ordered list of columns used.
 
     Raises:
         FileNotFoundError: If CSV file doesn't exist.
-        ValueError: If required columns are missing.
+        ValueError: If required columns are missing or unknown features given.
     """
     df = pd.read_csv(filepath)
 
@@ -49,11 +52,20 @@ def load_dataset_from_csv(
     if missing_features:
         raise ValueError(f"Missing feature columns: {missing_features}")
 
+    # Determine which features to use
+    if selected_features is not None:
+        invalid = [f for f in selected_features if f not in constants.ALL_FEATURES]
+        if invalid:
+            raise ValueError(f"Unknown feature columns: {invalid}")
+        feature_cols = selected_features
+    else:
+        feature_cols = constants.ALL_FEATURES
+
     # Extract features and target
-    X = df[constants.ALL_FEATURES].values.astype(np.float64)
+    X = df[feature_cols].values.astype(np.float64)
     y = df[constants.TARGET_COLUMN].values.astype(np.int_)
 
-    return X, y
+    return X, y, feature_cols
 
 
 def create_model(
@@ -102,16 +114,21 @@ def train_model(
         >>> assert result.model_id
         >>> assert 0 <= result.optimal_threshold <= 1
     """
-    # Generate descriptive model ID: type, test size, unique suffix
-    test_pct = int(config.test_size * 100)
-    model_id = f"{config.model_type}_test{test_pct}_{uuid.uuid4().hex[:6]}"
-    timestamp = datetime.now().isoformat()
-
-    # Load dataset
+    # Load dataset with optional feature subsetting
     if dataset_path is None:
         dataset_path = "data/processed/cr_loan_w2.csv"
 
-    X, y = load_dataset_from_csv(dataset_path)
+    X, y, feature_cols = load_dataset_from_csv(
+        dataset_path, selected_features=config.selected_features
+    )
+
+    # Generate descriptive model ID: type, test size, feature count, unique suffix
+    test_pct = int(config.test_size * 100)
+    n_features = len(feature_cols)
+    model_id = (
+        f"{config.model_type}_test{test_pct}_{n_features}f_{uuid.uuid4().hex[:6]}"
+    )
+    timestamp = datetime.now().isoformat()
 
     # Split dataset
     X_train, X_test, y_train, y_test = train_test_split(
@@ -136,14 +153,20 @@ def train_model(
     # Evaluate model using shared logic
     metrics = evaluate_model(y_test, y_proba)
 
-    # Extract feature importance if available
+    # Extract feature importance for all model types
     feature_importance: dict[str, float] | None = None
     if hasattr(model, "feature_importances_"):
+        # Tree-based models (XGBoost, Random Forest)
         feature_importance = {
             feature: float(importance)
-            for feature, importance in zip(
-                constants.ALL_FEATURES, model.feature_importances_
-            )
+            for feature, importance in zip(feature_cols, model.feature_importances_)
+        }
+    elif hasattr(model, "coef_"):
+        # Linear models (Logistic Regression) — use absolute coefficients
+        coefficients = np.abs(model.coef_[0])
+        feature_importance = {
+            feature: float(coef)
+            for feature, coef in zip(feature_cols, coefficients)
         }
 
     # Store model in memory
@@ -167,7 +190,13 @@ def train_model(
         training_time_seconds=round(training_time_seconds, 3),
     )
 
-    store_model(model_id, model, metadata, training_result=training_result)
+    store_model(
+        model_id,
+        model,
+        metadata,
+        training_result=training_result,
+        feature_columns=feature_cols,
+    )
 
     # Emit audit event
     audit_event = TrainingAuditEvent(
