@@ -3,8 +3,9 @@
 | Field | Value |
 |-------|-------|
 | Status | Accepted |
+| Author | Paul / Claude |
 | Date | 2026-02-02 |
-| RFC | RFC-005 |
+| PR | [#21](https://github.com/pkiage/tool-credit-risk-modelling/pull/21) |
 
 ## Context
 

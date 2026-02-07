@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Implemented |
-| Author(s) | Claude |
+| Author(s) | Paul / Claude |
 | Updated | 2026-02-01 |
 | GitHub Issue | — |
 | Obsoletes | — |
