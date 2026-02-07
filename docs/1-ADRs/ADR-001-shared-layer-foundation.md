@@ -3,6 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Accepted |
+| Author | Paul / Claude |
 | Date | 2025-01-31 |
 | RFC | RFC-001 |
 | PR | [link to merged PR] |

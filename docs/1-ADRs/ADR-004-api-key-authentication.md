@@ -3,6 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Accepted |
+| Author | Paul / Claude |
 | Date | 2026-02-02 |
 | RFC | RFC-006 |
 
