@@ -16,6 +16,7 @@ class TrainingConfig(BaseModel):
         random_state: Random seed for reproducibility.
         undersample: Whether to undersample the majority class for imbalanced data.
         cv_folds: Number of cross-validation folds (2-10).
+        selected_features: Encoded column names to train on. None = all features.
     """
 
     model_type: Literal["logistic_regression", "xgboost", "random_forest"] = Field(
@@ -27,6 +28,10 @@ class TrainingConfig(BaseModel):
     random_state: int = Field(default=42, description="Random seed for reproducibility")
     undersample: bool = Field(default=False, description="Undersample majority class")
     cv_folds: int = Field(default=5, ge=2, le=10, description="CV folds")
+    selected_features: list[str] | None = Field(
+        default=None,
+        description="Encoded column names to train on. None = all features.",
+    )
 
 
 class TrainingResult(BaseModel):
