@@ -5,7 +5,6 @@
 | Status | Accepted |
 | Author | Paul / Claude |
 | Date | 2026-02-01 |
-| RFC | RFC-004 |
 
 ## Context
 

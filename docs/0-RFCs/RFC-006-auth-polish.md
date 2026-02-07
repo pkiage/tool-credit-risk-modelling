@@ -5,7 +5,7 @@
 | Status | Implemented |
 | Author(s) | pkiage |
 | Updated | 2026-02-02 |
-| Depends On | RFC-001, RFC-002, RFC-004, RFC-005 |
+| Depends On | RFC-001, RFC-002 |
 
 ## Objective
 
