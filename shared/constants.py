@@ -169,6 +169,21 @@ VALID_LOAN_INTENT: list[str] = [
 VALID_LOAN_GRADE: list[str] = ["A", "B", "C", "D", "E", "F", "G"]
 VALID_DEFAULT_ON_FILE: list[str] = ["Y", "N"]
 
+# Feature selection constants
+
+# WoE/IV interpretation thresholds
+IV_THRESHOLD_USELESS: float = 0.02
+IV_THRESHOLD_WEAK: float = 0.1
+IV_THRESHOLD_MEDIUM: float = 0.3
+IV_THRESHOLD_STRONG: float = 0.5
+
+# Boruta defaults
+BORUTA_DEFAULT_N_ITERATIONS: int = 100
+BORUTA_DEFAULT_CONFIDENCE_LEVEL: float = 0.95
+
+# SHAP defaults
+SHAP_DEFAULT_SAMPLE_SIZE: int = 100
+
 # Chart color palette (shared across all notebooks and apps)
 COLOR_PRIMARY: str = "#636EFA"
 COLOR_DANGER: str = "#EF553B"

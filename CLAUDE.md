@@ -131,6 +131,33 @@ git checkout -b recovery-branch [commit-hash]
 Claude can: create branches, commit, push, create PRs
 Claude should NOT: merge PRs, force push, rebase shared branches
 
+### Worktrees (Parallel Development)
+
+Use **git worktrees** when working on multiple features in parallel. Each worktree is a separate working directory on its own branch, sharing the same `.git` object store.
+
+```bash
+# Create a worktree for a new feature (from the main repo)
+git worktree add ../tool-crm-[short-name] -b feature/[description]
+
+# List active worktrees
+git worktree list
+
+# Remove after PR is merged
+git worktree remove ../tool-crm-[short-name]
+git branch -d feature/[description]
+```
+
+| Approach             | When to Use                                                          |
+|----------------------|----------------------------------------------------------------------|
+| **Branch switching** | Quick, single-task work; small fixes                                 |
+| **Worktrees**        | Parallel features, long-running work, avoiding stash/switch overhead |
+
+**Worktree notes:**
+
+- Each worktree needs its own `uv sync` (venv is per-directory)
+- Branches/commits are visible across all worktrees
+- Never check out the same branch in two worktrees
+
 ### Pre-Flight Checklist (before starting any task)
 
 ```bash
@@ -141,8 +168,9 @@ git pull origin main
 # 2. Verify clean state
 git status  # Should show "nothing to commit, working tree clean"
 
-# 3. Create feature branch
-git checkout -b feature/[description]
+# 3. Create feature branch (pick one)
+git checkout -b feature/[description]                          # branch switch
+git worktree add ../tool-crm-[name] -b feature/[description]  # worktree (parallel)
 ```
 
 If `git status` shows uncommitted changes, either commit them or stash:

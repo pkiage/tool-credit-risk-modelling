@@ -11,6 +11,7 @@ dependencies = [
     "scikit-learn>=1.5",
     "xgboost>=2.1",
     "plotly>=5.22",
+    "shap>=0.46",
     "pydantic>=2.7",
     "marimo>=0.13",
 ]
@@ -45,6 +46,7 @@ quote-style = "double"
 "notebooks/*.py" = ["N803", "N806"]
 "apps/api/services/*.py" = ["N806"]
 "shared/logic/preprocessing.py" = ["N803"]
+"shared/logic/feature_selection.py" = ["N803", "N806"]
 "tests/**/*.py" = ["N806"]
 
 [tool.hatch.build.targets.wheel]

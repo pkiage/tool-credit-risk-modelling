@@ -128,6 +128,26 @@ class CreditRiskAPI:
         response.raise_for_status()
         return response.json()
 
+    def feature_selection(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Run automatic feature selection.
+
+        Args:
+            request: Feature selection request matching FeatureSelectionRequest schema.
+
+        Returns:
+            FeatureSelectionResult as a dictionary.
+
+        Raises:
+            httpx.HTTPStatusError: If the API returns an error status.
+        """
+        response = self.client.post(
+            f"{self.base_url}/feature-selection/",
+            json=request,
+            headers=self._headers(),
+        )
+        response.raise_for_status()
+        return response.json()
+
     def verify_key(self) -> bool:
         """Verify the current API key against the auth endpoint.
 
