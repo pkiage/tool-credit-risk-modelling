@@ -3,7 +3,9 @@ name: Deploy Gradio to HF Spaces
 on:
   push:
     branches: [main]
-    paths: [apps/gradio/**]
+    paths:
+      - apps/gradio/**
+      - shared/constants.py
   workflow_dispatch:
 
 jobs:
@@ -48,8 +50,11 @@ jobs:
       # Copy apps/gradio/* and rewrite monorepo imports for flat layout
       - name: Prepare deployment
         run: |
-          mkdir -p /tmp/hf-deploy
+          mkdir -p /tmp/hf-deploy/shared
           cp -r apps/gradio/* /tmp/hf-deploy/
+          # Copy shared/constants.py with a minimal __init__.py (avoids heavy deps)
+          echo '"""Shared constants for HF Spaces."""' > /tmp/hf-deploy/shared/__init__.py
+          cp shared/constants.py /tmp/hf-deploy/shared/constants.py
           cd /tmp/hf-deploy
           sed -i 's/from apps\.gradio\./from /g' app.py
           sed -i 's/from apps\.gradio\./from /g' components/*.py
