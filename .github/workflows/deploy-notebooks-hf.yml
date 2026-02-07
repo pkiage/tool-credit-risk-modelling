@@ -1,0 +1,77 @@
+name: Deploy Marimo Notebooks to HF Spaces
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - notebooks/**
+      - shared/**
+      - data/processed/**
+      - apps/marimo/**
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Create Docker Space (if it doesn't exist)
+      - name: Setup HF Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install huggingface_hub
+          python << 'SETUP'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.environ["HF_TOKEN"]
+          api = HfApi(token=token)
+          api.create_repo(
+              "pkiage/credit-risk-notebooks",
+              repo_type="space",
+              space_sdk="docker",
+              exist_ok=True,
+          )
+          print("HF Space ready")
+          SETUP
+
+      # Assemble flat layout: Dockerfile, server.py, requirements.txt,
+      # README.md at root, with notebooks/, shared/, and data/ alongside.
+      - name: Prepare deployment
+        run: |
+          mkdir -p /tmp/hf-deploy/notebooks
+          mkdir -p /tmp/hf-deploy/data/processed
+
+          # App files
+          cp apps/marimo/Dockerfile /tmp/hf-deploy/
+          cp apps/marimo/server.py /tmp/hf-deploy/
+          cp apps/marimo/requirements.txt /tmp/hf-deploy/
+          cp apps/marimo/README.md /tmp/hf-deploy/
+
+          # Full shared/ tree (notebooks import logic + schemas)
+          cp -r shared /tmp/hf-deploy/shared
+
+          # Notebooks
+          cp notebooks/*.py /tmp/hf-deploy/notebooks/
+
+          # Training dataset
+          cp data/processed/cr_loan_w2.csv /tmp/hf-deploy/data/processed/
+
+      # Push to HF Spaces
+      - name: Deploy to HF Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd /tmp/hf-deploy
+          git init -b main
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add .
+          git commit -m "Deploy from ${{ github.sha }}"
+          git push --force https://pkiage:$HF_TOKEN@huggingface.co/spaces/pkiage/credit-risk-notebooks main
