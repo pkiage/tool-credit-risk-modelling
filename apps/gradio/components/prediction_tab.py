@@ -47,7 +47,9 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
                 label="Interest Rate (%)", value=10.5, minimum=0.01, maximum=100
             )
             loan_percent_income = gr.Number(
-                label="Loan % of Income", value=0.2, minimum=0, maximum=1
+                label="Loan % of Income (auto-calculated)",
+                value=0.2,
+                interactive=False,
             )
             cb_person_cred_hist_length = gr.Number(
                 label="Credit History Length (years)", value=5, minimum=0
@@ -72,7 +74,7 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
             loan_grade = gr.Dropdown(
                 choices=["A", "B", "C", "D", "E", "F", "G"],
                 value="B",
-                label="Loan Grade",
+                label="Loan Grade (A=lowest risk, G=highest)",
             )
             cb_default = gr.Dropdown(
                 choices=["Y", "N"], value="N", label="Previous Default on File"
@@ -94,6 +96,31 @@ def create_prediction_tab(api: CreditRiskAPI) -> None:
             )
             threshold_display = gr.Textbox(label="Threshold Used", interactive=False)
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)
+
+    def _compute_loan_pct(amount: float, income: float) -> float:
+        """Compute loan amount as a fraction of income.
+
+        Args:
+            amount: Loan amount in dollars.
+            income: Annual income in dollars.
+
+        Returns:
+            Loan-to-income ratio clamped to [0, 1].
+        """
+        if income and income > 0 and amount and amount > 0:
+            return round(min(amount / income, 1.0), 4)
+        return 0.0
+
+    loan_amnt.change(
+        fn=_compute_loan_pct,
+        inputs=[loan_amnt, person_income],
+        outputs=[loan_percent_income],
+    )
+    person_income.change(
+        fn=_compute_loan_pct,
+        inputs=[loan_amnt, person_income],
+        outputs=[loan_percent_income],
+    )
 
     def _refresh() -> Any:
         """Refresh the model selector dropdown choices."""
