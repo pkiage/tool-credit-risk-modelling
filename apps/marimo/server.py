@@ -18,4 +18,4 @@ for nb in sorted(notebooks_dir.glob("*.py")):
 app = server.build()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    uvicorn.run(app, host="0.0.0.0", port=7860)  # nosec B104 — Docker container requires binding to all interfaces
