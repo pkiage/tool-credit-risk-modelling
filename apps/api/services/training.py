@@ -102,8 +102,9 @@ def train_model(
         >>> assert result.model_id
         >>> assert 0 <= result.optimal_threshold <= 1
     """
-    # Generate unique model ID
-    model_id = f"model_{uuid.uuid4().hex[:8]}"
+    # Generate descriptive model ID: type, test size, unique suffix
+    test_pct = int(config.test_size * 100)
+    model_id = f"{config.model_type}_test{test_pct}_{uuid.uuid4().hex[:6]}"
     timestamp = datetime.now().isoformat()
 
     # Load dataset
