@@ -6,7 +6,7 @@
 | Author | Paul / Claude |
 | Date | 2025-01-31 |
 | RFC | [RFC-001](../0-RFCs/RFC-001-CreditRiskPlatformArchitecture.md) |
-| PR | [link to merged PR] |
+| PR | [#19](https://github.com/pkiage/tool-credit-risk-modelling/pull/19) |
 
 ## Context
 

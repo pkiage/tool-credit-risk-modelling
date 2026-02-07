@@ -5,6 +5,7 @@
 | Status | Accepted |
 | Author | Paul / Claude |
 | Date | 2026-02-07 |
+| PR | [#31](https://github.com/pkiage/tool-credit-risk-modelling/pull/31) |
 
 ## Context
 

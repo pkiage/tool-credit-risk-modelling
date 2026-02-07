@@ -6,6 +6,7 @@
 | Author | Paul / Claude |
 | Date | 2026-02-02 |
 | RFC | [RFC-006](../0-RFCs/RFC-006-auth-polish.md) |
+| PR | [#19](https://github.com/pkiage/tool-credit-risk-modelling/pull/19) |
 
 ## Context
 
