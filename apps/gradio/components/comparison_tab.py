@@ -11,21 +11,52 @@ from apps.gradio.api_client import CreditRiskAPI
 logger = logging.getLogger(__name__)
 
 
-def _get_model_choices(api: CreditRiskAPI) -> list[str]:
+def _get_model_choices(api: CreditRiskAPI) -> tuple[list[str], str]:
     """Fetch available model IDs from the API.
 
     Args:
         api: CreditRiskAPI client instance.
 
     Returns:
-        List of model ID strings.
+        Tuple of (model_id_list, status_message). Status is empty on success.
     """
     try:
         models = api.list_models()
-        return [m["model_id"] for m in models]
+        ids = [m["model_id"] for m in models]
+        if not ids:
+            return [], "No trained models found. Train a model first."
+        return ids, ""
     except Exception:
         logger.exception("Failed to fetch model list")
-        return []
+        return [], "Failed to connect to API. Is the server running?"
+
+
+def _fetch_missing_results(
+    api: CreditRiskAPI,
+    model_ids: list[str],
+    training_results: dict[str, dict[str, Any]],
+) -> list[str]:
+    """Fetch training results from the API for models not in local cache.
+
+    Args:
+        api: CreditRiskAPI client instance.
+        model_ids: Model IDs to ensure are cached.
+        training_results: Session-scoped cache (mutated in place).
+
+    Returns:
+        List of model IDs that could not be fetched.
+    """
+    failed: list[str] = []
+    for model_id in model_ids:
+        if model_id in training_results:
+            continue
+        try:
+            result = api.get_model_results(model_id)
+            training_results[model_id] = result
+        except Exception:
+            logger.warning("Could not fetch results for model %s", model_id)
+            failed.append(model_id)
+    return failed
 
 
 def _build_roc_overlay(
@@ -181,7 +212,9 @@ def create_comparison_tab(api: CreditRiskAPI, training_results_state: gr.State) 
             interactive=True,
         )
         refresh_btn = gr.Button("Refresh Models")
+        compare_btn = gr.Button("Compare", variant="primary")
 
+    status_display = gr.Textbox(label="Status", interactive=False, visible=False)
     roc_overlay = gr.Plot(label="ROC Curves")
     metrics_bar = gr.Plot(label="Metrics Comparison")
     comparison_table = gr.Dataframe(
@@ -197,25 +230,36 @@ def create_comparison_tab(api: CreditRiskAPI, training_results_state: gr.State) 
         label="Metrics Table",
         interactive=False,
     )
-    error_display = gr.Textbox(label="Status", interactive=False, visible=False)
 
-    def _refresh() -> Any:
+    def _refresh() -> tuple[Any, Any]:
         """Refresh the model multiselect dropdown choices."""
-        choices = _get_model_choices(api)
-        return gr.update(choices=choices, value=[])
+        choices, status = _get_model_choices(api)
+        dropdown_update = gr.update(choices=choices, value=[])
+        if status:
+            status_update = gr.update(visible=True, value=status)
+        else:
+            msg = f"Found {len(choices)} model(s). Select models and click Compare."
+            status_update = gr.update(visible=True, value=msg)
+        return dropdown_update, status_update
 
     def _compare(
         selected: list[str],
         training_results: dict[str, dict[str, Any]],
-    ) -> tuple[go.Figure | None, go.Figure | None, list[list[str]], Any]:
-        """Compare selected models.
+    ) -> tuple[
+        go.Figure | None,
+        go.Figure | None,
+        list[list[str]],
+        Any,
+        dict[str, dict[str, Any]],
+    ]:
+        """Compare selected models, fetching results from API if needed.
 
         Args:
             selected: List of selected model IDs.
             training_results: Session-scoped training results cache.
 
         Returns:
-            Tuple of (roc_figure, bar_figure, table_rows, error_update).
+            Tuple of (roc_figure, bar_figure, table_rows, status_update, updated_state).
         """
         if not selected:
             return (
@@ -223,34 +267,50 @@ def create_comparison_tab(api: CreditRiskAPI, training_results_state: gr.State) 
                 None,
                 [],
                 gr.update(visible=True, value="Select at least one model to compare."),
+                training_results,
             )
 
-        # Check which models have cached results
-        missing = [mid for mid in selected if mid not in training_results]
-        if missing:
+        # Fetch any missing training results from the API
+        failed = _fetch_missing_results(api, selected, training_results)
+        if failed:
             return (
                 None,
                 None,
                 [],
                 gr.update(
                     visible=True,
-                    value=(
-                        f"No training data cached for: {', '.join(missing)}. "
-                        "Models must be trained in this session to compare."
-                    ),
+                    value=f"Could not fetch results for: {', '.join(failed)}. "
+                    "These models may no longer be available.",
                 ),
+                training_results,
             )
 
         roc_fig = _build_roc_overlay(selected, training_results)
         bar_fig = _build_metrics_bar(selected, training_results)
         table = _build_comparison_table(selected, training_results)
 
-        return (roc_fig, bar_fig, table, gr.update(visible=False, value=""))
+        return (
+            roc_fig,
+            bar_fig,
+            table,
+            gr.update(visible=False, value=""),
+            training_results,
+        )
 
-    refresh_btn.click(fn=_refresh, inputs=[], outputs=[model_multiselect])
+    refresh_btn.click(
+        fn=_refresh,
+        inputs=[],
+        outputs=[model_multiselect, status_display],
+    )
 
-    model_multiselect.change(
+    compare_btn.click(
         fn=_compare,
         inputs=[model_multiselect, training_results_state],
-        outputs=[roc_overlay, metrics_bar, comparison_table, error_display],
+        outputs=[
+            roc_overlay,
+            metrics_bar,
+            comparison_table,
+            status_display,
+            training_results_state,
+        ],
     )
