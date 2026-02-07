@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Implemented |
-| Author(s) | [Your Name] |
+| Author(s) | Paul / Claude |
 | Updated | 2026-02-01 |
 | Depends On | RFC-001 |
 
