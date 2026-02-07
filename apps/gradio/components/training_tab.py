@@ -146,9 +146,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             gr.Markdown("### Feature Selection")
 
             # Numeric features — each maps to a single encoded column
-            numeric_choices = [
-                (FEATURE_GROUP_LABELS[f], f) for f in NUMERIC_FEATURES
-            ]
+            numeric_choices = [(FEATURE_GROUP_LABELS[f], f) for f in NUMERIC_FEATURES]
             numeric_group = gr.CheckboxGroup(
                 choices=numeric_choices,
                 value=list(NUMERIC_FEATURES),
@@ -163,9 +161,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             for cat_name in CATEGORICAL_FEATURES:
                 label = FEATURE_GROUP_LABELS[cat_name]
                 columns = FEATURE_GROUPS[cat_name]
-                col_choices = [
-                    (_column_display_name(c, cat_name), c) for c in columns
-                ]
+                col_choices = [(_column_display_name(c, cat_name), c) for c in columns]
                 with gr.Accordion(label, open=False):
                     select_all = gr.Checkbox(value=True, label="Select All")
                     col_group = gr.CheckboxGroup(
@@ -185,18 +181,12 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 label="Model Metrics",
                 interactive=False,
             )
-            threshold_display = gr.Textbox(
-                label="Optimal Threshold", interactive=False
-            )
-            training_time_display = gr.Textbox(
-                label="Training Time", interactive=False
-            )
+            threshold_display = gr.Textbox(label="Optimal Threshold", interactive=False)
+            training_time_display = gr.Textbox(label="Training Time", interactive=False)
             model_id_display = gr.Textbox(label="Model ID", interactive=False)
             roc_plot = gr.Plot(label="ROC Curve")
             importance_plot = gr.Plot(label="Feature Importance")
-            error_display = gr.Textbox(
-                label="Status", interactive=False, visible=False
-            )
+            error_display = gr.Textbox(label="Status", interactive=False, visible=False)
 
     # Wire up Select All ↔ column toggle events for each categorical group.
     # Uses .input() for Select All to avoid event loops: .input() fires only
@@ -210,9 +200,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             """Check or uncheck all columns when Select All is toggled."""
             return cols if checked else []
 
-        def _sync_select_all(
-            selected: list[str], cols: list[str] = all_cols
-        ) -> bool:
+        def _sync_select_all(selected: list[str], cols: list[str] = all_cols) -> bool:
             """Update Select All checkbox to reflect column selection state."""
             return len(selected) == len(cols)
 
@@ -287,9 +275,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
 
         # Send None when all features are selected (backward compatible)
         features_param = (
-            selected_features
-            if len(selected_features) < len(ALL_FEATURES)
-            else None
+            selected_features if len(selected_features) < len(ALL_FEATURES) else None
         )
 
         try:
@@ -313,15 +299,11 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
 
             roc_fig = None
             if "roc_curve" in metrics:
-                roc_fig = _build_roc_plot(
-                    metrics["roc_curve"], selected_model_type
-                )
+                roc_fig = _build_roc_plot(metrics["roc_curve"], selected_model_type)
 
             importance_fig = None
             if result.get("feature_importance"):
-                importance_fig = _build_importance_plot(
-                    result["feature_importance"]
-                )
+                importance_fig = _build_importance_plot(result["feature_importance"])
 
             return (
                 table_data,

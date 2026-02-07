@@ -165,8 +165,7 @@ def train_model(
         # Linear models (Logistic Regression) — use absolute coefficients
         coefficients = np.abs(model.coef_[0])
         feature_importance = {
-            feature: float(coef)
-            for feature, coef in zip(feature_cols, coefficients)
+            feature: float(coef) for feature, coef in zip(feature_cols, coefficients)
         }
 
     # Store model in memory
