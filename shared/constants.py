@@ -46,6 +46,62 @@ CATEGORICAL_FEATURES: list[str] = [
 # All feature columns (numeric + encoded categorical)
 ALL_FEATURES: list[str] = NUMERIC_FEATURES + CATEGORICAL_FEATURES_ENCODED
 
+# Feature groups: maps a logical feature name to its encoded column(s).
+# Numeric features map 1:1; categorical features expand to their one-hot columns.
+FEATURE_GROUPS: dict[str, list[str]] = {
+    "person_age": ["person_age"],
+    "person_income": ["person_income"],
+    "person_emp_length": ["person_emp_length"],
+    "loan_amnt": ["loan_amnt"],
+    "loan_int_rate": ["loan_int_rate"],
+    "loan_percent_income": ["loan_percent_income"],
+    "cb_person_cred_hist_length": ["cb_person_cred_hist_length"],
+    "person_home_ownership": [
+        "person_home_ownership_MORTGAGE",
+        "person_home_ownership_OTHER",
+        "person_home_ownership_OWN",
+        "person_home_ownership_RENT",
+    ],
+    "loan_intent": [
+        "loan_intent_DEBTCONSOLIDATION",
+        "loan_intent_EDUCATION",
+        "loan_intent_HOMEIMPROVEMENT",
+        "loan_intent_MEDICAL",
+        "loan_intent_PERSONAL",
+        "loan_intent_VENTURE",
+    ],
+    "loan_grade": [
+        "loan_grade_A",
+        "loan_grade_B",
+        "loan_grade_C",
+        "loan_grade_D",
+        "loan_grade_E",
+        "loan_grade_F",
+        "loan_grade_G",
+    ],
+    "cb_person_default_on_file": [
+        "cb_person_default_on_file_N",
+        "cb_person_default_on_file_Y",
+    ],
+}
+
+ALL_FEATURE_GROUPS: list[str] = list(FEATURE_GROUPS.keys())
+
+# Human-readable labels for feature groups (used in Gradio UI)
+FEATURE_GROUP_LABELS: dict[str, str] = {
+    "person_age": "Age",
+    "person_income": "Income",
+    "person_emp_length": "Employment Length",
+    "loan_amnt": "Loan Amount",
+    "loan_int_rate": "Interest Rate",
+    "loan_percent_income": "Loan % of Income",
+    "cb_person_cred_hist_length": "Credit History Length",
+    "person_home_ownership": "Home Ownership",
+    "loan_intent": "Loan Intent",
+    "loan_grade": "Loan Grade",
+    "cb_person_default_on_file": "Previous Default",
+}
+
 # Target column
 TARGET_COLUMN: str = "loan_status"
 
