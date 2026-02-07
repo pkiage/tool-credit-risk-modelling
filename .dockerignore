@@ -1,0 +1,22 @@
+# Exclude everything not needed for the API Docker build
+apps/web/
+apps/gradio/
+notebooks/
+docs/
+.github/
+.git/
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+.claude/
+.claude_skills/
+artifacts/
+data/raw/
+data/interim/
+*.md
+!README.md
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
