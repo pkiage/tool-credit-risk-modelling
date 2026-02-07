@@ -5,7 +5,7 @@
 | Status | Accepted |
 | Author | Paul / Claude |
 | Date | 2025-01-31 |
-| RFC | RFC-001 |
+| RFC | [RFC-001](../0-RFCs/RFC-001-CreditRiskPlatformArchitecture.md) |
 | PR | [link to merged PR] |
 
 ## Context

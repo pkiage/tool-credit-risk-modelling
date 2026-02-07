@@ -5,7 +5,7 @@
 | Status | Accepted |
 | Author | Paul / Claude |
 | Date | 2026-02-02 |
-| RFC | RFC-006 |
+| RFC | [RFC-006](../0-RFCs/RFC-006-auth-polish.md) |
 
 ## Context
 
