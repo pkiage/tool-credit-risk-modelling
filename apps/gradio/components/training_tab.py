@@ -8,6 +8,13 @@ import plotly.graph_objects as go
 
 import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
+from shared.constants import (
+    ALL_FEATURES,
+    CATEGORICAL_FEATURES,
+    FEATURE_GROUP_LABELS,
+    FEATURE_GROUPS,
+    NUMERIC_FEATURES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +57,38 @@ def _build_roc_plot(roc_data: dict[str, Any], model_type: str) -> go.Figure:
     return fig
 
 
+def _build_importance_plot(feature_importance: dict[str, float]) -> go.Figure:
+    """Build a horizontal bar chart of feature importance.
+
+    Args:
+        feature_importance: Mapping of feature name to importance score.
+
+    Returns:
+        Plotly Figure with horizontal bars sorted by importance.
+    """
+    sorted_items = sorted(feature_importance.items(), key=lambda x: abs(x[1]))
+    names = [item[0] for item in sorted_items]
+    values = [item[1] for item in sorted_items]
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            x=values,
+            y=names,
+            orientation="h",
+            marker_color="#636EFA",
+        )
+    )
+    fig.update_layout(
+        title="Feature Importance",
+        xaxis_title="Importance",
+        height=max(400, len(names) * 25),
+        width=600,
+        margin={"l": 200},
+    )
+    return fig
+
+
 def _format_metrics_table(metrics: dict[str, Any]) -> list[list[str]]:
     """Format model metrics into a table rows list.
 
@@ -68,6 +107,20 @@ def _format_metrics_table(metrics: dict[str, Any]) -> list[list[str]]:
     ]
 
 
+def _column_display_name(col: str, group: str) -> str:
+    """Extract the human-readable suffix from a one-hot encoded column name.
+
+    Args:
+        col: Full encoded column name (e.g. "person_home_ownership_RENT").
+        group: Feature group name (e.g. "person_home_ownership").
+
+    Returns:
+        Suffix portion of the column name (e.g. "RENT").
+    """
+    prefix = f"{group}_"
+    return col[len(prefix) :] if col.startswith(prefix) else col
+
+
 def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) -> None:
     """Create the training tab UI and wire up event handlers.
 
@@ -77,8 +130,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
     """
     with gr.Row():
         with gr.Column(scale=1):
-            # Model types match shared.constants.MODEL_HYPERPARAMETERS keys.
-            # Update here if new model types are added to shared/.
             model_type = gr.Dropdown(
                 choices=["logistic_regression", "xgboost", "random_forest"],
                 value="logistic_regression",
@@ -91,6 +142,37 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 value=0.2,
                 label="Test Size",
             )
+
+            gr.Markdown("### Feature Selection")
+
+            # Numeric features — each maps to a single encoded column
+            numeric_choices = [(FEATURE_GROUP_LABELS[f], f) for f in NUMERIC_FEATURES]
+            numeric_group = gr.CheckboxGroup(
+                choices=numeric_choices,
+                value=list(NUMERIC_FEATURES),
+                label="Numeric Features",
+            )
+
+            # Categorical features — each has multiple one-hot columns
+            cat_col_groups: list[gr.CheckboxGroup] = []
+            cat_select_alls: list[gr.Checkbox] = []
+            cat_all_cols: list[list[str]] = []
+
+            for cat_name in CATEGORICAL_FEATURES:
+                label = FEATURE_GROUP_LABELS[cat_name]
+                columns = FEATURE_GROUPS[cat_name]
+                col_choices = [(_column_display_name(c, cat_name), c) for c in columns]
+                with gr.Accordion(label, open=False):
+                    select_all = gr.Checkbox(value=True, label="Select All")
+                    col_group = gr.CheckboxGroup(
+                        choices=col_choices,
+                        value=list(columns),
+                        label=f"{label} Columns",
+                    )
+                cat_select_alls.append(select_all)
+                cat_col_groups.append(col_group)
+                cat_all_cols.append(list(columns))
+
             train_btn = gr.Button("Train Model", variant="primary")
 
         with gr.Column(scale=2):
@@ -103,36 +185,107 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             training_time_display = gr.Textbox(label="Training Time", interactive=False)
             model_id_display = gr.Textbox(label="Model ID", interactive=False)
             roc_plot = gr.Plot(label="ROC Curve")
+            importance_plot = gr.Plot(label="Feature Importance")
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)
+
+    # Wire up Select All ↔ column toggle events for each categorical group.
+    # Uses .input() for Select All to avoid event loops: .input() fires only
+    # on direct user interaction, not programmatic updates.
+    for i in range(len(CATEGORICAL_FEATURES)):
+        select_all_cb = cat_select_alls[i]
+        col_group_cb = cat_col_groups[i]
+        all_cols = cat_all_cols[i]
+
+        def _toggle_all(checked: bool, cols: list[str] = all_cols) -> list[str]:
+            """Check or uncheck all columns when Select All is toggled."""
+            return cols if checked else []
+
+        def _sync_select_all(selected: list[str], cols: list[str] = all_cols) -> bool:
+            """Update Select All checkbox to reflect column selection state."""
+            return len(selected) == len(cols)
+
+        select_all_cb.input(
+            fn=_toggle_all, inputs=[select_all_cb], outputs=[col_group_cb]
+        )
+        col_group_cb.change(
+            fn=_sync_select_all, inputs=[col_group_cb], outputs=[select_all_cb]
+        )
+
+    # Build train inputs: model config + numeric features + categorical columns + state
+    train_inputs: list[Any] = [
+        model_type,
+        test_size,
+        numeric_group,
+        *cat_col_groups,
+        training_results_state,
+    ]
+
+    train_outputs: list[Any] = [
+        metrics_table,
+        threshold_display,
+        training_time_display,
+        model_id_display,
+        roc_plot,
+        importance_plot,
+        error_display,
+        training_results_state,
+    ]
 
     def _train(
         selected_model_type: str,
         selected_test_size: float,
-        training_results: dict[str, dict[str, Any]],
-    ) -> tuple[
-        Any,  # metrics_table
-        str,  # threshold_display
-        str,  # training_time_display
-        str,  # model_id_display
-        go.Figure | None,  # roc_plot
-        Any,  # error_display update
-        dict[str, dict[str, Any]],  # updated training_results_state
-    ]:
+        numeric_selected: list[str],
+        *args: Any,
+    ) -> tuple[Any, ...]:
         """Handle train button click.
 
         Args:
             selected_model_type: Model type from dropdown.
             selected_test_size: Test/train split ratio.
-            training_results: Session-scoped training results cache.
+            numeric_selected: Selected numeric feature group names.
+            *args: Categorical column selections (one list per group) followed
+                by the training_results state dict as the last element.
 
         Returns:
             Tuple of updated component values and updated state.
         """
+        # Last arg is training_results state; rest are categorical column selections
+        training_results: dict[str, dict[str, Any]] = args[-1]
+        cat_selections = args[:-1]
+
+        # Collect all selected encoded column names
+        selected_features: list[str] = list(numeric_selected)
+        for sel in cat_selections:
+            selected_features.extend(sel)
+
+        if not selected_features:
+            return (
+                [],
+                "",
+                "",
+                "",
+                None,
+                None,
+                gr.update(
+                    visible=True,
+                    value="Please select at least one feature to train on.",
+                ),
+                training_results,
+            )
+
+        # Send None when all features are selected (backward compatible)
+        features_param = (
+            selected_features if len(selected_features) < len(ALL_FEATURES) else None
+        )
+
         try:
-            config = {
+            config: dict[str, Any] = {
                 "model_type": selected_model_type,
                 "test_size": selected_test_size,
             }
+            if features_param is not None:
+                config["selected_features"] = features_param
+
             result = api.train(config)
 
             # Store result in session state for comparison tab
@@ -148,12 +301,17 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             if "roc_curve" in metrics:
                 roc_fig = _build_roc_plot(metrics["roc_curve"], selected_model_type)
 
+            importance_fig = None
+            if result.get("feature_importance"):
+                importance_fig = _build_importance_plot(result["feature_importance"])
+
             return (
                 table_data,
                 f"{threshold:.4f}",
                 f"{train_time:.3f}s",
                 model_id,
                 roc_fig,
+                importance_fig,
                 gr.update(visible=False, value=""),
                 training_results,
             )
@@ -172,6 +330,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 "",
                 "",
                 None,
+                None,
                 gr.update(visible=True, value=msg),
                 training_results,
             )
@@ -182,6 +341,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 "",
                 "",
                 "",
+                None,
                 None,
                 gr.update(
                     visible=True,
@@ -200,14 +360,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
         outputs=[error_display],
     ).then(
         fn=_train,
-        inputs=[model_type, test_size, training_results_state],
-        outputs=[
-            metrics_table,
-            threshold_display,
-            training_time_display,
-            model_id_display,
-            roc_plot,
-            error_display,
-            training_results_state,
-        ],
+        inputs=train_inputs,
+        outputs=train_outputs,
     )

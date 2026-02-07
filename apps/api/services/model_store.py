@@ -31,6 +31,7 @@ def store_model(
     model: Any,
     metadata: ModelMetadata,
     training_result: TrainingResult | None = None,
+    feature_columns: list[str] | None = None,
 ) -> None:
     """Store a trained model in memory.
 
@@ -39,6 +40,8 @@ def store_model(
         model: Trained model object (sklearn/xgboost).
         metadata: Model metadata.
         training_result: Full training result with metrics (optional).
+        feature_columns: Ordered list of encoded column names the model was
+            trained on. Required for prediction-time feature subsetting.
 
     Example:
         >>> from sklearn.linear_model import LogisticRegression
@@ -56,6 +59,7 @@ def store_model(
         "model": model,
         "metadata": metadata.model_dump(),
         "training_result": training_result.model_dump() if training_result else None,
+        "feature_columns": feature_columns,
     }
 
 
@@ -112,6 +116,21 @@ def get_training_result(model_id: str) -> TrainingResult | None:
         return None
 
     return TrainingResult(**stored_data["training_result"])
+
+
+def get_feature_columns(model_id: str) -> list[str] | None:
+    """Retrieve the feature columns a model was trained on.
+
+    Args:
+        model_id: Model identifier.
+
+    Returns:
+        List of encoded column names, or None if model not found.
+    """
+    stored_data = _model_store.get(model_id)
+    if stored_data is None:
+        return None
+    return stored_data.get("feature_columns")
 
 
 def delete_model(model_id: str) -> bool:
