@@ -111,11 +111,10 @@ artifacts/
 # ----------------------------------------
 # Data
 # ----------------------------------------
-/data/
-# If you want to keep raw data tracked:
-# !/data/raw/
-# /data/processed/
-# /data/interim/
+/data/raw/
+/data/interim/
+# Processed dataset is tracked (needed by API on Render)
+# /data/processed/ — NOT ignored
 
 # ----------------------------------------
 # Logs
