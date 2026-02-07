@@ -11,7 +11,8 @@ dependencies = [
     "scikit-learn>=1.5",
     "xgboost>=2.1",
     "plotly>=5.22",
-    "shap>=0.46",
+    "shap>=0.46,<0.50",
+    "numba>=0.59",
     "pydantic>=2.7",
     "marimo>=0.13",
 ]

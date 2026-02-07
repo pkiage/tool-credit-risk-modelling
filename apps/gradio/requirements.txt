@@ -1,4 +1,5 @@
 gradio>=6.5.1
 httpx>=0.25.0
 plotly>=5.0.0
-shap>=0.46
+shap>=0.46,<0.50
+numba>=0.59
