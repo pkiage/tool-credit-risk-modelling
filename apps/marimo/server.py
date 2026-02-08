@@ -12,8 +12,16 @@ _candidates = [_here / "notebooks", _here.parent.parent / "notebooks"]
 notebooks_dir = next((d for d in _candidates if d.is_dir()), _candidates[0])
 
 server = marimo.create_asgi_app(quiet=True, include_code=True)
+
+# Mount landing page at root
+landing_page = notebooks_dir / "00_landing.py"
+if landing_page.exists():
+    server = server.with_app(path="/", root=str(landing_page))
+
+# Mount other notebooks at their respective paths
 for nb in sorted(notebooks_dir.glob("*.py")):
-    server = server.with_app(path=f"/{nb.stem}", root=str(nb))
+    if nb.stem != "00_landing":  # Skip landing page (already mounted at root)
+        server = server.with_app(path=f"/{nb.stem}", root=str(nb))
 
 app = server.build()
 
