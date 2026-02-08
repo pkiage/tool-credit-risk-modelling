@@ -144,6 +144,7 @@ class CreditRiskAPI:
             f"{self.base_url}/feature-selection/",
             json=request,
             headers=self._headers(),
+            timeout=300.0,
         )
         response.raise_for_status()
         return response.json()

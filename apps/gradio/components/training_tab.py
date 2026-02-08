@@ -330,6 +330,17 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 None,
                 gr.update(visible=False),
             )
+        except httpx.TimeoutException:
+            logger.warning("Feature selection timed out")
+            return (
+                gr.update(
+                    visible=True,
+                    value="Feature selection timed out — try fewer iterations.",
+                ),
+                None,
+                None,
+                gr.update(visible=False),
+            )
         except Exception:
             logger.exception("Feature selection failed")
             return (
