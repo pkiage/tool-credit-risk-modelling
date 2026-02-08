@@ -41,7 +41,8 @@ All methods return a standardized `FeatureSelectionResult` schema (see `shared/s
 | 2   | LASSO (L1)      | Embedded         | `C` (regularization)   | None     |
 | 3   | WoE / IV        | Statistical filter | `iv_threshold`       | None     |
 | 4   | Boruta          | Wrapper          | `include_tentative`    | None     |
-| 5   | SHAP            | XAI              | `top_k` or `threshold` | `shap`   |
+
+> **SHAP (deferred)**: Removed due to [shap#4184](https://github.com/shap/shap/issues/4184) — XGBoost 3.x returns `base_score` as an array string that SHAP cannot parse. The fix ([PR #4187](https://github.com/shap/shap/pull/4187)) has not been released. Re-add when a compatible shap version ships.
 
 #### 1. Tree Importance
 
@@ -70,10 +71,6 @@ Custom implementation to avoid adding the `BorutaPy` package. Algorithm:
 3. Record which real features beat the max shadow importance
 4. Repeat N iterations
 5. Apply `scipy.stats.binom.ppf` to classify each feature as Confirmed, Tentative, or Rejected
-
-#### 5. SHAP
-
-Train a tree model, compute SHAP values via `shap.TreeExplainer`, rank by mean |SHAP| per feature. Adds `shap>=0.49,<0.50` as a dependency (0.49+ properly constrains `numba>=0.54` for Python 3.12 compatibility; <0.50 avoids an unresolvable Python 3.14 pre-release constraint). Uses the modern `explainer(X)` call API which returns an `Explanation` object with clean numpy arrays.
 
 ### Standardized Output
 

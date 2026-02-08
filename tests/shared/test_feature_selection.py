@@ -7,7 +7,6 @@ from shared.schemas.feature_selection import (
     BorutaParams,
     FeatureSelectionMethod,
     LassoParams,
-    ShapParams,
     TreeImportanceParams,
     WoeIvParams,
 )
@@ -171,28 +170,6 @@ class TestBoruta:
             X, y, names, BorutaParams(n_iterations=20, include_tentative=True)
         )
         assert relaxed.n_selected >= strict.n_selected
-
-
-# -------------------------------------------------------------------
-# SHAP
-# -------------------------------------------------------------------
-
-
-class TestShap:
-    """Tests for select_features_shap."""
-
-    def test_top_k(self, classification_data: tuple) -> None:
-        """SHAP top-K returns exactly K features."""
-        from shared.logic.feature_selection import select_features_shap
-
-        X, y, names = classification_data
-        params = ShapParams(model_type="xgboost", sample_size=50, top_k=5)
-        result = select_features_shap(X, y, names, params)
-
-        assert result.method == FeatureSelectionMethod.SHAP
-        assert result.n_selected == 5
-        assert result.n_total == 10
-        assert len(result.selected_features) == 5
 
 
 # -------------------------------------------------------------------

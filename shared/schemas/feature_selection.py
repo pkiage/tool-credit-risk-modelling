@@ -13,7 +13,6 @@ class FeatureSelectionMethod(str, Enum):
     LASSO = "lasso"
     WOE_IV = "woe_iv"
     BORUTA = "boruta"
-    SHAP = "shap"
 
 
 # --- Per-method parameter models ---
@@ -89,30 +88,6 @@ class BorutaParams(BaseModel):
     )
 
 
-class ShapParams(BaseModel):
-    """Parameters for SHAP-based feature selection.
-
-    Attributes:
-        model_type: Model to train for SHAP value computation.
-        sample_size: Number of samples for SHAP computation (controls speed).
-        top_k: Number of top features to select. None = use threshold instead.
-        threshold: Mean |SHAP| threshold. Features above this are selected.
-    """
-
-    model_type: Literal["xgboost", "random_forest"] = Field(
-        default="xgboost", description="Model type for SHAP"
-    )
-    sample_size: int = Field(
-        default=100, ge=50, le=1000, description="Sample size for SHAP computation"
-    )
-    top_k: int | None = Field(
-        default=None, ge=1, le=26, description="Select top K features"
-    )
-    threshold: float | None = Field(
-        default=None, ge=0, description="Mean |SHAP| threshold"
-    )
-
-
 # --- Request ---
 
 
@@ -126,7 +101,6 @@ class FeatureSelectionRequest(BaseModel):
         lasso_params: Parameters when method is lasso.
         woe_iv_params: Parameters when method is woe_iv.
         boruta_params: Parameters when method is boruta.
-        shap_params: Parameters when method is shap.
     """
 
     method: FeatureSelectionMethod = Field(description="Selection method")
@@ -135,7 +109,6 @@ class FeatureSelectionRequest(BaseModel):
     lasso_params: LassoParams | None = Field(default=None)
     woe_iv_params: WoeIvParams | None = Field(default=None)
     boruta_params: BorutaParams | None = Field(default=None)
-    shap_params: ShapParams | None = Field(default=None)
 
 
 # --- Response ---

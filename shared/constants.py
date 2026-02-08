@@ -181,9 +181,6 @@ IV_THRESHOLD_STRONG: float = 0.5
 BORUTA_DEFAULT_N_ITERATIONS: int = 100
 BORUTA_DEFAULT_CONFIDENCE_LEVEL: float = 0.95
 
-# SHAP defaults
-SHAP_DEFAULT_SAMPLE_SIZE: int = 100
-
 # Chart color palette (shared across all notebooks and apps)
 COLOR_PRIMARY: str = "#636EFA"
 COLOR_DANGER: str = "#EF553B"

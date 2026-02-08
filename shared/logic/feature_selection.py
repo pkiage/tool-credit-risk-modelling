@@ -22,7 +22,6 @@ from shared.schemas.feature_selection import (
     FeatureSelectionMethod,
     FeatureSelectionResult,
     LassoParams,
-    ShapParams,
     TreeImportanceParams,
     WoeIvParams,
 )
@@ -414,105 +413,4 @@ def select_features_boruta(
             "n_tentative": int(tentative.sum()),
             "n_rejected": int(rejected.sum()),
         },
-    )
-
-
-# ---------------------------------------------------------------------------
-# 5. SHAP
-# ---------------------------------------------------------------------------
-
-
-def select_features_shap(
-    X: NDArray[np.float64],
-    y: NDArray[np.int_],
-    feature_names: list[str],
-    params: ShapParams,
-    random_state: int = 42,
-) -> FeatureSelectionResult:
-    """Select features using mean |SHAP| values.
-
-    Trains a tree model, computes SHAP values via TreeExplainer, and ranks
-    features by their mean absolute SHAP contribution.
-
-    Args:
-        X: Feature matrix (n_samples, n_features).
-        y: Binary target labels.
-        feature_names: Encoded column names.
-        params: SHAP parameters (model_type, sample_size, top_k or threshold).
-        random_state: Random seed.
-
-    Returns:
-        FeatureSelectionResult with SHAP-based selection.
-    """
-    import shap
-
-    if params.model_type == "xgboost":
-        # base_score=0.5 avoids XGBoost 3.x returning an array-typed
-        # base_score that SHAP cannot parse (shap#4184).
-        xgb_params = {
-            **constants.XGBOOST_PARAMS,
-            "random_state": random_state,
-            "base_score": 0.5,
-        }
-        model = XGBClassifier(**xgb_params)  # type: ignore[arg-type]
-    else:
-        model = RandomForestClassifier(
-            **{**constants.RANDOM_FOREST_PARAMS, "random_state": random_state},  # type: ignore[arg-type]
-        )
-
-    model.fit(X, y)
-
-    # Sample for efficiency
-    if X.shape[0] > params.sample_size:
-        idx = np.random.RandomState(random_state).choice(
-            X.shape[0], size=params.sample_size, replace=False
-        )
-        X_sample = X[idx]
-    else:
-        X_sample = X
-
-    # Use native Booster for XGBoost to avoid sklearn wrapper
-    # compatibility issues with SHAP on certain platforms
-    if params.model_type == "xgboost":
-        explainer = shap.TreeExplainer(model.get_booster())
-    else:
-        explainer = shap.TreeExplainer(model)
-
-    shap_values = explainer.shap_values(X_sample)
-
-    # Binary classification: RF returns list [class_0, class_1],
-    # XGBoost Booster returns a single 2D array (log-odds)
-    if isinstance(shap_values, list):
-        shap_values = shap_values[1]
-
-    mean_abs_shap = np.abs(np.asarray(shap_values, dtype=np.float64)).mean(axis=0)
-
-    # Determine selection
-    if params.top_k is not None:
-        top_indices = np.argsort(mean_abs_shap)[-params.top_k :]
-        selected_mask = np.zeros(len(feature_names), dtype=bool)
-        selected_mask[top_indices] = True
-        meta: dict[str, str | float | int | bool] = {
-            "selection_mode": "top_k",
-            "k": params.top_k,
-        }
-    elif params.threshold is not None:
-        selected_mask = mean_abs_shap >= params.threshold
-        meta = {"selection_mode": "threshold", "threshold": params.threshold}
-    else:
-        selected_mask = mean_abs_shap > 0
-        meta = {"selection_mode": "non_zero"}
-
-    meta["model_type"] = params.model_type
-    meta["sample_size"] = min(X.shape[0], params.sample_size)
-
-    return FeatureSelectionResult(
-        method=FeatureSelectionMethod.SHAP,
-        selected_features=[n for n, s in zip(feature_names, selected_mask) if s],
-        feature_scores=_rank_and_build_scores(
-            feature_names, mean_abs_shap, selected_mask
-        ),
-        n_selected=int(selected_mask.sum()),
-        n_total=len(feature_names),
-        method_metadata=meta,
     )

@@ -157,7 +157,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                         ("LASSO (L1 Regularization)", "lasso"),
                         ("WoE / IV (Information Value)", "woe_iv"),
                         ("Boruta (All-Relevant)", "boruta"),
-                        ("SHAP (Explainability)", "shap"),
                     ],
                     value="tree_importance",
                     label="Method",
@@ -221,24 +220,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                         value=False, label="Include tentative features"
                     )
 
-                # -- SHAP params --
-                with gr.Column(visible=False) as fs_shap_group:
-                    fs_shap_model = gr.Dropdown(
-                        choices=[
-                            ("XGBoost", "xgboost"),
-                            ("Random Forest", "random_forest"),
-                        ],
-                        value="xgboost",
-                        label="Model Type",
-                    )
-                    fs_shap_top_k = gr.Slider(
-                        minimum=1,
-                        maximum=26,
-                        step=1,
-                        value=10,
-                        label="Top K Features",
-                    )
-
                 fs_run_btn = gr.Button("Run Feature Selection", variant="secondary")
                 fs_status = gr.Textbox(label="Status", interactive=False, visible=False)
                 fs_plot = gr.Plot(label="Feature Scores")
@@ -299,7 +280,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             gr.update(visible=method == "lasso"),
             gr.update(visible=method == "woe_iv"),
             gr.update(visible=method == "boruta"),
-            gr.update(visible=method == "shap"),
         )
 
     fs_method.change(
@@ -310,7 +290,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             fs_lasso_group,
             fs_woe_group,
             fs_boruta_group,
-            fs_shap_group,
         ],
     )
 
@@ -323,8 +302,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
         woe_thresh: float,
         boruta_iters: int,
         boruta_tent: bool,
-        shap_model: str,
-        shap_k: int,
     ) -> tuple[Any, ...]:
         """Call the feature-selection API and return results + chart."""
         request: dict[str, Any] = {"method": method}
@@ -342,9 +319,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                 "n_iterations": int(boruta_iters),
                 "include_tentative": boruta_tent,
             }
-        elif method == "shap":
-            request["shap_params"] = {"model_type": shap_model, "top_k": int(shap_k)}
-
         try:
             result = api.feature_selection(request)
         except httpx.HTTPStatusError as exc:
@@ -399,8 +373,6 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             fs_woe_threshold,
             fs_boruta_iters,
             fs_boruta_tentative,
-            fs_shap_model,
-            fs_shap_top_k,
         ],
         outputs=[fs_status, fs_plot, fs_result_state, fs_apply_btn],
     )

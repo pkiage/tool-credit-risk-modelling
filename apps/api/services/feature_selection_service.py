@@ -8,7 +8,6 @@ from shared.schemas.feature_selection import (
     FeatureSelectionRequest,
     FeatureSelectionResult,
     LassoParams,
-    ShapParams,
     TreeImportanceParams,
     WoeIvParams,
 )
@@ -49,10 +48,6 @@ def run_feature_selection(
         FeatureSelectionMethod.BORUTA: (
             fs_logic.select_features_boruta,
             request.boruta_params or BorutaParams(),
-        ),
-        FeatureSelectionMethod.SHAP: (
-            fs_logic.select_features_shap,
-            request.shap_params or ShapParams(),
         ),
     }
 

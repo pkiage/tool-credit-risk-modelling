@@ -61,20 +61,6 @@ class TestFeatureSelectionEndpoint:
         assert data["method"] == "boruta"
         assert "n_confirmed" in data["method_metadata"]
 
-    def test_shap(self, client: TestClient) -> None:
-        """SHAP endpoint returns SHAP-based selection."""
-        response = client.post(
-            "/feature-selection/",
-            json={
-                "method": "shap",
-                "shap_params": {"model_type": "xgboost", "top_k": 10},
-            },
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["method"] == "shap"
-        assert data["n_selected"] == 10
-
     def test_invalid_method(self, client: TestClient) -> None:
         """Invalid method returns 422."""
         response = client.post(
