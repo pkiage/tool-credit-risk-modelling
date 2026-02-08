@@ -10,10 +10,13 @@ pinned: false
 
 Interactive Marimo notebooks for exploring credit risk model training, evaluation, and threshold optimization.
 
+**Live Demo**: [huggingface.co/spaces/pkiage/credit-risk-notebooks](https://huggingface.co/spaces/pkiage/credit-risk-notebooks)
+
 ## Notebooks
 
 | Route | Notebook | Description |
 | ----- | -------- | ----------- |
+| `/` | Landing Page | Navigation and overview of all notebooks |
 | `/01_eda` | Exploratory Data Analysis | Dataset overview, distributions, correlations |
 | `/02_model_comparison` | Model Comparison | Train and compare Logistic Regression, XGBoost, Random Forest |
 | `/03_threshold_optimization` | Threshold Optimization | Interactive threshold tuning with Youden's J |
