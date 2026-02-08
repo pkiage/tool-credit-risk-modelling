@@ -141,7 +141,7 @@ CORS_ORIGINS_DEV = ["*"]
 CORS_ORIGINS_PROD = [
     "https://your-domain.com",
     "https://www.your-domain.com",
-    "https://your-app.vercel.app",
+    "https://your-app.run.app",
 ]
 
 app.add_middleware(
@@ -327,7 +327,7 @@ async def credit_risk_exception_handler(request: Request, exc: CreditRiskExcepti
 
 - Installation instructions
 - Configuration guide
-- Deployment guide (Vercel, HF Spaces, Docker)
+- Deployment guide (Cloud Run, HF Spaces, Docker)
 - API usage examples
 - Contributing guidelines
 
