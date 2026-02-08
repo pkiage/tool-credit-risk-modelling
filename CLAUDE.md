@@ -126,37 +126,90 @@ git reflog  # Find the commit hash
 git checkout -b recovery-branch [commit-hash]
 ```
 
-### Claude Code Git Permissions
+### Parallel Development: Branches vs Worktrees
 
-Claude can: create branches, commit, push, create PRs
-Claude should NOT: merge PRs, force push, rebase shared branches
+**Default**: Use branches. Only add worktrees when you need two working directories simultaneously.
 
-### Worktrees (Parallel Development)
+#### When to Use What
 
-Use **git worktrees** when working on multiple features in parallel. Each worktree is a separate working directory on its own branch, sharing the same `.git` object store.
+| Scenario | Use | Why |
+|----------|-----|-----|
+| Sequential feature work | Branch only | One task at a time, no extra setup |
+| Quick fix while on a feature branch | Branch only | Stash, switch, fix, switch back |
+| Working on `apps/api/` while testing `shared/` changes | Worktree | Need both running simultaneously |
+| `apps/web/` + `apps/api/` dev in parallel | Worktree | Separate `node_modules` and `.venv` needed |
+| Reviewing a PR while mid-feature | Worktree | Avoid stashing incomplete work |
+| Long-running `docs/` + `feature/` tasks | Worktree | Independent streams, no context switching |
+
+#### Monorepo-Specific Notes
+
+- **`shared/` changes cascade** to all apps — a worktree lets you test against apps without stash/switch cycles
+- **Independent apps** (`apps/web/`, `apps/api/`, `apps/gradio/`) rarely conflict — parallel worktrees work well
+- **`docs/`** is always safe for parallel worktrees since it never conflicts with code
+
+#### Worktree Commands
 
 ```bash
-# Create a worktree for a new feature (from the main repo)
-git worktree add ../tool-crm-[short-name] -b feature/[description]
+# Add a worktree for a new branch (from main)
+git worktree add -b feature/api-auth ../credit-risk-api main
 
-# List active worktrees
+# Add a worktree for an existing branch
+git worktree add ../credit-risk-docs docs/update-readme
+
+# List all worktrees
 git worktree list
 
-# Remove after PR is merged
-git worktree remove ../tool-crm-[short-name]
-git branch -d feature/[description]
+# Remove a worktree (after merging/done)
+git worktree remove ../credit-risk-docs
 ```
 
-| Approach             | When to Use                                                          |
-|----------------------|----------------------------------------------------------------------|
-| **Branch switching** | Quick, single-task work; small fixes                                 |
-| **Worktrees**        | Parallel features, long-running work, avoiding stash/switch overhead |
+**Naming convention** for worktree directories: `../credit-risk-[purpose]`
 
-**Worktree notes:**
+```text
+Dev/Repos/
+├── tool-credit-risk-modelling/      ← main worktree (primary)
+├── credit-risk-docs/                ← docs worktree
+├── credit-risk-api/                 ← api feature worktree
+└── credit-risk-web/                 ← web feature worktree
+```
 
-- Each worktree needs its own `uv sync` (venv is per-directory)
-- Branches/commits are visible across all worktrees
-- Never check out the same branch in two worktrees
+#### Worktree Gotchas
+
+| Gotcha | Detail |
+|--------|--------|
+| Same branch in two worktrees | **Not allowed.** Git prevents checking out the same branch in multiple worktrees. |
+| Shared `.git` | All worktrees share one `.git` directory. Commits in any worktree are visible to all. |
+| `node_modules` / `.venv` per worktree | Each worktree needs its own install. Run `npm install` and `uv sync` in each new worktree. |
+| `.env` files | Not tracked by git. Copy `.env` manually to each new worktree. |
+| Branch naming still applies | Worktree branches follow the same `feature/`, `fix/`, `docs/` convention. |
+| Cleanup | Always use `git worktree remove`, not `rm -rf`. Stale entries break `git worktree list`. |
+
+#### Worktree + Branch Workflow
+
+```bash
+# 1. You're mid-feature on a branch. Need to start parallel work.
+
+# 2. Create a worktree for the new task (branches from main)
+git worktree add -b feature/new-task ../credit-risk-new-task main
+
+# 3. Set up the new worktree
+cd ../credit-risk-new-task
+uv sync                         # Python deps
+cd apps/web && npm install      # Node deps (if needed)
+
+# 4. Work, commit, push, PR from the worktree
+git push -u origin feature/new-task
+gh pr create --title "feat(scope): description"
+
+# 5. Clean up after merge
+cd ../tool-credit-risk-modelling
+git worktree remove ../credit-risk-new-task
+```
+
+### Claude Code Git Permissions
+
+Claude can: create branches, commit, push, create PRs, add/remove worktrees
+Claude should NOT: merge PRs, force push, rebase shared branches
 
 ### Pre-Flight Checklist (before starting any task)
 
@@ -170,7 +223,7 @@ git status  # Should show "nothing to commit, working tree clean"
 
 # 3. Create feature branch (pick one)
 git checkout -b feature/[description]                          # branch switch
-git worktree add ../tool-crm-[name] -b feature/[description]  # worktree (parallel)
+git worktree add ../credit-risk-[name] -b feature/[description]  # worktree (parallel)
 ```
 
 If `git status` shows uncommitted changes, either commit them or stash:
