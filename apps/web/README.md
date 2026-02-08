@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Credit Risk Platform - Web UI
+
+Production Next.js web interface for the Credit Risk Modelling Platform.
+
+## Live Deployment
+
+**Production App:** [https://credit-risk-web-p24vtxpm5q-uc.a.run.app](https://credit-risk-web-p24vtxpm5q-uc.a.run.app)
+
+Deployed on Google Cloud Run with automated CI/CD via GitHub Actions.
+
+## Features
+
+- **Model Training** - Configure and train credit risk models with custom hyperparameters
+- **Predictions** - Submit loan applications and get default probability predictions
+- **Model Comparison** - Compare performance metrics across multiple trained models
+- **Interactive Charts** - ROC curves, confusion matrices, feature importance visualizations
+- **Authentication** - Secure cookie-based authentication with API key verification
+
+## Tech Stack
+
+- **Framework:** Next.js 16.1.6 (App Router, TypeScript strict mode)
+- **UI:** React 19, Tailwind CSS v4
+- **Charts:** Recharts
+- **Code Quality:** Biome (linting & formatting)
+- **Deployment:** Google Cloud Run (Docker)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- npm
+
+### Environment Variables
+
+Create a `.env.local` file:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For production, set this to your deployed FastAPI backend URL.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Development Server
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Install dependencies
+npm install
 
-## Learn More
+# Run development server
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Build for Production
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+npm start
+```
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+app/
+├── page.tsx           # Dashboard/home page
+├── login/page.tsx     # Authentication
+├── train/page.tsx     # Model training interface
+├── predict/page.tsx   # Loan prediction interface
+└── compare/page.tsx   # Model comparison
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+components/
+├── charts/            # Visualization components
+├── forms/             # Form components
+├── layout/            # Header, nav, footer
+└── ui/                # Base UI components
+
+lib/
+├── api-client.ts      # API integration
+├── types.ts           # TypeScript interfaces
+└── validation.ts      # Form validation
+```
+
+## API Integration
+
+The web app connects to the FastAPI backend (`apps/api/`) for all data operations. See `lib/api-client.ts` for the API client implementation.
+
+**Required Backend Endpoints:**
+
+- `GET /health` - Health check
+- `POST /auth/verify` - API key verification
+- `POST /train` - Model training
+- `POST /predict` - Predictions
+- `GET /models` - List models
+- `GET /models/{id}` - Model details
+- `GET /models/{id}/results` - Training results
+- `POST /models/{id}/persist` - Persist model
+
+## Scripts
+
+| Command | Description |
+| ------- | ----------- |
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm start` | Start production server |
+| `npm run lint` | Run Biome linter |
+| `npm run format` | Format code with Biome |
+
+## Deployment
+
+See [ADR-011](../../docs/1-ADRs/ADR-011-nextjs-cloud-run.md) for deployment architecture details.
+
+The app is automatically deployed to Google Cloud Run when changes are pushed to the `main` branch via the `.github/workflows/deploy-web-cloudrun.yml` workflow.
