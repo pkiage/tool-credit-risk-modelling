@@ -24,7 +24,8 @@ def _(mo):
         """
         # Credit Risk Modeling Platform
 
-        Interactive notebooks for exploring credit risk data, training models, and optimizing decision thresholds.
+        Interactive notebooks for exploring credit risk data, training models,
+        and optimizing decision thresholds.
         """
     )
     return
@@ -37,16 +38,23 @@ def _(mo):
         ## Notebooks
 
         ### [📊 Exploratory Data Analysis](/01_eda)
-        Dataset overview, feature distributions, correlation analysis, and target variable exploration.
+        Dataset overview, feature distributions, correlation analysis,
+        and target variable exploration.
 
         ### [🤖 Model Comparison](/02_model_comparison)
-        Train and compare multiple classification models (Logistic Regression, XGBoost, Random Forest) side-by-side with ROC curves and feature importance.
+        Train and compare multiple classification models
+        (Logistic Regression, XGBoost, Random Forest) side-by-side
+        with ROC curves and feature importance.
 
         ### [⚖️ Threshold Optimization](/03_threshold_optimization)
-        Interactive threshold tuning using Youden's J statistic with sensitivity vs specificity trade-offs and cost-based optimization.
+        Interactive threshold tuning using Youden's J statistic
+        with sensitivity vs specificity trade-offs
+        and cost-based optimization.
 
         ### [📈 Probability Calibration](/04_calibration)
-        Evaluate model calibration with reliability diagrams, Brier scores, and compare sigmoid vs isotonic calibration methods.
+        Evaluate model calibration with reliability diagrams,
+        Brier scores, and compare sigmoid vs isotonic
+        calibration methods.
         """
     )
     return
