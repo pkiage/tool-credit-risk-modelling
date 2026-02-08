@@ -17,29 +17,6 @@ with gr.Blocks(title=APP_TITLE) as app:
     # Session-scoped state for training results (isolated per user session).
     training_results_state = gr.State(value={})
 
-    # API Key authentication row
-    with gr.Row():
-        api_key_input = gr.Textbox(
-            label="API Key",
-            type="password",
-            placeholder="Enter your API key",
-            scale=3,
-        )
-        verify_btn = gr.Button("Verify", scale=1)
-        auth_status = gr.Markdown("Not authenticated")
-
-    def _verify_key(key: str) -> tuple[str, str]:
-        """Verify the API key and update auth status."""
-        if not key.strip():
-            return "", "Not authenticated"
-        api.set_api_key(key.strip())
-        if api.verify_key():
-            return key.strip(), "Authenticated"
-        api.set_api_key("")
-        return "", "Invalid key"
-
-    verify_btn.click(_verify_key, [api_key_input], [api_key_input, auth_status])
-
     # Dynamic health banner — checked on each page load, not just at startup.
     api_status = gr.Markdown(visible=False)
 
