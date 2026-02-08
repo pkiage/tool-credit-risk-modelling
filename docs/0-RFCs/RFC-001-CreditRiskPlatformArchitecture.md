@@ -293,7 +293,7 @@ marimo run notebooks/02_model_comparison.py
 
 - HF Spaces deployment (Gradio)
 - Molab deployment (Marimo)
-- Vercel deployment (Next.js)
+- Cloud Run deployment (Next.js, FastAPI)
 
 ## Engineering Impact
 
@@ -316,8 +316,7 @@ marimo run notebooks/02_model_comparison.py
 | Local | All | `uv run`, `npm run dev` |
 | Molab | Marimo | Notebook deployment |
 | HF Spaces | Gradio | Docker-based |
-| Vercel | Next.js | Edge deployment |
-| Any cloud | FastAPI | Containerized |
+| Cloud Run | Next.js, FastAPI | Containerized, scales to zero |
 
 ## Best Practices
 
