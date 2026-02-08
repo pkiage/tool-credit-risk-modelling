@@ -19,7 +19,7 @@ This directory contains Architecture Decision Records (ADRs) for the Credit Risk
 | [ADR-011](ADR-011-nextjs-cloud-run.md) | Next.js Deployment on Cloud Run | Proposed | 2026-02-07 | [#37](https://github.com/pkiage/tool-credit-risk-modelling/pull/37) |
 | [ADR-012](ADR-012-automatic-feature-selection.md) | Automatic Feature Selection Methods | Accepted | 2026-02-07 | [#38](https://github.com/pkiage/tool-credit-risk-modelling/pull/38), [#39](https://github.com/pkiage/tool-credit-risk-modelling/pull/39) |
 | [ADR-013](ADR-013-remove-web-authentication.md) | Remove Web Authentication Layer | Proposed | 2026-02-08 | [#44](https://github.com/pkiage/tool-credit-risk-modelling/pull/44) |
-| [ADR-014](ADR-014-remove-gradio-authentication.md) | Remove Gradio Authentication Layer | Proposed | 2026-02-08 | _Added before merge_ |
+| [ADR-014](ADR-014-remove-gradio-authentication.md) | Remove Gradio Authentication Layer | Proposed | 2026-02-08 | [#45](https://github.com/pkiage/tool-credit-risk-modelling/pull/45) |
 
 ## Creating a New ADR
 
