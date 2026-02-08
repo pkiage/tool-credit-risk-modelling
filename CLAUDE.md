@@ -101,9 +101,18 @@ refactor(api): extract training service
 git checkout main
 git pull origin main
 
-# Delete local feature branch (optional, keeps things clean)
+# Delete local feature branch
 git branch -d feature/[old-branch]
+
+# Remove worktree if one was used
+git worktree remove ../credit-risk-[name]
+
+# Prune stale remote tracking refs
+git remote prune origin
 ```
+
+> **Note:** Remote branches are auto-deleted on merge (GitHub setting enabled).
+> `git remote prune origin` cleans up local tracking refs that point to those deleted remotes.
 
 **If you downloaded files to wrong branch:**
 
@@ -125,6 +134,27 @@ git pull
 git reflog  # Find the commit hash
 git checkout -b recovery-branch [commit-hash]
 ```
+
+### Periodic Cleanup
+
+Run periodically (or at the start of a session) to catch accumulated stale branches and worktrees:
+
+```bash
+# 1. Check for stale worktrees
+git worktree list                    # Should only show main worktree if no parallel work active
+
+# 2. Remove any worktrees for merged PRs
+git worktree remove ../credit-risk-[name]
+
+# 3. Delete local branches whose PRs are merged
+git branch                           # Review list
+git branch -d [branch-name]          # -d is safe (refuses if unmerged)
+
+# 4. Prune stale remote tracking refs
+git remote prune origin
+```
+
+> **Tip:** If many branches have accumulated, check PR status with `gh pr list --state merged --json headRefName`.
 
 ### Parallel Development: Branches vs Worktrees
 
