@@ -294,10 +294,8 @@ git stash pop  # Restore changes later
 
 | File | Purpose |
 |------|---------|
-| `docs/0-RFCs/RFC-001-*.md` | Platform architecture |
-| `docs/0-RFCs/RFC-002-*.md` | API layer design |
-| `docs/0-RFCs/RFC-006-*.md` | Auth & security |
-| `docs/1-ADRs/` | Architecture decision records ([index](docs/1-ADRs/README.md)) |
+| `docs/0-RFCs/` | Architecture proposals and design specs ([index](docs/0-RFCs/RFC-README.md)) |
+| `docs/1-ADRs/` | Architecture decision records ([index](docs/1-ADRs/ADR-README.md)) |
 | `shared/schemas/loan.py` | Core data models |
 | `shared/logic/threshold.py` | Youden's J implementation |
 | `data/processed/cr_loan_w2.csv` | Training dataset (one-hot encoded) |
