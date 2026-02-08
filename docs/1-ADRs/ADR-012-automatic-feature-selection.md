@@ -1,10 +1,11 @@
-# ADR-011: Automatic Feature Selection Methods
+# ADR-012: Automatic Feature Selection Methods
 
-| Field  | Value               |
-|--------|---------------------|
-| Status | Accepted            |
-| Author | Paul / Claude       |
-| Date   | 2026-02-07          |
+| Field | Value |
+|-------|-------|
+| Status | Accepted |
+| Author | Paul / Claude |
+| Date | 2026-02-07 |
+| PR | [#38](https://github.com/pkiage/tool-credit-risk-modelling/pull/38), [#39](https://github.com/pkiage/tool-credit-risk-modelling/pull/39) |
 
 ## Context
 

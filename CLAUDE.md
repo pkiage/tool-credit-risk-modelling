@@ -297,7 +297,7 @@ git stash pop  # Restore changes later
 | `docs/0-RFCs/RFC-001-*.md` | Platform architecture |
 | `docs/0-RFCs/RFC-002-*.md` | API layer design |
 | `docs/0-RFCs/RFC-006-*.md` | Auth & security |
-| `docs/1-ADRs/` | Architecture decision records (ADR-001 through ADR-008) |
+| `docs/1-ADRs/` | Architecture decision records ([index](docs/1-ADRs/README.md)) |
 | `shared/schemas/loan.py` | Core data models |
 | `shared/logic/threshold.py` | Youden's J implementation |
 | `data/processed/cr_loan_w2.csv` | Training dataset (one-hot encoded) |
@@ -311,6 +311,48 @@ When Pydantic schemas in `shared/` change:
 3. Regenerate TS interfaces via `datamodel-code-generator` (see RFC-001 Q4)
 4. Update `apps/web/` components
 5. Verify `apps/gradio/` field mappings still match API contract
+
+## ADR Creation Checklist
+
+When creating a new Architecture Decision Record:
+
+### 1. Pick the next number
+
+```bash
+# Check the highest ADR number on main (not your branch)
+ls docs/1-ADRs/ADR-*.md | sort -V | tail -1
+```
+
+If working in a **worktree** or **parallel branch**, another branch may also be creating an ADR. To avoid numbering conflicts:
+
+- **Check open PRs** for new ADR files: `gh pr list --search "ADR" --state open`
+- **If a conflict is found at merge time**, renumber the later PR's ADR (higher number = later merge)
+- **Never reuse** a number that appeared in a merged PR, even if the file was later deleted
+
+### 2. Create the file
+
+File: `docs/1-ADRs/ADR-NNN-short-description.md`
+
+Required metadata table:
+
+```markdown
+# ADR-NNN: Title
+
+| Field | Value |
+|-------|-------|
+| Status | Proposed |
+| Author | Paul / Claude |
+| Date | YYYY-MM-DD |
+| PR | _Added before merge_ |
+```
+
+Status values: `Proposed` → `Accepted` → `Superseded` (or `Rejected`)
+
+### 3. Before merging the PR
+
+- [ ] Add the `| PR |` link to the ADR metadata table (use the PR number from `gh pr create`)
+- [ ] Add the new ADR to `docs/1-ADRs/README.md` index table
+- [ ] Verify no numbering conflict with other open/recently-merged PRs
 
 ## Do NOT
 
