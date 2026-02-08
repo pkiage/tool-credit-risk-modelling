@@ -467,13 +467,16 @@ def select_features_shap(
         X_sample = X
 
     explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(X_sample)
+    explanation = explainer(X_sample)
 
-    # Binary classification may return list [class_0, class_1]
-    if isinstance(shap_values, list):
-        shap_values = shap_values[1]
+    # Extract raw numpy values from Explanation object
+    shap_vals = np.array(explanation.values)
 
-    mean_abs_shap = np.abs(shap_values).mean(axis=0).astype(np.float64)
+    # Binary classification may return 3D (n_samples, n_features, 2)
+    if shap_vals.ndim == 3:
+        shap_vals = shap_vals[:, :, 1]
+
+    mean_abs_shap = np.abs(shap_vals).mean(axis=0).astype(np.float64)
 
     # Determine selection
     if params.top_k is not None:
