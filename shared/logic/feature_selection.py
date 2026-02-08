@@ -466,17 +466,21 @@ def select_features_shap(
     else:
         X_sample = X
 
-    explainer = shap.TreeExplainer(model)
-    explanation = explainer(X_sample)
+    # Use native Booster for XGBoost to avoid sklearn wrapper
+    # compatibility issues with SHAP on certain platforms
+    if params.model_type == "xgboost":
+        explainer = shap.TreeExplainer(model.get_booster())
+    else:
+        explainer = shap.TreeExplainer(model)
 
-    # Extract raw numpy values from Explanation object
-    shap_vals = np.array(explanation.values)
+    shap_values = explainer.shap_values(X_sample)
 
-    # Binary classification may return 3D (n_samples, n_features, 2)
-    if shap_vals.ndim == 3:
-        shap_vals = shap_vals[:, :, 1]
+    # Binary classification: RF returns list [class_0, class_1],
+    # XGBoost Booster returns a single 2D array (log-odds)
+    if isinstance(shap_values, list):
+        shap_values = shap_values[1]
 
-    mean_abs_shap = np.abs(shap_vals).mean(axis=0).astype(np.float64)
+    mean_abs_shap = np.abs(np.asarray(shap_values, dtype=np.float64)).mean(axis=0)
 
     # Determine selection
     if params.top_k is not None:
