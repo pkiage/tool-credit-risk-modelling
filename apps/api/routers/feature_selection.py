@@ -21,7 +21,7 @@ router = APIRouter()
 
 @router.post("/", response_model=FeatureSelectionResult)
 @limiter.limit("20/hour")
-async def select_features(
+def select_features(
     request: Request,
     fs_request: FeatureSelectionRequest,
     settings: Settings = Depends(get_settings),

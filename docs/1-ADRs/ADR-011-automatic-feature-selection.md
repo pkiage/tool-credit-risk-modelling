@@ -72,6 +72,13 @@ Custom implementation to avoid adding the `BorutaPy` package. Algorithm:
 4. Repeat N iterations
 5. Apply `scipy.stats.binom.ppf` to classify each feature as Confirmed, Tentative, or Rejected
 
+**Performance note**: Each iteration trains a RandomForest(100 trees, max_depth=10) on a doubled feature matrix (real + shadow columns). With the full 26-feature dataset (7500 rows × 52 columns), this is the most compute-heavy method. Mitigations:
+
+- `n_jobs=-1` on the per-iteration RandomForest (parallel tree training)
+- Gradio client uses a 300-second timeout for the feature-selection endpoint (vs 60s default)
+- The API endpoint uses a synchronous `def` (not `async def`) so FastAPI runs it in a threadpool, avoiding event-loop blocking
+- The Gradio UI shows a specific timeout message ("try fewer iterations") rather than a generic failure
+
 ### Standardized Output
 
 ```json
@@ -131,7 +138,7 @@ Custom implementation to avoid adding the `BorutaPy` package. Algorithm:
 ### Negative
 
 - Adds `shap` dependency (~50 MB installed)
-- Boruta with high iteration count is compute-heavy (rate limited to 20/hour)
+- Boruta with high iteration count is compute-heavy (rate limited to 20/hour, mitigated with `n_jobs=-1` and extended client timeout)
 - WoE/IV binning may not be optimal for all feature distributions
 
 ### Future Enhancements

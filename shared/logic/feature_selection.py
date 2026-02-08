@@ -359,6 +359,7 @@ def select_features_boruta(
         rf = RandomForestClassifier(
             n_estimators=100,
             max_depth=10,
+            n_jobs=-1,
             random_state=random_state + iteration,
         )
         rf.fit(X_combined, y)
