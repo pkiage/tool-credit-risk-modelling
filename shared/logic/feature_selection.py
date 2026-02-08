@@ -447,9 +447,14 @@ def select_features_shap(
     import shap
 
     if params.model_type == "xgboost":
-        model = XGBClassifier(
-            **{**constants.XGBOOST_PARAMS, "random_state": random_state},  # type: ignore[arg-type]
-        )
+        # base_score=0.5 avoids XGBoost 3.x returning an array-typed
+        # base_score that SHAP cannot parse (shap#4184).
+        xgb_params = {
+            **constants.XGBOOST_PARAMS,
+            "random_state": random_state,
+            "base_score": 0.5,
+        }
+        model = XGBClassifier(**xgb_params)  # type: ignore[arg-type]
     else:
         model = RandomForestClassifier(
             **{**constants.RANDOM_FOREST_PARAMS, "random_state": random_state},  # type: ignore[arg-type]
