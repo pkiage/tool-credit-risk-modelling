@@ -221,8 +221,9 @@ git pull origin main
 # 2. Verify clean state
 git status  # Should show "nothing to commit, working tree clean"
 
-# 3. Create feature branch
-git checkout -b feature/[description]
+# 3. Create feature branch (pick one)
+git checkout -b feature/[description]                          # branch switch
+git worktree add ../credit-risk-[name] -b feature/[description]  # worktree (parallel)
 ```
 
 If `git status` shows uncommitted changes, either commit them or stash:

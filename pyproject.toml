@@ -45,6 +45,7 @@ quote-style = "double"
 "notebooks/*.py" = ["N803", "N806"]
 "apps/api/services/*.py" = ["N806"]
 "shared/logic/preprocessing.py" = ["N803"]
+"shared/logic/feature_selection.py" = ["N803", "N806"]
 "tests/**/*.py" = ["N806"]
 
 [tool.hatch.build.targets.wheel]
@@ -59,8 +60,8 @@ build-backend = "hatchling.build"
 DEP002 = ["uvicorn", "pytest", "pytest-cov", "ruff", "bandit", "deptry", "pip-audit"]
 # Gradio app has its own requirements.txt (deploys separately to HF Spaces)
 DEP001 = ["gradio"]
-# apps/ and shared/ are local packages, not external transitive deps
-DEP003 = ["apps", "shared"]
+# apps/ and shared/ are local packages; scipy is transitive via scikit-learn but used in Boruta
+DEP003 = ["apps", "shared", "scipy"]
 # httpx is a dev dep for test client; Gradio installs it via its own requirements.txt
 DEP004 = ["httpx"]
 

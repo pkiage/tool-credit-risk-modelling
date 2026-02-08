@@ -145,6 +145,89 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
 
             gr.Markdown("### Feature Selection")
 
+            # --- Auto Feature Selection ---
+            with gr.Accordion("Auto Feature Selection", open=False):
+                gr.Markdown(
+                    "Run an algorithm to recommend features, "
+                    "then apply the result to the checkboxes below."
+                )
+                fs_method = gr.Dropdown(
+                    choices=[
+                        ("Tree Importance (RF / XGB)", "tree_importance"),
+                        ("LASSO (L1 Regularization)", "lasso"),
+                        ("WoE / IV (Information Value)", "woe_iv"),
+                        ("Boruta (All-Relevant)", "boruta"),
+                    ],
+                    value="tree_importance",
+                    label="Method",
+                )
+
+                # -- Tree Importance params --
+                with gr.Column(visible=True) as fs_tree_group:
+                    fs_tree_model = gr.Dropdown(
+                        choices=[
+                            ("Random Forest", "random_forest"),
+                            ("XGBoost", "xgboost"),
+                        ],
+                        value="random_forest",
+                        label="Model Type",
+                    )
+                    fs_tree_top_k = gr.Slider(
+                        minimum=1,
+                        maximum=26,
+                        step=1,
+                        value=10,
+                        label="Top K Features",
+                    )
+
+                # -- LASSO params --
+                with gr.Column(visible=False) as fs_lasso_group:
+                    fs_lasso_c = gr.Slider(
+                        minimum=0.01,
+                        maximum=10,
+                        step=0.01,
+                        value=1.0,
+                        label="Regularization (C) — lower = fewer features",
+                    )
+
+                # -- WoE/IV params --
+                with gr.Column(visible=False) as fs_woe_group:
+                    fs_woe_bins = gr.Slider(
+                        minimum=5, maximum=20, step=1, value=10, label="Bins"
+                    )
+                    fs_woe_threshold = gr.Slider(
+                        minimum=0,
+                        maximum=0.5,
+                        step=0.01,
+                        value=0.1,
+                        label="IV Threshold",
+                    )
+                    gr.Markdown(
+                        "<0.02 useless · 0.02-0.1 weak · "
+                        "0.1-0.3 medium · 0.3-0.5 strong · >0.5 suspicious"
+                    )
+
+                # -- Boruta params --
+                with gr.Column(visible=False) as fs_boruta_group:
+                    fs_boruta_iters = gr.Slider(
+                        minimum=20,
+                        maximum=200,
+                        step=10,
+                        value=100,
+                        label="Iterations",
+                    )
+                    fs_boruta_tentative = gr.Checkbox(
+                        value=False, label="Include tentative features"
+                    )
+
+                fs_run_btn = gr.Button("Run Feature Selection", variant="secondary")
+                fs_status = gr.Textbox(label="Status", interactive=False, visible=False)
+                fs_plot = gr.Plot(label="Feature Scores")
+                fs_result_state = gr.State(value=None)
+                fs_apply_btn = gr.Button(
+                    "Apply to Training", variant="primary", visible=False
+                )
+
             # Numeric features — each maps to a single encoded column
             numeric_choices = [(FEATURE_GROUP_LABELS[f], f) for f in NUMERIC_FEATURES]
             numeric_group = gr.CheckboxGroup(
@@ -187,6 +270,133 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
             roc_plot = gr.Plot(label="ROC Curve")
             importance_plot = gr.Plot(label="Feature Importance")
             error_display = gr.Textbox(label="Status", interactive=False, visible=False)
+
+    # --- Auto Feature Selection event handlers ---
+
+    def _switch_fs_params(method: str) -> tuple[Any, ...]:
+        """Toggle visibility of method-specific parameter groups."""
+        return (
+            gr.update(visible=method == "tree_importance"),
+            gr.update(visible=method == "lasso"),
+            gr.update(visible=method == "woe_iv"),
+            gr.update(visible=method == "boruta"),
+        )
+
+    fs_method.change(
+        fn=_switch_fs_params,
+        inputs=[fs_method],
+        outputs=[
+            fs_tree_group,
+            fs_lasso_group,
+            fs_woe_group,
+            fs_boruta_group,
+        ],
+    )
+
+    def _run_fs(
+        method: str,
+        tree_model: str,
+        tree_k: int,
+        lasso_c: float,
+        woe_bins: int,
+        woe_thresh: float,
+        boruta_iters: int,
+        boruta_tent: bool,
+    ) -> tuple[Any, ...]:
+        """Call the feature-selection API and return results + chart."""
+        request: dict[str, Any] = {"method": method}
+        if method == "tree_importance":
+            request["tree_params"] = {"model_type": tree_model, "top_k": int(tree_k)}
+        elif method == "lasso":
+            request["lasso_params"] = {"C": lasso_c}
+        elif method == "woe_iv":
+            request["woe_iv_params"] = {
+                "n_bins": int(woe_bins),
+                "iv_threshold": woe_thresh,
+            }
+        elif method == "boruta":
+            request["boruta_params"] = {
+                "n_iterations": int(boruta_iters),
+                "include_tentative": boruta_tent,
+            }
+        try:
+            result = api.feature_selection(request)
+        except httpx.HTTPStatusError as exc:
+            logger.exception("Feature selection HTTP error")
+            msg = f"API error {exc.response.status_code}"
+            return (
+                gr.update(visible=True, value=msg),
+                None,
+                None,
+                gr.update(visible=False),
+            )
+        except Exception:
+            logger.exception("Feature selection failed")
+            return (
+                gr.update(visible=True, value="Feature selection failed."),
+                None,
+                None,
+                gr.update(visible=False),
+            )
+
+        # Build chart (top 15 for readability)
+        scores = sorted(result["feature_scores"], key=lambda s: s["rank"])[:15]
+        names = [s["feature_name"] for s in reversed(scores)]
+        vals = [s["score"] for s in reversed(scores)]
+        colors = ["#636EFA" if s["selected"] else "#CCCCCC" for s in reversed(scores)]
+
+        fig = go.Figure(go.Bar(x=vals, y=names, orientation="h", marker_color=colors))
+        method_label = method.replace("_", " ").title()
+        fig.update_layout(
+            title=f"Top Features — {method_label}",
+            xaxis_title="Score",
+            height=max(350, len(scores) * 28),
+            margin={"l": 200},
+        )
+
+        status = f"Selected {result['n_selected']} of {result['n_total']} features"
+        return (
+            gr.update(visible=True, value=status),
+            fig,
+            result,
+            gr.update(visible=True),
+        )
+
+    fs_run_btn.click(
+        fn=_run_fs,
+        inputs=[
+            fs_method,
+            fs_tree_model,
+            fs_tree_top_k,
+            fs_lasso_c,
+            fs_woe_bins,
+            fs_woe_threshold,
+            fs_boruta_iters,
+            fs_boruta_tentative,
+        ],
+        outputs=[fs_status, fs_plot, fs_result_state, fs_apply_btn],
+    )
+
+    def _apply_fs(
+        result: dict[str, Any] | None,
+    ) -> tuple[Any, ...]:
+        """Transfer selected features into the manual checkboxes."""
+        if not result:
+            defaults = [list(FEATURE_GROUPS[c]) for c in CATEGORICAL_FEATURES]
+            return (list(NUMERIC_FEATURES), *defaults)
+        selected = set(result["selected_features"])
+        numeric_sel = [f for f in NUMERIC_FEATURES if f in selected]
+        cat_sels = [
+            [c for c in FEATURE_GROUPS[cat] if c in selected]
+            for cat in CATEGORICAL_FEATURES
+        ]
+        return (numeric_sel, *cat_sels)
+
+    fs_apply_btn.click(
+        fn=_apply_fs,
+        inputs=[fs_result_state],
+        outputs=[numeric_group, *cat_col_groups],
+    )
 
     # Wire up Select All ↔ column toggle events for each categorical group.
     # Uses .input() for Select All to avoid event loops: .input() fires only
