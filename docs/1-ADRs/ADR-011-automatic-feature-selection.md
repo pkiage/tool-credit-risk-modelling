@@ -73,7 +73,7 @@ Custom implementation to avoid adding the `BorutaPy` package. Algorithm:
 
 #### 5. SHAP
 
-Train a tree model, compute SHAP values via `shap.TreeExplainer`, rank by mean |SHAP| per feature. Adds `shap>=0.46,<0.50` and `numba>=0.59` as dependencies (numba 0.59+ is required for Python 3.12 compatibility; shap <0.50 avoids an unresolvable Python 3.14 pre-release constraint).
+Train a tree model, compute SHAP values via `shap.TreeExplainer`, rank by mean |SHAP| per feature. Adds `shap>=0.49,<0.50` as a dependency (0.49+ properly constrains `numba>=0.54` for Python 3.12 compatibility; <0.50 avoids an unresolvable Python 3.14 pre-release constraint). Uses the modern `explainer(X)` call API which returns an `Explanation` object with clean numpy arrays.
 
 ### Standardized Output
 

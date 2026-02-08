@@ -11,8 +11,7 @@ dependencies = [
     "scikit-learn>=1.5",
     "xgboost>=2.1",
     "plotly>=5.22",
-    "shap>=0.46,<0.50",
-    "numba>=0.59",
+    "shap>=0.49,<0.50",
     "pydantic>=2.7",
     "marimo>=0.13",
 ]
@@ -58,8 +57,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.deptry.per_rule_ignores]
-# CLI tools are invoked, not imported; numba is pinned for Python 3.12 compat (transitive via shap)
-DEP002 = ["uvicorn", "pytest", "pytest-cov", "ruff", "bandit", "deptry", "pip-audit", "numba"]
+# CLI tools are invoked, not imported
+DEP002 = ["uvicorn", "pytest", "pytest-cov", "ruff", "bandit", "deptry", "pip-audit"]
 # Gradio app has its own requirements.txt (deploys separately to HF Spaces)
 DEP001 = ["gradio"]
 # apps/ and shared/ are local packages; scipy is transitive via scikit-learn but used in Boruta
