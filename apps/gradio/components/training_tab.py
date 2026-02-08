@@ -240,9 +240,7 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
                     )
 
                 fs_run_btn = gr.Button("Run Feature Selection", variant="secondary")
-                fs_status = gr.Textbox(
-                    label="Status", interactive=False, visible=False
-                )
+                fs_status = gr.Textbox(label="Status", interactive=False, visible=False)
                 fs_plot = gr.Plot(label="Feature Scores")
                 fs_result_state = gr.State(value=None)
                 fs_apply_btn = gr.Button(
@@ -371,13 +369,9 @@ def create_training_tab(api: CreditRiskAPI, training_results_state: gr.State) ->
         scores = sorted(result["feature_scores"], key=lambda s: s["rank"])[:15]
         names = [s["feature_name"] for s in reversed(scores)]
         vals = [s["score"] for s in reversed(scores)]
-        colors = [
-            "#636EFA" if s["selected"] else "#CCCCCC" for s in reversed(scores)
-        ]
+        colors = ["#636EFA" if s["selected"] else "#CCCCCC" for s in reversed(scores)]
 
-        fig = go.Figure(
-            go.Bar(x=vals, y=names, orientation="h", marker_color=colors)
-        )
+        fig = go.Figure(go.Bar(x=vals, y=names, orientation="h", marker_color=colors))
         method_label = method.replace("_", " ").title()
         fig.update_layout(
             title=f"Top Features — {method_label}",

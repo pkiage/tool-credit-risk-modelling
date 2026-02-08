@@ -14,9 +14,7 @@ from shared.schemas.feature_selection import (
 
 
 @pytest.fixture
-def classification_data() -> (
-    tuple[np.ndarray, np.ndarray, list[str]]
-):
+def classification_data() -> tuple[np.ndarray, np.ndarray, list[str]]:
     """Synthetic binary classification dataset with 5 informative + 5 noise features."""
     rng = np.random.RandomState(42)
     n = 500
