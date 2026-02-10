@@ -11,15 +11,15 @@ export function Slider({ label, displayValue, id, className = "", ...props }: Sl
 	return (
 		<div className="space-y-1">
 			<div className="flex items-center justify-between">
-				<label htmlFor={sliderId} className="block text-sm font-medium text-gray-700">
+				<label htmlFor={sliderId} className="block text-sm font-medium text-foreground-secondary">
 					{label}
 				</label>
-				{displayValue && <span className="text-sm font-medium text-blue-600">{displayValue}</span>}
+				{displayValue && <span className="text-sm font-medium text-primary">{displayValue}</span>}
 			</div>
 			<input
 				id={sliderId}
 				type="range"
-				className={`w-full accent-blue-600 ${className}`}
+				className={`w-full accent-primary ${className}`}
 				{...props}
 			/>
 		</div>

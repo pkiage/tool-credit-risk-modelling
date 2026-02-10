@@ -71,8 +71,8 @@ export default function TrainPage() {
 	return (
 		<div className="space-y-8">
 			<div>
-				<h1 className="text-2xl font-bold text-gray-900">Train Model</h1>
-				<p className="mt-1 text-gray-600">Configure and train a credit risk model.</p>
+				<h1 className="text-2xl font-bold text-foreground">Train Model</h1>
+				<p className="mt-1 text-foreground-secondary">Configure and train a credit risk model.</p>
 			</div>
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -84,8 +84,16 @@ export default function TrainPage() {
 
 				<div className="space-y-6 lg:col-span-2">
 					{error && (
-						<div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-							{error}
+						<div
+							className="rounded-lg border border-danger bg-red-50 dark:bg-red-950 p-4 text-sm text-red-800 dark:text-red-200"
+							role="alert"
+							aria-live="polite"
+						>
+							<p className="font-semibold">Training Failed</p>
+							<p className="mt-1">{error}</p>
+							<p className="mt-2 text-xs opacity-75">
+								API URL: {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}
+							</p>
 						</div>
 					)}
 
@@ -94,7 +102,7 @@ export default function TrainPage() {
 							<div className="flex items-center justify-center py-12">
 								<div className="text-center">
 									<svg
-										className="mx-auto h-8 w-8 animate-spin text-blue-600"
+										className="mx-auto h-8 w-8 animate-spin text-primary"
 										viewBox="0 0 24 24"
 										fill="none"
 										role="img"
@@ -114,7 +122,7 @@ export default function TrainPage() {
 											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
 										/>
 									</svg>
-									<p className="mt-4 text-sm text-gray-600">Training model...</p>
+									<p className="mt-4 text-sm text-foreground-secondary">Training model...</p>
 								</div>
 							</div>
 						</Card>
@@ -125,19 +133,19 @@ export default function TrainPage() {
 							<Card title="Training Summary">
 								<div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
 									<div>
-										<span className="text-gray-500">Model ID</span>
+										<span className="text-foreground-muted">Model ID</span>
 										<p className="font-mono text-xs">{result.model_id}</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Type</span>
+										<span className="text-foreground-muted">Type</span>
 										<p className="font-medium">{result.model_type}</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Optimal Threshold</span>
+										<span className="text-foreground-muted">Optimal Threshold</span>
 										<p className="font-medium">{result.optimal_threshold.toFixed(4)}</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Training Time</span>
+										<span className="text-foreground-muted">Training Time</span>
 										<p className="font-medium">{result.training_time_seconds.toFixed(2)}s</p>
 									</div>
 								</div>
@@ -167,37 +175,37 @@ export default function TrainPage() {
 							<Card title="Threshold Analysis">
 								<div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
 									<div>
-										<span className="text-gray-500">Threshold</span>
+										<span className="text-foreground-muted">Threshold</span>
 										<p className="font-medium">
 											{result.metrics.threshold_analysis.threshold.toFixed(4)}
 										</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Sensitivity</span>
+										<span className="text-foreground-muted">Sensitivity</span>
 										<p className="font-medium">
 											{result.metrics.threshold_analysis.sensitivity.toFixed(4)}
 										</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Specificity</span>
+										<span className="text-foreground-muted">Specificity</span>
 										<p className="font-medium">
 											{result.metrics.threshold_analysis.specificity.toFixed(4)}
 										</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Youden&apos;s J</span>
+										<span className="text-foreground-muted">Youden&apos;s J</span>
 										<p className="font-medium">
 											{result.metrics.threshold_analysis.youden_j.toFixed(4)}
 										</p>
 									</div>
 									<div>
-										<span className="text-gray-500">Precision</span>
+										<span className="text-foreground-muted">Precision</span>
 										<p className="font-medium">
 											{result.metrics.threshold_analysis.precision.toFixed(4)}
 										</p>
 									</div>
 									<div>
-										<span className="text-gray-500">F1 Score</span>
+										<span className="text-foreground-muted">F1 Score</span>
 										<p className="font-medium">
 											{result.metrics.threshold_analysis.f1_score.toFixed(4)}
 										</p>
