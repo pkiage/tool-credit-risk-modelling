@@ -154,7 +154,7 @@ export default function ComparePage() {
 	if (modelsLoading) {
 		return (
 			<div className="flex items-center justify-center py-12">
-				<p className="text-gray-500">Loading models...</p>
+				<p className="text-foreground-muted">Loading models...</p>
 			</div>
 		);
 	}
@@ -162,11 +162,11 @@ export default function ComparePage() {
 	if (models.length === 0) {
 		return (
 			<div className="space-y-4">
-				<h1 className="text-2xl font-bold text-gray-900">Compare Models</h1>
+				<h1 className="text-2xl font-bold text-foreground">Compare Models</h1>
 				<Card>
 					<div className="py-8 text-center">
-						<p className="text-gray-500">No trained models available.</p>
-						<p className="mt-2 text-sm text-gray-400">
+						<p className="text-foreground-muted">No trained models available.</p>
+						<p className="mt-2 text-sm text-foreground-muted">
 							Train some models first, then come back to compare them.
 						</p>
 					</div>
@@ -178,12 +178,14 @@ export default function ComparePage() {
 	return (
 		<div className="space-y-8">
 			<div>
-				<h1 className="text-2xl font-bold text-gray-900">Compare Models</h1>
-				<p className="mt-1 text-gray-600">Select models to compare their performance metrics.</p>
+				<h1 className="text-2xl font-bold text-foreground">Compare Models</h1>
+				<p className="mt-1 text-foreground-secondary">
+					Select models to compare their performance metrics.
+				</p>
 			</div>
 
 			{error && (
-				<div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+				<div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4 text-sm text-red-800 dark:text-red-200">
 					{error}
 				</div>
 			)}
@@ -193,34 +195,42 @@ export default function ComparePage() {
 					{models.map((model) => (
 						<label
 							key={model.model_id}
-							className="flex cursor-pointer items-center gap-3 rounded-md border border-gray-100 px-4 py-2 hover:bg-gray-50"
+							className="flex cursor-pointer items-center gap-3 rounded-md border border-border px-4 py-2 hover:bg-surface"
 						>
 							<input
 								type="checkbox"
-								className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+								className="h-4 w-4 rounded border-border-strong text-primary focus:ring-focus-ring"
 								checked={selectedIds.has(model.model_id)}
 								onChange={() => toggleModel(model.model_id)}
 							/>
 							<div className="flex-1">
-								<span className="font-medium text-gray-900">{model.model_type}</span>
-								<span className="ml-2 text-sm text-gray-500">{model.model_id.slice(0, 8)}</span>
+								<span className="font-medium text-foreground">
+									{model.model_type}
+								</span>
+								<span className="ml-2 text-sm text-foreground-muted">
+									{model.model_id.slice(0, 8)}
+								</span>
 							</div>
 							<div className="text-right text-sm">
-								<span className="text-gray-600">AUC: {model.roc_auc.toFixed(3)}</span>
-								<span className="ml-3 text-gray-400">{formatTimestamp(model.created_at)}</span>
+								<span className="text-foreground-secondary">
+									AUC: {model.roc_auc.toFixed(3)}
+								</span>
+								<span className="ml-3 text-foreground-muted">
+									{formatTimestamp(model.created_at)}
+								</span>
 							</div>
 						</label>
 					))}
 				</div>
 
 				<div className="mt-4 flex items-center gap-4">
-					<div className="flex rounded-lg border border-gray-200">
+					<div className="flex rounded-lg border border-border">
 						<button
 							type="button"
 							className={`rounded-l-lg px-3 py-1.5 text-sm font-medium transition-colors ${
 								mode === "stored"
-									? "bg-blue-600 text-white"
-									: "bg-white text-gray-700 hover:bg-gray-50"
+									? "bg-primary text-primary-foreground"
+									: "bg-background text-foreground-secondary hover:bg-surface"
 							}`}
 							onClick={() => setMode("stored")}
 						>
@@ -228,10 +238,10 @@ export default function ComparePage() {
 						</button>
 						<button
 							type="button"
-							className={`rounded-r-lg border-l border-gray-200 px-3 py-1.5 text-sm font-medium transition-colors ${
+							className={`rounded-r-lg border-l border-border px-3 py-1.5 text-sm font-medium transition-colors ${
 								mode === "retrain"
-									? "bg-blue-600 text-white"
-									: "bg-white text-gray-700 hover:bg-gray-50"
+									? "bg-primary text-primary-foreground"
+									: "bg-background text-foreground-secondary hover:bg-surface"
 							}`}
 							onClick={() => setMode("retrain")}
 						>
@@ -247,19 +257,20 @@ export default function ComparePage() {
 				</div>
 
 				{mode === "stored" && (
-					<p className="mt-2 text-xs text-gray-400">
+					<p className="mt-2 text-xs text-foreground-muted">
 						Uses metrics from original training. Results may not be available for older models.
 					</p>
 				)}
 				{mode === "retrain" && (
-					<p className="mt-2 text-xs text-gray-400">
-						Re-trains each model type with default config. Creates new models with fresh metrics.
+					<p className="mt-2 text-xs text-foreground-muted">
+						Re-trains each model type with default config. Creates new models with fresh
+						metrics.
 					</p>
 				)}
 			</Card>
 
 			{unavailableIds.size > 0 && (
-				<div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+				<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-amber-800 dark:text-amber-200">
 					Stored results unavailable for{" "}
 					{Array.from(unavailableIds)
 						.map((id) => id.slice(0, 8))

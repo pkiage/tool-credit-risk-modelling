@@ -50,12 +50,14 @@ export default function PredictPage() {
 	return (
 		<div className="space-y-8">
 			<div>
-				<h1 className="text-2xl font-bold text-gray-900">Predict Default</h1>
-				<p className="mt-1 text-gray-600">Submit a loan application to predict default risk.</p>
+				<h1 className="text-2xl font-bold text-foreground">Predict Default</h1>
+				<p className="mt-1 text-foreground-secondary">
+					Submit a loan application to predict default risk.
+				</p>
 			</div>
 
 			{error && (
-				<div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+				<div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4 text-sm text-red-800 dark:text-red-200">
 					{error}
 				</div>
 			)}
@@ -64,7 +66,7 @@ export default function PredictPage() {
 				<div className="lg:col-span-2">
 					<Card title="Loan Application">
 						{modelsLoading ? (
-							<p className="text-sm text-gray-500">Loading models...</p>
+							<p className="text-sm text-foreground-muted">Loading models...</p>
 						) : (
 							<PredictionForm models={models} onSubmit={handlePredict} loading={loading} />
 						)}
@@ -76,7 +78,7 @@ export default function PredictPage() {
 						<Card>
 							<div className="flex items-center justify-center py-8">
 								<svg
-									className="h-6 w-6 animate-spin text-blue-600"
+									className="h-6 w-6 animate-spin text-primary"
 									viewBox="0 0 24 24"
 									fill="none"
 									role="img"
@@ -107,8 +109,8 @@ export default function PredictPage() {
 									<div
 										className={`inline-block rounded-full px-6 py-3 text-lg font-bold ${
 											prediction.predicted_default
-												? "bg-red-100 text-red-800"
-												: "bg-green-100 text-green-800"
+												? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200"
+												: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
 										}`}
 									>
 										{prediction.predicted_default ? "Default" : "No Default"}
@@ -119,21 +121,23 @@ export default function PredictPage() {
 							<Card title="Details">
 								<div className="space-y-3 text-sm">
 									<div className="flex justify-between">
-										<span className="text-gray-500">Default Probability</span>
+										<span className="text-foreground-muted">Default Probability</span>
 										<span className="font-medium">
 											{(prediction.default_probability * 100).toFixed(2)}%
 										</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-500">Confidence</span>
-										<span className="font-medium">{(prediction.confidence * 100).toFixed(2)}%</span>
+										<span className="text-foreground-muted">Confidence</span>
+										<span className="font-medium">
+											{(prediction.confidence * 100).toFixed(2)}%
+										</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-500">Threshold</span>
+										<span className="text-foreground-muted">Threshold</span>
 										<span className="font-medium">{result.threshold.toFixed(4)}</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-500">Model</span>
+										<span className="text-foreground-muted">Model</span>
 										<span className="font-medium">{result.model_type}</span>
 									</div>
 								</div>
@@ -141,12 +145,12 @@ export default function PredictPage() {
 
 							<Card title="Probability Bar">
 								<div className="space-y-2">
-									<div className="flex justify-between text-xs text-gray-500">
+									<div className="flex justify-between text-xs text-foreground-muted">
 										<span>0%</span>
 										<span>Threshold ({(result.threshold * 100).toFixed(0)}%)</span>
 										<span>100%</span>
 									</div>
-									<div className="relative h-4 w-full overflow-hidden rounded-full bg-gray-200">
+									<div className="relative h-4 w-full overflow-hidden rounded-full bg-surface-elevated">
 										<div
 											className={`absolute left-0 top-0 h-full rounded-full transition-all ${
 												prediction.predicted_default ? "bg-red-500" : "bg-green-500"
@@ -156,7 +160,7 @@ export default function PredictPage() {
 											}}
 										/>
 										<div
-											className="absolute top-0 h-full w-0.5 bg-gray-800"
+											className="absolute top-0 h-full w-0.5 bg-foreground"
 											style={{ left: `${result.threshold * 100}%` }}
 										/>
 									</div>
@@ -167,7 +171,7 @@ export default function PredictPage() {
 
 					{!loading && !prediction && (
 						<Card>
-							<p className="text-center text-sm text-gray-500">
+							<p className="text-center text-sm text-foreground-muted">
 								Fill in the loan application form and click &quot;Get Prediction&quot; to see
 								results.
 							</p>
