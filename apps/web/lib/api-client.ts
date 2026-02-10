@@ -51,6 +51,15 @@ async function request<T>(path: string, options?: RequestInit & { timeout?: numb
 		if (error instanceof DOMException && error.name === "AbortError") {
 			throw new ApiClientError("Request timed out", 408);
 		}
+
+		// Better network error handling
+		if (error instanceof TypeError && error.message.includes("fetch")) {
+			throw new ApiClientError(
+				`Cannot reach API at ${API_BASE_URL}. Check your NEXT_PUBLIC_API_URL configuration.`,
+				0,
+			);
+		}
+
 		throw new ApiClientError(error instanceof Error ? error.message : "Network error", 0);
 	} finally {
 		clearTimeout(timeoutId);

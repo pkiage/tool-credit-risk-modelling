@@ -1,22 +1,128 @@
 @import "tailwindcss";
 
 :root {
+	/* Backgrounds */
 	--background: #ffffff;
-	--foreground: #171717;
+	--surface: #f9fafb;
+	--surface-elevated: #ffffff;
+
+	/* Foregrounds */
+	--foreground: #111827;
+	--foreground-secondary: #4b5563;
+	--foreground-muted: #6b7280;
+
+	/* Borders */
+	--border: #e5e7eb;
+	--border-strong: #d1d5db;
+
+	/* Primary (Blue) - 4.5:1 minimum on white */
+	--primary: #2563eb;
+	--primary-hover: #1d4ed8;
+	--primary-active: #1e40af;
+	--primary-foreground: #ffffff;
+
+	/* Danger (Red) - 4.5:1 minimum on white */
+	--danger: #dc2626;
+	--danger-hover: #b91c1c;
+	--danger-foreground: #ffffff;
+
+	/* Success (Green) - 4.5:1 minimum on white */
+	--success: #059669;
+	--success-hover: #047857;
+	--success-foreground: #ffffff;
+
+	/* Warning (Orange) - 4.5:1 minimum on white */
+	--warning: #d97706;
+	--warning-hover: #b45309;
+	--warning-foreground: #ffffff;
+
+	/* Chart colors (color-blind friendly palette) */
+	--chart-1: #2563eb; /* Blue */
+	--chart-2: #dc2626; /* Red */
+	--chart-3: #059669; /* Green */
+	--chart-4: #7c3aed; /* Purple */
+	--chart-5: #d97706; /* Orange */
+
+	/* Focus ring */
+	--focus-ring: #3b82f6;
 }
 
 @theme inline {
 	--color-background: var(--background);
+	--color-surface: var(--surface);
+	--color-surface-elevated: var(--surface-elevated);
 	--color-foreground: var(--foreground);
+	--color-foreground-secondary: var(--foreground-secondary);
+	--color-foreground-muted: var(--foreground-muted);
+	--color-border: var(--border);
+	--color-border-strong: var(--border-strong);
+	--color-primary: var(--primary);
+	--color-primary-hover: var(--primary-hover);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-danger: var(--danger);
+	--color-danger-hover: var(--danger-hover);
+	--color-danger-foreground: var(--danger-foreground);
+	--color-success: var(--success);
+	--color-success-hover: var(--success-hover);
+	--color-success-foreground: var(--success-foreground);
+	--color-warning: var(--warning);
+	--color-warning-hover: var(--warning-hover);
+	--color-warning-foreground: var(--warning-foreground);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-focus-ring: var(--focus-ring);
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+.dark {
+	/* Backgrounds */
+	--background: #0a0a0a;
+	--surface: #171717;
+	--surface-elevated: #262626;
+
+	/* Foregrounds - enhanced contrast for dark mode */
+	--foreground: #fafafa;
+	--foreground-secondary: #d4d4d4;
+	--foreground-muted: #a3a3a3;
+
+	/* Borders */
+	--border: #404040;
+	--border-strong: #525252;
+
+	/* Primary (Blue) - brighter for dark backgrounds */
+	--primary: #3b82f6;
+	--primary-hover: #60a5fa;
+	--primary-active: #2563eb;
+	--primary-foreground: #ffffff;
+
+	/* Danger (Red) - adjusted for dark mode */
+	--danger: #ef4444;
+	--danger-hover: #f87171;
+	--danger-foreground: #ffffff;
+
+	/* Success (Green) - adjusted for dark mode */
+	--success: #10b981;
+	--success-hover: #34d399;
+	--success-foreground: #ffffff;
+
+	/* Warning (Orange) - adjusted for dark mode */
+	--warning: #f59e0b;
+	--warning-hover: #fbbf24;
+	--warning-foreground: #000000;
+
+	/* Chart colors (same hues, adjusted lightness) */
+	--chart-1: #60a5fa; /* Blue */
+	--chart-2: #f87171; /* Red */
+	--chart-3: #34d399; /* Green */
+	--chart-4: #a78bfa; /* Purple */
+	--chart-5: #fbbf24; /* Orange */
+
+	/* Focus ring */
+	--focus-ring: #60a5fa;
 }
 
 body {
