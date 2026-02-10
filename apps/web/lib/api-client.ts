@@ -72,7 +72,7 @@ export const api = {
 	},
 
 	train: async (config: TrainingConfig): Promise<TrainingResult> => {
-		return request<TrainingResult>("/train", {
+		return request<TrainingResult>("/train/", {
 			method: "POST",
 			body: JSON.stringify(config),
 			timeout: TRAINING_TIMEOUT,
@@ -80,14 +80,14 @@ export const api = {
 	},
 
 	predict: async (requestBody: PredictionRequest): Promise<PredictionResponse> => {
-		return request<PredictionResponse>("/predict", {
+		return request<PredictionResponse>("/predict/", {
 			method: "POST",
 			body: JSON.stringify(requestBody),
 		});
 	},
 
 	listModels: async (): Promise<ModelMetadata[]> => {
-		return request<ModelMetadata[]>("/models");
+		return request<ModelMetadata[]>("/models/");
 	},
 
 	getModel: async (modelId: string): Promise<ModelMetadata> => {
