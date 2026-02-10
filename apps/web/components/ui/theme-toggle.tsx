@@ -16,7 +16,13 @@ export function ThemeToggle() {
 			aria-label={`Switch theme (current: ${theme})`}
 		>
 			{theme === "light" && (
-				<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+				<svg
+					className="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					aria-hidden="true"
+				>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -26,7 +32,13 @@ export function ThemeToggle() {
 				</svg>
 			)}
 			{theme === "dark" && (
-				<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+				<svg
+					className="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					aria-hidden="true"
+				>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -36,7 +48,13 @@ export function ThemeToggle() {
 				</svg>
 			)}
 			{theme === "system" && (
-				<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+				<svg
+					className="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					aria-hidden="true"
+				>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"

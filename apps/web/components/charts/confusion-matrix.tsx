@@ -42,28 +42,20 @@ export function ConfusionMatrixChart({ data }: ConfusionMatrixProps) {
 	];
 
 	return (
-		<div className="space-y-2" role="table" aria-label="Confusion matrix showing model prediction accuracy">
-			<div className="grid grid-cols-3 gap-1 text-center text-sm" role="rowgroup">
-				<div role="columnheader" />
-				<div role="columnheader" className="font-medium text-foreground-secondary">
-					Pred: No Default
-				</div>
-				<div role="columnheader" className="font-medium text-foreground-secondary">
-					Pred: Default
-				</div>
+		<section className="space-y-2" aria-label="Confusion matrix showing model prediction accuracy">
+			<div className="grid grid-cols-3 gap-1 text-center text-sm">
+				<div />
+				<div className="font-medium text-foreground-secondary">Pred: No Default</div>
+				<div className="font-medium text-foreground-secondary">Pred: Default</div>
 
-				<div
-					role="rowheader"
-					className="flex items-center justify-center font-medium text-foreground-secondary"
-				>
+				<div className="flex items-center justify-center font-medium text-foreground-secondary">
 					Actual: No Default
 				</div>
 				{cells.slice(0, 2).map((cell) => (
 					<div
 						key={cell.label}
-						role="cell"
 						className={`rounded-lg p-4 ${cell.color}`}
-						aria-label={`${cell.label}: ${cell.value} cases (${total > 0 ? ((cell.value / total) * 100).toFixed(1) : 0}%)`}
+						title={`${cell.label}: ${cell.value} cases (${total > 0 ? ((cell.value / total) * 100).toFixed(1) : 0}%)`}
 					>
 						<div className="text-2xl font-bold">{cell.value}</div>
 						<div className="text-xs font-medium">{cell.label}</div>
@@ -73,18 +65,14 @@ export function ConfusionMatrixChart({ data }: ConfusionMatrixProps) {
 					</div>
 				))}
 
-				<div
-					role="rowheader"
-					className="flex items-center justify-center font-medium text-foreground-secondary"
-				>
+				<div className="flex items-center justify-center font-medium text-foreground-secondary">
 					Actual: Default
 				</div>
 				{cells.slice(2, 4).map((cell) => (
 					<div
 						key={cell.label}
-						role="cell"
 						className={`rounded-lg p-4 ${cell.color}`}
-						aria-label={`${cell.label}: ${cell.value} cases (${total > 0 ? ((cell.value / total) * 100).toFixed(1) : 0}%)`}
+						title={`${cell.label}: ${cell.value} cases (${total > 0 ? ((cell.value / total) * 100).toFixed(1) : 0}%)`}
 					>
 						<div className="text-2xl font-bold">{cell.value}</div>
 						<div className="text-xs font-medium">{cell.label}</div>
@@ -94,6 +82,6 @@ export function ConfusionMatrixChart({ data }: ConfusionMatrixProps) {
 					</div>
 				))}
 			</div>
-		</div>
+		</section>
 	);
 }
