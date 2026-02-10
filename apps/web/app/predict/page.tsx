@@ -128,9 +128,7 @@ export default function PredictPage() {
 									</div>
 									<div className="flex justify-between">
 										<span className="text-foreground-muted">Confidence</span>
-										<span className="font-medium">
-											{(prediction.confidence * 100).toFixed(2)}%
-										</span>
+										<span className="font-medium">{(prediction.confidence * 100).toFixed(2)}%</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-foreground-muted">Threshold</span>

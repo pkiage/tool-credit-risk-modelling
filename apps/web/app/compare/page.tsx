@@ -204,17 +204,13 @@ export default function ComparePage() {
 								onChange={() => toggleModel(model.model_id)}
 							/>
 							<div className="flex-1">
-								<span className="font-medium text-foreground">
-									{model.model_type}
-								</span>
+								<span className="font-medium text-foreground">{model.model_type}</span>
 								<span className="ml-2 text-sm text-foreground-muted">
 									{model.model_id.slice(0, 8)}
 								</span>
 							</div>
 							<div className="text-right text-sm">
-								<span className="text-foreground-secondary">
-									AUC: {model.roc_auc.toFixed(3)}
-								</span>
+								<span className="text-foreground-secondary">AUC: {model.roc_auc.toFixed(3)}</span>
 								<span className="ml-3 text-foreground-muted">
 									{formatTimestamp(model.created_at)}
 								</span>
@@ -263,8 +259,7 @@ export default function ComparePage() {
 				)}
 				{mode === "retrain" && (
 					<p className="mt-2 text-xs text-foreground-muted">
-						Re-trains each model type with default config. Creates new models with fresh
-						metrics.
+						Re-trains each model type with default config. Creates new models with fresh metrics.
 					</p>
 				)}
 			</Card>
