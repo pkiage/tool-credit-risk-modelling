@@ -64,7 +64,7 @@ export function PredictionForm({ models, onSubmit, loading = false }: Prediction
 
 	if (models.length === 0) {
 		return (
-			<div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+			<div className="rounded-lg border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950 p-4 text-sm text-yellow-800 dark:text-yellow-200">
 				No trained models available. Train a model first.
 			</div>
 		);

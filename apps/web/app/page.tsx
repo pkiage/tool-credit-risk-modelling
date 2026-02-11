@@ -43,21 +43,23 @@ export default function Home() {
 	return (
 		<div className="space-y-8">
 			<div>
-				<h1 className="text-3xl font-bold text-gray-900">Credit Risk Platform</h1>
-				<p className="mt-2 text-gray-600">Train, evaluate, and deploy credit risk models.</p>
+				<h1 className="text-3xl font-bold text-foreground">Credit Risk Platform</h1>
+				<p className="mt-2 text-foreground-secondary">
+					Train, evaluate, and deploy credit risk models.
+				</p>
 			</div>
 
 			<div className="flex items-center gap-2">
 				<span
 					className={`inline-block h-3 w-3 rounded-full ${
-						healthy === null ? "bg-gray-300" : healthy ? "bg-green-500" : "bg-red-500"
+						healthy === null ? "bg-foreground-muted" : healthy ? "bg-green-500" : "bg-red-500"
 					}`}
 				/>
-				<span className="text-sm text-gray-600">
+				<span className="text-sm text-foreground-secondary">
 					API: {healthy === null ? "Checking..." : healthy ? "Connected" : "Unavailable"}
 				</span>
 				{models.length > 0 && (
-					<span className="ml-4 text-sm text-gray-600">
+					<span className="ml-4 text-sm text-foreground-secondary">
 						{models.length} model{models.length !== 1 ? "s" : ""} trained
 					</span>
 				)}
@@ -67,8 +69,8 @@ export default function Home() {
 				{pages.map((page) => (
 					<Link key={page.href} href={page.href}>
 						<Card className="h-full transition-shadow hover:shadow-md">
-							<h2 className="text-lg font-semibold text-gray-900">{page.title}</h2>
-							<p className="mt-2 text-sm text-gray-600">{page.description}</p>
+							<h2 className="text-lg font-semibold text-foreground">{page.title}</h2>
+							<p className="mt-2 text-sm text-foreground-secondary">{page.description}</p>
 						</Card>
 					</Link>
 				))}
@@ -80,13 +82,13 @@ export default function Home() {
 						{models.map((model) => (
 							<div
 								key={model.model_id}
-								className="flex items-center justify-between rounded-md border border-gray-100 px-4 py-2"
+								className="flex items-center justify-between rounded-md border border-border px-4 py-2"
 							>
 								<div>
-									<span className="font-medium text-gray-900">{model.model_type}</span>
-									<span className="ml-2 text-sm text-gray-500">{model.model_id}</span>
+									<span className="font-medium text-foreground">{model.model_type}</span>
+									<span className="ml-2 text-sm text-foreground-muted">{model.model_id}</span>
 								</div>
-								<div className="text-sm text-gray-600">
+								<div className="text-sm text-foreground-secondary">
 									AUC: {model.roc_auc.toFixed(3)} | Acc: {model.accuracy.toFixed(3)}
 								</div>
 							</div>

@@ -66,11 +66,11 @@ export function TrainingForm({ onSubmit, loading = false }: TrainingFormProps) {
 				<input
 					id="undersample"
 					type="checkbox"
-					className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+					className="h-4 w-4 rounded border-border-strong text-primary focus:ring-focus-ring"
 					checked={config.undersample}
 					onChange={(e) => setConfig({ ...config, undersample: e.target.checked })}
 				/>
-				<label htmlFor="undersample" className="text-sm font-medium text-gray-700">
+				<label htmlFor="undersample" className="text-sm font-medium text-foreground-secondary">
 					Undersample majority class
 				</label>
 			</div>

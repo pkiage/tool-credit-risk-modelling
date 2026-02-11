@@ -84,32 +84,32 @@
 	--surface: #171717;
 	--surface-elevated: #262626;
 
-	/* Foregrounds - enhanced contrast for dark mode */
+	/* Foregrounds - WCAG AAA (7:1 on surface-elevated) */
 	--foreground: #fafafa;
 	--foreground-secondary: #d4d4d4;
-	--foreground-muted: #a3a3a3;
+	--foreground-muted: #c0c0c0;
 
-	/* Borders */
-	--border: #404040;
-	--border-strong: #525252;
+	/* Borders - 3:1+ on background (SC 1.4.11) */
+	--border: #666666;
+	--border-strong: #7a7a7a;
 
-	/* Primary (Blue) - brighter for dark backgrounds */
-	--primary: #3b82f6;
-	--primary-hover: #60a5fa;
-	--primary-active: #2563eb;
-	--primary-foreground: #ffffff;
+	/* Primary (Blue) - 7.8:1 on background, dark fg for AAA on bright bg */
+	--primary: #60a5fa;
+	--primary-hover: #93c5fd;
+	--primary-active: #3b82f6;
+	--primary-foreground: #000000;
 
-	/* Danger (Red) - adjusted for dark mode */
-	--danger: #ef4444;
-	--danger-hover: #f87171;
-	--danger-foreground: #ffffff;
+	/* Danger (Red) - 7.2:1 on background */
+	--danger: #f87171;
+	--danger-hover: #fca5a5;
+	--danger-foreground: #000000;
 
-	/* Success (Green) - adjusted for dark mode */
+	/* Success (Green) - 7.8:1 on background */
 	--success: #10b981;
 	--success-hover: #34d399;
-	--success-foreground: #ffffff;
+	--success-foreground: #000000;
 
-	/* Warning (Orange) - adjusted for dark mode */
+	/* Warning (Orange) - 9.2:1 on background */
 	--warning: #f59e0b;
 	--warning-hover: #fbbf24;
 	--warning-foreground: #000000;
@@ -122,7 +122,7 @@
 	--chart-5: #fbbf24; /* Orange */
 
 	/* Focus ring */
-	--focus-ring: #60a5fa;
+	--focus-ring: #93c5fd;
 }
 
 body {
