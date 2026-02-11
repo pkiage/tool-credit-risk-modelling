@@ -23,4 +23,4 @@ This directory contains Architecture Decision Records (ADRs) for the Credit Risk
 
 ## Creating a New ADR
 
-See the [ADR Creation Checklist](../../CLAUDE.md#adr-creation-checklist) in CLAUDE.md.
+See the [ADR Creation section](../../CLAUDE.md#adr-creation) in CLAUDE.md and the `adr` skill in `.claude_skills/adr/`.
