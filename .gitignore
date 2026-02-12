@@ -172,7 +172,4 @@ apps/gradio/flagged/
 # ----------------------------------------
 .claudeignore
 .claude/
-.claude_skills/
-claude_skills/
-skills/
 .prompts/
