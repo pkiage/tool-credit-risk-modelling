@@ -1,4 +1,4 @@
-# RFC-007: Gradio Data Input Strategy — Synthetic Generation over User Uploads
+# RFC-007: Platform-Wide Synthetic Data Generation for Testing and Comparison
 
 | Field | Value |
 |-------|-------|
@@ -9,50 +9,60 @@
 
 ## Objective
 
-Replace the implicit "bundled-dataset-only" approach in Gradio with an explicit strategy: **no user file uploads**; instead, provide built-in synthetic data generation so stakeholders can explore model behavior across controlled data distributions and compare results against the real reference dataset.
+Add a platform-wide synthetic data generation capability to `shared/` that all three UI layers — Marimo, Gradio, and Next.js — can use for model testing, comparison, and exploration. Credit risk data is hard to come by and often confidential; synthetic generation removes the dependency on real datasets for development, demos, and stakeholder validation.
 
 **Goals:**
 
-- Remove any ambiguity about whether Gradio should support CSV uploads
-- Provide a synthetic data generator that produces loan application datasets matching the `shared/` schema
-- Enable side-by-side comparison of model performance on real vs. synthetic data
-- Keep the Gradio app deployable to HuggingFace Spaces without filesystem or security concerns
+- Provide a synthetic data generator in `shared/logic/` that produces loan application datasets matching the platform schema
+- Surface synthetic data generation across all three UIs: Marimo notebooks (developer exploration), Gradio (stakeholder demos), and Next.js (production testing)
+- Enable side-by-side comparison of model performance on real vs. synthetic data at every layer
+- Eliminate the need for file uploads by providing controlled, on-demand data generation
+- Allow the platform to be demonstrated and tested without access to real (potentially confidential) loan data
 
 **Non-goals:**
 
 - Building a general-purpose data generation framework (scope is credit risk loan data only)
-- Adding dataset upload to the Next.js web app (separate decision, separate RFC if needed)
 - Replacing the real training dataset — synthetic data supplements, not supplants
 - Statistical guarantees on synthetic data fidelity (e.g., differential privacy, GAN-based generation)
+- Full-fidelity simulation of real-world credit portfolios (the generator targets plausible distributions, not actuarial accuracy)
 
 ## Motivation
 
-### Why not add file uploads to Gradio?
+### Credit risk data is scarce and confidential
 
-The Gradio app (`apps/gradio/`) currently trains models exclusively on the bundled dataset (`data/processed/cr_loan_w2.csv`). There is **no file upload UI and no upload API endpoint**. Adding uploads would introduce:
+Real-world credit risk datasets are difficult to obtain. Financial institutions treat loan-level data as highly confidential — governed by regulations (GDPR, CCPA, bank secrecy laws) and internal data governance policies. The platform currently ships a single bundled dataset (`data/processed/cr_loan_w2.csv`), but:
 
-1. **Security surface** — Arbitrary CSV parsing opens the door to path traversal, CSV injection, and denial-of-service via large files. The Gradio app is designed for HuggingFace Spaces deployment where filesystem access is sandboxed and ephemeral.
+1. **Demos without real data** — When demonstrating the platform to prospective users or stakeholders, sharing real loan data may be impossible due to confidentiality agreements. A synthetic generator lets the platform be fully functional without exposing sensitive records.
 
-2. **Validation complexity** — Uploaded data must match the exact 28-feature schema (7 numeric + 19 one-hot encoded categoricals + 1 target). Users would need to understand internal encoding conventions (`person_home_ownership_RENT`, `loan_grade_B`, etc.) to prepare valid files. This is a poor stakeholder experience.
+2. **Development and testing** — Contributors and CI pipelines shouldn't depend on access to confidential datasets. Synthetic data enables meaningful integration tests, notebook development, and UI testing without real data.
 
-3. **Scope mismatch** — Gradio's role in the UI progression (Marimo → Gradio → Next.js) is *stakeholder demos*, not data engineering workflows. Upload functionality belongs in Marimo notebooks (developer exploration) or the Next.js app (production workflows with proper auth and validation).
+3. **Limited diversity** — A single bundled dataset represents one population distribution. Models need to be tested against diverse scenarios (economic downturns, different demographic mixes, varying default rates) that a single static file cannot represent.
 
-4. **Reproducibility** — Uploaded datasets are ephemeral on HF Spaces. Models trained on uploaded data cannot be reproduced without the original file, breaking the audit trail.
+4. **Regulatory scrutiny** — Model validation in financial services requires testing against stressed and adversarial scenarios. Synthetic data provides a controlled, auditable mechanism for these tests.
 
-### Why synthetic data?
+### Why not file uploads?
 
-Stakeholders frequently ask "what if" questions: *What happens if we see more high-income applicants? What if default rates increase? How does the model handle grade F loans?* Today, the only way to explore these scenarios is to modify the CSV manually — which requires developer intervention.
+Rather than asking users to source and upload their own datasets, synthetic generation is a better fit across all three UIs:
 
-A synthetic data generator would let stakeholders:
+- **Marimo** — Developers can generate data programmatically in notebooks without managing CSV files. Reproducible via seed parameters.
+- **Gradio** — Stakeholders get interactive controls instead of needing to prepare schema-compliant CSVs (28 columns with exact one-hot encoding conventions). No security surface from arbitrary file parsing on HF Spaces.
+- **Next.js** — Production users can generate test scenarios on-demand through the web UI rather than uploading potentially confidential files over the network.
 
-- Stress-test models against shifted distributions (e.g., higher default rates, skewed income)
-- Understand model sensitivity to specific feature ranges
-- Compare model performance on controlled vs. real-world data
-- Generate unlimited training data for quick iteration without touching production datasets
+File uploads also introduce validation complexity (schema matching), security risks (CSV injection, large file DoS), and reproducibility problems (ephemeral files on HF Spaces break the audit trail).
+
+### What synthetic data enables
+
+Across all three UIs, synthetic data unlocks:
+
+- **Stress testing** — Shift distributions (higher default rates, skewed income) and see how models respond
+- **Sensitivity analysis** — Understand which feature ranges the model is most sensitive to
+- **Real vs. synthetic comparison** — Train on both, compare side-by-side to validate model robustness
+- **Onboarding** — New users and contributors can explore the full platform immediately without data access approvals
+- **CI/CD testing** — Automated pipelines can generate fresh datasets for integration tests without storing sensitive data in repositories
 
 ## User Benefit
 
-**Release notes:** "Generate synthetic loan datasets directly in the Gradio app. Explore model behavior under custom distributions and compare performance against the real reference dataset — no file uploads needed."
+**Release notes:** "Generate synthetic loan datasets across all platform interfaces — Marimo notebooks, Gradio demos, and the Next.js web app. Explore model behavior under custom distributions, compare against real data, and demo the full platform without needing access to confidential datasets."
 
 ## Design Proposal
 
@@ -60,9 +70,18 @@ A synthetic data generator would let stakeholders:
 
 ```mermaid
 flowchart TB
+    subgraph "Marimo Notebooks"
+        MN[Developer Notebooks]
+    end
+
     subgraph "Gradio App"
-        UI[Gradio UI]
-        ST[Synthetic Tab]
+        GU[Gradio UI]
+        GST[Synthetic Tab]
+    end
+
+    subgraph "Next.js Web App"
+        NX[Production UI]
+        NST[Synthetic Panel]
     end
 
     subgraph "FastAPI Backend"
@@ -76,14 +95,20 @@ flowchart TB
         CO[constants.py<br/>feature bounds]
     end
 
-    ST -- "generation config" --> SE
+    MN -- "direct import" --> SG
+    GST -- "generation config" --> SE
+    NST -- "generation config" --> SE
     SE -- "delegates to" --> SG
     SG -- "reads bounds from" --> CO
-    SE -- "returns dataset" --> ST
-    ST -- "trains on synthetic" --> TE
-    UI -- "trains on real" --> TE
+    SE -- "returns dataset" --> GST
+    SE -- "returns dataset" --> NST
+    GST -- "trains on synthetic" --> TE
+    NST -- "trains on synthetic" --> TE
+    GU -- "trains on real" --> TE
+    NX -- "trains on real" --> TE
 
-    style ST fill:#f9f,stroke:#333
+    style GST fill:#f9f,stroke:#333
+    style NST fill:#f9f,stroke:#333
     style SE fill:#f9f,stroke:#333
     style SG fill:#f9f,stroke:#333
     style SC fill:#f9f,stroke:#333
@@ -93,13 +118,19 @@ Pink nodes are new components introduced by this RFC.
 
 ### Overview
 
-The design adds three components:
+The design adds components across the full platform stack:
 
-1. **`shared/logic/synthetic.py`** — A pure-numpy synthetic data generator that produces loan datasets conforming to the existing schema. Uses `constants.py` bounds for realistic value ranges.
+1. **`shared/logic/synthetic.py`** — A pure-numpy synthetic data generator that produces loan datasets conforming to the existing schema. Uses `constants.py` bounds for realistic value ranges. This is the single source of truth for generation logic.
 
-2. **`POST /synthetic/generate`** — A new API endpoint that accepts a generation config and returns a dataset (or stores it for training).
+2. **`shared/schemas/synthetic.py`** — Pydantic models for generation config and output metadata.
 
-3. **Gradio "Synthetic Data" tab** — UI controls for distribution parameters, generation trigger, preview, and "Train on Synthetic" workflow.
+3. **`POST /synthetic/generate`** — A new API endpoint that accepts a generation config and returns a dataset (or stores it for training). Used by Gradio and Next.js.
+
+4. **Gradio "Synthetic Data" tab** — Interactive UI controls for distribution parameters, generation trigger, preview, and "Train on Synthetic" workflow. Targets stakeholder demos.
+
+5. **Next.js "Synthetic Data" panel** — Production-grade UI for generating test scenarios, with the same capabilities as the Gradio tab but integrated into the web app's design system.
+
+6. **Marimo notebook integration** — Notebooks import `generate_synthetic_dataset()` directly from `shared/logic/` for programmatic exploration, avoiding the API round-trip.
 
 ### Key Design Decisions
 
@@ -113,11 +144,15 @@ The design adds three components:
 
 #### 3. No raw CSV upload at any layer
 
-**Why:** See Motivation. The API already accepts structured `TrainingConfig` objects. Synthetic data flows through the same typed pipeline — generated in-memory, validated against Pydantic schemas, and passed directly to `train_model()`. No filesystem round-trip needed.
+**Why:** See Motivation. Credit risk data is confidential — accepting uploads means handling, validating, and potentially storing sensitive files across three UI layers. The API already accepts structured `TrainingConfig` objects. Synthetic data flows through the same typed pipeline — generated in-memory, validated against Pydantic schemas, and passed directly to `train_model()`. No filesystem round-trip, no confidential data transit.
 
 #### 4. Comparison as a first-class workflow
 
-**Why:** The primary value of synthetic data isn't training better models — it's *understanding* model behavior. The design prioritizes the comparison workflow: train on real data, train on synthetic data, compare metrics side-by-side using the existing Comparison tab.
+**Why:** The primary value of synthetic data isn't training better models — it's *understanding* model behavior under conditions where real data may not be available. The design prioritizes the comparison workflow at every layer: train on real data (when available), train on synthetic data, compare metrics side-by-side. This works in Marimo (programmatic comparison), Gradio (existing Comparison tab), and Next.js (model comparison views).
+
+#### 5. Consistent capability across all three UIs
+
+**Why:** The UI progression (Marimo → Gradio → Next.js) means insights discovered at one layer should be reproducible at the next. If a developer finds an interesting synthetic scenario in a Marimo notebook, stakeholders should be able to reproduce it in Gradio, and production users in Next.js. All three layers share the same generator via `shared/logic/` and the same config schema via `shared/schemas/`.
 
 ### API / Interface Changes
 
@@ -184,7 +219,34 @@ Datasets auto-expire after 1 hour or when the server restarts. A maximum of 10 d
 
 ### Usage Examples
 
-#### Gradio workflow
+#### Marimo notebook workflow (explore)
+
+Developers import the generator directly — no API needed. Ideal for exploratory analysis when real data isn't available or can't leave a secure environment.
+
+```python
+from shared.logic.synthetic import generate_synthetic_dataset
+from shared.schemas.synthetic import SyntheticConfig
+
+# Generate a stressed scenario: high default rate, younger borrowers
+config = SyntheticConfig(
+    n_samples=10000,
+    default_rate=0.4,
+    distributions=[
+        SyntheticDistribution(feature="person_age", mean_shift=-5.0),
+    ],
+    random_seed=42,
+)
+X_syn, y_syn, feature_names = generate_synthetic_dataset(config)
+
+# Compare against real data (if available)
+X_real, y_real, _ = load_dataset_from_csv("data/processed/cr_loan_w2.csv")
+
+# Train and evaluate both — use shared/logic/evaluation.py, threshold.py
+```
+
+#### Gradio workflow (validate)
+
+Stakeholders interact via the UI — no code, no data files needed.
 
 1. User opens the **Synthetic Data** tab
 2. Adjusts sliders: `n_samples=10000`, `default_rate=0.35`, increases `loan_int_rate` mean by 20%
@@ -193,7 +255,21 @@ Datasets auto-expire after 1 hour or when the server restarts. A maximum of 10 d
 5. Switches to **Training** tab → trains same model type on real data
 6. Opens **Comparison** tab → selects both models → sees side-by-side metrics and ROC curves
 
-#### API workflow
+This workflow lets stakeholders demo model capabilities without ever touching real confidential data.
+
+#### Next.js workflow (ship)
+
+Production users generate test scenarios through the web UI, run comparisons, and export results.
+
+1. Navigate to **Data > Synthetic Generator**
+2. Configure scenario parameters or select a preset
+3. Generate dataset → review summary statistics
+4. Train model on synthetic data → compare against production model trained on real data
+5. Export comparison report for model validation documentation
+
+#### API workflow (shared backend)
+
+All three UIs use the same API endpoints:
 
 ```bash
 # Generate synthetic dataset
@@ -213,28 +289,17 @@ curl -X POST /models/compare/ \
   -d '{"model_ids": ["lr_real_abc", "lr_syn_def"]}'
 ```
 
-#### Marimo notebook workflow
-
-```python
-from shared.logic.synthetic import generate_synthetic_dataset
-from shared.schemas.synthetic import SyntheticConfig
-
-config = SyntheticConfig(n_samples=10000, default_rate=0.4)
-X, y, feature_names = generate_synthetic_dataset(config)
-# Use directly with shared/logic/evaluation.py, threshold.py, etc.
-```
-
 ## Alternatives Considered
 
-### Alternative 1: Add CSV upload to Gradio
+### Alternative 1: Add CSV upload across UIs
 
-**Description:** Add a `gr.File` upload component to allow users to upload their own datasets.
+**Description:** Add file upload components to Gradio (`gr.File`), Next.js (file input), and Marimo (file picker) to allow users to bring their own datasets.
 
-**Pros:** Maximum flexibility; users can bring any dataset.
+**Pros:** Maximum flexibility; users can bring any dataset; works with proprietary data.
 
-**Cons:** Security risks (arbitrary file parsing), validation burden (must match 28-column schema with exact naming), poor UX for non-technical stakeholders, breaks audit trail on HF Spaces, doesn't address "what if" scenarios.
+**Cons:** Security risks at three layers (CSV injection, large file DoS, path traversal); validation burden (must match 28-column one-hot encoded schema); confidential data transits over network to API; uploaded files are ephemeral on HF Spaces breaking the audit trail; doesn't address the core problem of data scarcity (users still need to *have* data to upload).
 
-**Why not chosen:** Misaligns with Gradio's role as a stakeholder demo tool. Upload workflows belong in Marimo (developer) or Next.js (production with auth).
+**Why not chosen:** Doesn't solve the fundamental problem — credit risk data is hard to obtain. Upload shifts the data sourcing burden to users rather than removing it. Also multiplies security and validation surface across three UI layers.
 
 ### Alternative 2: Preset scenario library (no custom generation)
 
@@ -259,24 +324,26 @@ X, y, feature_names = generate_synthetic_dataset(config)
 ## Dependencies
 
 - **New dependencies:** None. Generator uses numpy (already a transitive dependency via sklearn) and existing Pydantic schemas.
-- **Dependent projects:** `apps/gradio/` (new tab), `apps/api/` (new endpoint), `notebooks/` (can import generator)
+- **Dependent projects:** `shared/` (new modules), `apps/api/` (new endpoint), `apps/gradio/` (new tab), `apps/web/` (new panel), `notebooks/` (new notebook)
 
 ## Engineering Impact
 
-- **Maintenance:** Owned by the same team maintaining `shared/logic/`. Generator is ~150-200 lines of numpy code.
-- **Testing:** Unit tests for generator (distribution properties, schema compliance, edge cases). Integration tests for API endpoint. Gradio tab tested via existing manual QA pattern.
+- **Maintenance:** Core generator owned by the same team maintaining `shared/logic/`. ~150-200 lines of numpy code. UI components follow existing patterns in each app.
+- **Testing:** Unit tests for generator (distribution properties, schema compliance, edge cases). Integration tests for API endpoint. E2E tests for Next.js panel. Gradio tab tested via existing manual QA pattern.
 - **Build impact:** None — no new dependencies.
 - **API surface:** One new endpoint (`/synthetic/generate/`), one modified schema (`TrainingConfig.dataset_id`).
+- **TypeScript sync:** `SyntheticConfig` and `SyntheticDataset` schemas need TS interface generation for `apps/web/` per the Schema Sync Protocol.
 
 ## Platforms and Environments
 
-- **HuggingFace Spaces:** Fully compatible. In-memory generation, no filesystem writes, bounded memory.
-- **Local development:** Works identically.
-- **Production (Next.js):** Synthetic generation is available via API but not yet exposed in the web UI (future RFC if needed).
+- **HuggingFace Spaces (Gradio):** Fully compatible. In-memory generation, no filesystem writes, bounded memory.
+- **Vercel / Node.js (Next.js):** Calls API endpoint; no server-side generation needed. Compatible with edge and serverless deployments.
+- **Local development (Marimo):** Direct import from `shared/logic/`. No API dependency — works offline.
+- **CI/CD:** Generator can produce deterministic test data via `random_seed`, enabling reproducible integration test suites without storing sensitive data in repos.
 
 ## User Impact
 
-- **User-facing changes:** New "Synthetic Data" tab in Gradio app. All existing functionality unchanged.
+- **User-facing changes:** New "Synthetic Data" tab in Gradio app. New "Synthetic Generator" panel in Next.js web app. New example notebook in Marimo. All existing functionality unchanged.
 - **Migration:** None. The `dataset_id` field on `TrainingConfig` is optional with `None` default — existing API clients are unaffected.
 
 ## Implementation Plan
@@ -288,7 +355,9 @@ X, y, feature_names = generate_synthetic_dataset(config)
 | 3 | `apps/api/` — `/synthetic/generate/` endpoint + synthetic store | Medium |
 | 4 | `apps/api/` — `TrainingConfig.dataset_id` support in `/train/` | Small |
 | 5 | `apps/gradio/` — Synthetic Data tab | Medium |
-| 6 | Documentation and notebook example | Small |
+| 6 | `apps/web/` — Synthetic Generator panel + TS interfaces | Medium |
+| 7 | `notebooks/` — `05_synthetic_exploration.py` Marimo notebook | Small |
+| 8 | Documentation update (ENV_VARS, DEPLOYMENT, README) | Small |
 
 ## Questions and Discussion Topics
 
@@ -296,11 +365,15 @@ X, y, feature_names = generate_synthetic_dataset(config)
 
 2. **Feature correlation preservation** — The parametric generator samples features independently by default. Should we add an option to preserve correlations from the real dataset (e.g., income ↔ loan amount)? This adds complexity but prevents unrealistic combinations.
 
-3. **Preset configs** — Should we ship a handful of named presets ("Stress Test", "Low Default", "Young Borrowers") as convenience shortcuts in the Gradio UI? Easy to add and makes the tab immediately useful without parameter tuning.
+3. **Preset configs** — Should we ship a handful of named presets ("Stress Test", "Low Default", "Young Borrowers") as convenience shortcuts across all UIs? Easy to add and makes synthetic generation immediately useful without parameter tuning.
 
-4. **Next.js exposure** — Should synthetic generation be exposed in the Next.js web app in this RFC, or deferred to a follow-up? Current recommendation: defer, keep this RFC focused on Gradio.
+4. **Implementation phasing** — Should all three UIs (Marimo, Gradio, Next.js) be implemented together, or should we roll out in phases following the UI progression (Marimo first → Gradio → Next.js)? Phased rollout reduces risk but delays the full platform story.
 
 5. **Memory limits** — The proposed 10-dataset / 1-hour TTL limits are conservative. Should these be configurable via environment variables for different deployment contexts?
+
+6. **CI/CD integration** — Should we add a pytest fixture that generates synthetic data for integration tests, replacing the current dependency on the bundled CSV? This would make the test suite fully self-contained.
+
+7. **Confidentiality labeling** — Should models trained on synthetic data be labeled differently in the model store (e.g., `data_source: "synthetic"` in `ModelMetadata`)? This prevents confusion in production about which models were trained on real vs. generated data.
 
 ---
 
@@ -309,3 +382,4 @@ X, y, feature_names = generate_synthetic_dataset(config)
 | Date | Author | Changes |
 |------|--------|---------|
 | 2026-02-13 | pkiage | Initial draft |
+| 2026-02-13 | pkiage | Broadened scope from Gradio-only to platform-wide (Marimo, Gradio, Next.js). Reframed motivation around data scarcity and confidentiality. |
