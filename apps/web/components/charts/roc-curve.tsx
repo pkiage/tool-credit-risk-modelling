@@ -79,6 +79,7 @@ export function MultiROCCurve({ curves }: MultiROCCurveProps) {
 			<LineChart margin={{ top: 5, right: 20, bottom: 25, left: 10 }}>
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis
+					dataKey="x"
 					type="number"
 					domain={[0, 1]}
 					label={{ value: "False Positive Rate", position: "insideBottom", offset: -15 }}

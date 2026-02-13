@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [web] Number input step validation rejecting valid income, employment length, and loan amount values
+- [web] Compare page ROC curve X-axis showing array indices instead of false positive rate
+- [web] Model ID text overflow on home page and training summary on mobile viewports
+
 ## [0.1.0] - 2026-02-11
 
 Initial release — migrated from a Streamlit prototype to a production-grade monorepo

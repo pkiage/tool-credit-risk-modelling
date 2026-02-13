@@ -57,7 +57,7 @@ export function LoanFields({ values, onChange, errors = {} }: LoanFieldsProps) {
 				label="Annual Income"
 				type="number"
 				min={1}
-				step={1000}
+				step="any"
 				value={values.person_income}
 				onChange={(e) => onChange("person_income", Number(e.target.value))}
 				error={errors.person_income}
@@ -66,7 +66,7 @@ export function LoanFields({ values, onChange, errors = {} }: LoanFieldsProps) {
 				label="Employment Length (years)"
 				type="number"
 				min={0}
-				step={0.5}
+				step="any"
 				value={values.person_emp_length}
 				onChange={(e) => onChange("person_emp_length", Number(e.target.value))}
 				error={errors.person_emp_length}
@@ -75,7 +75,7 @@ export function LoanFields({ values, onChange, errors = {} }: LoanFieldsProps) {
 				label="Loan Amount"
 				type="number"
 				min={1}
-				step={500}
+				step="any"
 				value={values.loan_amnt}
 				onChange={(e) => onChange("loan_amnt", Number(e.target.value))}
 				error={errors.loan_amnt}
