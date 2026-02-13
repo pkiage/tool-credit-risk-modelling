@@ -132,9 +132,11 @@ export default function TrainPage() {
 						<>
 							<Card title="Training Summary">
 								<div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-									<div>
+									<div className="min-w-0">
 										<span className="text-foreground-muted">Model ID</span>
-										<p className="font-mono text-xs">{result.model_id}</p>
+										<p className="truncate font-mono text-xs" title={result.model_id}>
+											{result.model_id.slice(0, 8)}
+										</p>
 									</div>
 									<div>
 										<span className="text-foreground-muted">Type</span>

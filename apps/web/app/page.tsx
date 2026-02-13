@@ -82,11 +82,13 @@ export default function Home() {
 						{models.map((model) => (
 							<div
 								key={model.model_id}
-								className="flex items-center justify-between rounded-md border border-border px-4 py-2"
+								className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border px-4 py-2"
 							>
-								<div>
+								<div className="min-w-0">
 									<span className="font-medium text-foreground">{model.model_type}</span>
-									<span className="ml-2 text-sm text-foreground-muted">{model.model_id}</span>
+									<span className="ml-2 text-sm text-foreground-muted" title={model.model_id}>
+										{model.model_id.slice(0, 8)}
+									</span>
 								</div>
 								<div className="text-sm text-foreground-secondary">
 									AUC: {model.roc_auc.toFixed(3)} | Acc: {model.accuracy.toFixed(3)}
