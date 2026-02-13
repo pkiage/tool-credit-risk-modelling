@@ -9,3 +9,4 @@ This directory contains RFCs (Requests for Comments) for the Credit Risk Platfor
 | [RFC-001](RFC-001-CreditRiskPlatformArchitecture.md) | Credit Risk Modeling Platform Architecture | Implemented | 2026-02-01 |
 | [RFC-002](RFC-002-api-layer.md) | FastAPI Service Layer | Implemented | 2026-02-01 |
 | [RFC-006](RFC-006-auth-polish.md) | Authentication & Production Polish | Implemented | 2026-02-02 |
+| [RFC-007](RFC-007-gradio-data-input-strategy.md) | Gradio Data Input Strategy — Synthetic Generation over User Uploads | Draft | 2026-02-13 |
