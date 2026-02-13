@@ -251,6 +251,8 @@ Claude Code skills are in `.claude_skills/`. Reference them for domain-specific 
 | `changelog` | Maintain CHANGELOG.md | "Update changelog", "Add changelog entry", releasing a version |
 | `adr` | Create ADR documents | "Create an ADR for...", "Record decision..." |
 | `git-workflow` | Worktree and parallel dev reference | "Set up worktree", "Parallel development", periodic cleanup |
+| `fastapi-crud-endpoint` | Create new API endpoints | "Add endpoint for...", "New router for..." |
+| `recharts-chart` | Create new chart visualizations | "Add chart for...", "New visualization for..." |
 
 To use a skill, Claude reads the SKILL.md and follows its structure.
 
@@ -272,8 +274,16 @@ Place skill folders in `.claude_skills/`:
 │   ├── SKILL.md
 │   └── references/
 │       └── adr-template.md
-└── git-workflow/
-    └── SKILL.md
+├── git-workflow/
+│   └── SKILL.md
+├── fastapi-crud-endpoint/
+│   ├── SKILL.md
+│   └── references/
+│       └── router-template.py
+└── recharts-chart/
+    ├── SKILL.md
+    └── references/
+        └── chart-template.tsx
 ```
 
 Each skill has a SKILL.md with frontmatter (name, description) and instructions.
