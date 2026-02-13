@@ -13,6 +13,43 @@ notebooks/    → Marimo (.py files only) — Developer exploration
 docs/         → RFCs, ADRs, deployment guide
 ```
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph notebooks["📓 Notebooks"]
+        marimo["Marimo (.py)<br/>Exploration & Analysis"]
+    end
+
+    subgraph shared["🔗 Shared Layer"]
+        schemas["Pydantic Schemas<br/>Data Models"]
+        logic["Business Logic<br/>Algorithms"]
+    end
+
+    subgraph apps["📱 Applications"]
+        gradio["Gradio Demo<br/>Stakeholder Feedback"]
+        api["FastAPI Server<br/>Model Training & Inference"]
+        web["Next.js UI<br/>Production Dashboard"]
+    end
+
+    marimo -->|imports| shared
+    marimo -->|deploy to HF Spaces| gradio
+
+    gradio -->|API calls| api
+    web -->|API calls| api
+
+    api -->|uses| shared
+    api -->|reads/writes| data["💾 Model Data<br/>Predictions & Artifacts"]
+
+    shared -.->|syncs with| web
+
+    style marimo fill:#ffffcc
+    style gradio fill:#ffe6e6
+    style web fill:#e6f3ff
+    style api fill:#e6ffe6
+    style shared fill:#f0e6ff
+```
+
 **UI progression:** Marimo (explore) → Gradio (validate) → Next.js (ship)
 
 ## Quick Start
