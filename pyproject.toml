@@ -33,6 +33,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+exclude = [".claude_skills/"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
