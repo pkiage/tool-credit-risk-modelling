@@ -36,7 +36,9 @@ cd apps/web && npm run dev
 uv run python -m apps.gradio.app
 ```
 
-### Start with Authentication
+### Start with Authentication (Optional)
+
+> **Note:** Authentication is disabled by default (`require_auth=false`). The Web and Gradio layers do not enforce authentication — see [ADR-013](1-ADRs/ADR-013-remove-web-authentication.md) and [ADR-014](1-ADRs/ADR-014-remove-gradio-authentication.md). To enable API-level auth:
 
 ```bash
 CREDIT_RISK_REQUIRE_AUTH=true \

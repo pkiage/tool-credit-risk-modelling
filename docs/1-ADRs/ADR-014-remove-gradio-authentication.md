@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Proposed |
+| Status | Accepted |
 | Author | Paul / Claude |
 | Date | 2026-02-08 |
 | PR | [#45](https://github.com/pkiage/tool-credit-risk-modelling/pull/45) |
@@ -124,7 +124,7 @@ Rely on Gradio-layer authentication only.
 
 ## Implementation
 
-Changes made in PR #[TBD]:
+Changes made in [PR #45](https://github.com/pkiage/tool-credit-risk-modelling/pull/45):
 
 **Modified files:**
 - `apps/gradio/app.py` - Removed:
