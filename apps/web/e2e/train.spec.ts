@@ -17,13 +17,15 @@ test.describe("Train Flow", () => {
 		await expect(page.getByText("Training model...")).toBeVisible();
 
 		// Wait for training to complete
-		await expect(page.getByText("Training Summary")).toBeVisible({ timeout: 120_000 });
+		await expect(page.getByRole("heading", { name: "Training Summary" })).toBeVisible({
+			timeout: 60_000,
+		});
 
 		// Verify results are displayed
-		await expect(page.getByText("Metrics")).toBeVisible();
-		await expect(page.getByText("ROC Curve")).toBeVisible();
-		await expect(page.getByText("Confusion Matrix")).toBeVisible();
-		await expect(page.getByText("Threshold Analysis")).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Metrics" })).toBeVisible();
+		await expect(page.getByRole("heading", { name: "ROC Curve" })).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Confusion Matrix" })).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Threshold Analysis" })).toBeVisible();
 	});
 
 	test("trains an xgboost model", async ({ page }) => {
@@ -32,9 +34,11 @@ test.describe("Train Flow", () => {
 		await page.getByLabel("Model Type").selectOption("xgboost");
 		await page.getByRole("button", { name: "Train Model" }).click();
 
-		await expect(page.getByText("Training Summary")).toBeVisible({ timeout: 120_000 });
+		await expect(page.getByRole("heading", { name: "Training Summary" })).toBeVisible({
+			timeout: 60_000,
+		});
 
 		// XGBoost should show feature importance
-		await expect(page.getByText("Feature Importance")).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Feature Importance" })).toBeVisible();
 	});
 });

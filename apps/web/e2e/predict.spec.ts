@@ -1,13 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { trainModel } from "./helpers";
 
 test.describe("Predict Flow", () => {
-	test.beforeAll(async ({ browser }) => {
-		// Train a model so there's something to predict with
-		const page = await browser.newPage();
-		await trainModel(page);
-		await page.close();
-	});
+	// Models are pre-trained by global setup
 
 	test("loads prediction form with trained models", async ({ page }) => {
 		await page.goto("/predict");

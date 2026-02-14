@@ -10,7 +10,7 @@ export async function waitForApiHealth(page: Page) {
 }
 
 /**
- * Train a model and return its model ID from the training summary.
+ * Train a model via the UI and wait for results.
  */
 export async function trainModel(
 	page: Page,
@@ -25,8 +25,9 @@ export async function trainModel(
 	await page.getByRole("button", { name: "Train Model" }).click();
 
 	// Wait for training to complete (can take up to 60s)
-	await expect(page.getByText("Training Summary")).toBeVisible({ timeout: 120_000 });
+	await expect(page.getByRole("heading", { name: "Training Summary" })).toBeVisible({
+		timeout: 60_000,
+	});
 
-	// Return the model ID from the summary
 	return page;
 }

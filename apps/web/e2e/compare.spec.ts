@@ -1,20 +1,13 @@
 import { expect, test } from "@playwright/test";
-import { trainModel } from "./helpers";
 
 test.describe("Compare Flow", () => {
-	test.beforeAll(async ({ browser }) => {
-		// Train two models for comparison
-		const page = await browser.newPage();
-		await trainModel(page, "logistic_regression");
-		await trainModel(page, "random_forest");
-		await page.close();
-	});
+	// Models are pre-trained by global setup
 
 	test("loads compare page with model checkboxes", async ({ page }) => {
 		await page.goto("/compare");
 
 		await expect(page.getByRole("heading", { name: "Compare Models" })).toBeVisible();
-		await expect(page.getByText("Select Models")).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Select Models" })).toBeVisible();
 
 		// Should have at least 2 model checkboxes
 		const checkboxes = page.getByRole("checkbox");
@@ -26,7 +19,7 @@ test.describe("Compare Flow", () => {
 		await page.goto("/compare");
 
 		// Wait for models to load
-		await expect(page.getByText("Select Models")).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Select Models" })).toBeVisible();
 
 		// Select first two models
 		const checkboxes = page.getByRole("checkbox");
@@ -42,7 +35,7 @@ test.describe("Compare Flow", () => {
 		// Wait for results (stored results should be fast, but re-train can be slow)
 		// Either we get metrics comparison or a warning about unavailable results
 		const metricsOrWarning = page
-			.getByText("Metrics Comparison")
+			.getByRole("heading", { name: "Metrics Comparison" })
 			.or(page.getByText(/stored results unavailable/i))
 			.or(page.getByText(/Re-train mode/i));
 
@@ -53,7 +46,7 @@ test.describe("Compare Flow", () => {
 		await page.goto("/compare");
 
 		// Wait for models to load
-		await expect(page.getByText("Select Models")).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Select Models" })).toBeVisible();
 
 		// Click re-train button
 		await page.getByRole("button", { name: "Re-train" }).click();
@@ -64,7 +57,7 @@ test.describe("Compare Flow", () => {
 
 	test("compare button shows correct count", async ({ page }) => {
 		await page.goto("/compare");
-		await expect(page.getByText("Select Models")).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Select Models" })).toBeVisible();
 
 		// Initially 0 selected
 		await expect(page.getByRole("button", { name: "Compare 0 Models" })).toBeVisible();

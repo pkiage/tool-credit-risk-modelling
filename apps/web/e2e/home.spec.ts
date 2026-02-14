@@ -11,9 +11,10 @@ test.describe("Home Page", () => {
 	test("has navigation links to train, predict, and compare", async ({ page }) => {
 		await page.goto("/");
 
-		await expect(page.getByRole("link", { name: /Train/i })).toBeVisible();
-		await expect(page.getByRole("link", { name: /Predict/i })).toBeVisible();
-		await expect(page.getByRole("link", { name: /Compare/i })).toBeVisible();
+		const nav = page.locator("nav");
+		await expect(nav.getByRole("link", { name: "Train" })).toBeVisible();
+		await expect(nav.getByRole("link", { name: "Predict" })).toBeVisible();
+		await expect(nav.getByRole("link", { name: "Compare" })).toBeVisible();
 	});
 
 	test("can navigate to train page", async ({ page }) => {
