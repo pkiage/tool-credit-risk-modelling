@@ -199,19 +199,23 @@ export default function ComparePage() {
 						>
 							<input
 								type="checkbox"
-								className="h-4 w-4 rounded border-border-strong text-primary focus:ring-focus-ring"
+								className="h-4 w-4 shrink-0 rounded border-border-strong text-primary focus:ring-focus-ring"
 								checked={selectedIds.has(model.model_id)}
 								onChange={() => toggleModel(model.model_id)}
 							/>
-							<div className="flex-1">
-								<span className="font-medium text-foreground">{model.model_type}</span>
-								<span className="ml-2 text-sm text-foreground-muted">
+							<div className="min-w-0 flex-1">
+								<span className="block truncate font-medium text-foreground">
+									{model.model_type}
+								</span>
+								<span className="block truncate font-mono text-xs text-foreground-muted">
 									{model.model_id.slice(0, 8)}
 								</span>
 							</div>
-							<div className="text-right text-sm">
-								<span className="text-foreground-secondary">AUC: {model.roc_auc.toFixed(3)}</span>
-								<span className="ml-3 text-foreground-muted">
+							<div className="shrink-0 text-right text-sm">
+								<span className="block whitespace-nowrap text-foreground-secondary">
+									AUC: {model.roc_auc.toFixed(3)}
+								</span>
+								<span className="block whitespace-nowrap text-xs text-foreground-muted">
 									{formatTimestamp(model.created_at)}
 								</span>
 							</div>
@@ -219,7 +223,7 @@ export default function ComparePage() {
 					))}
 				</div>
 
-				<div className="mt-4 flex items-center gap-4">
+				<div className="mt-4 flex flex-wrap items-center gap-4">
 					<div className="flex rounded-lg border border-border">
 						<button
 							type="button"
