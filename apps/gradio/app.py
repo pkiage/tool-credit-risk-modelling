@@ -6,6 +6,7 @@ import gradio as gr
 from apps.gradio.api_client import CreditRiskAPI
 from apps.gradio.components.comparison_tab import create_comparison_tab
 from apps.gradio.components.prediction_tab import create_prediction_tab
+from apps.gradio.components.synthetic_tab import create_synthetic_tab
 from apps.gradio.components.training_tab import create_training_tab
 from apps.gradio.config import API_BASE_URL, APP_TITLE
 
@@ -25,6 +26,8 @@ with gr.Blocks(title=APP_TITLE) as app:
             create_training_tab(api, training_results_state)
         with gr.Tab("Predict"):
             create_prediction_tab(api)
+        with gr.Tab("Synthetic Data"):
+            create_synthetic_tab(api, training_results_state)
         with gr.Tab("Compare"):
             create_comparison_tab(api, training_results_state)
 
