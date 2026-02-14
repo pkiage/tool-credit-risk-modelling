@@ -17,6 +17,7 @@ class TrainingConfig(BaseModel):
         undersample: Whether to undersample the majority class for imbalanced data.
         cv_folds: Number of cross-validation folds (2-10).
         selected_features: Encoded column names to train on. None = all features.
+        dataset_id: Synthetic dataset ID to train on. None = use real CSV dataset.
     """
 
     model_type: Literal["logistic_regression", "xgboost", "random_forest"] = Field(
@@ -31,6 +32,10 @@ class TrainingConfig(BaseModel):
     selected_features: list[str] | None = Field(
         default=None,
         description="Encoded column names to train on. None = all features.",
+    )
+    dataset_id: str | None = Field(
+        default=None,
+        description="Synthetic dataset ID to train on. None = use real CSV dataset.",
     )
 
 

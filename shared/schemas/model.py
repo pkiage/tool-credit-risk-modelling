@@ -1,5 +1,7 @@
 """Schemas for model metadata and persistence."""
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -13,6 +15,7 @@ class ModelMetadata(BaseModel):
         roc_auc: Area under ROC curve.
         accuracy: Test set accuracy.
         created_at: Timestamp when model was trained.
+        data_source: Whether model was trained on real or synthetic data.
     """
 
     model_id: str
@@ -21,6 +24,7 @@ class ModelMetadata(BaseModel):
     roc_auc: float
     accuracy: float
     created_at: str
+    data_source: Literal["real", "synthetic"] = "real"
 
 
 class PersistResponse(BaseModel):
