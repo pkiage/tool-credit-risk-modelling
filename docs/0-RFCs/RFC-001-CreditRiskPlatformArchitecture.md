@@ -88,7 +88,7 @@ Three-tier architecture with progressive UI fidelity:
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                      Data Layer                             │
-│         cr_loan_w2.csv | User Uploads | Artifacts           │
+│         cr_loan_w2.csv | Synthetic Data | Artifacts         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -116,7 +116,7 @@ flowchart TB
 
     subgraph "Data Layer"
         CSV["cr_loan_w2.csv"]
-        UPLOAD["User Uploads"]
+        SYNTH["Synthetic Data"]
         ARTIFACTS["Model Artifacts"]
     end
 
@@ -127,7 +127,7 @@ flowchart TB
     API --> SCHEMAS
     API --> LOGIC
     TRAIN --> CSV
-    TRAIN --> UPLOAD
+    TRAIN --> SYNTH
     PREDICT --> ARTIFACTS
 ```
 

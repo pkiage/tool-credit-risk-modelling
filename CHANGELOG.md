@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [shared] Synthetic data generation schemas and numpy-based generator with correlation preservation (#56)
+- [shared] Named presets for synthetic generation: Stress Test, Low Default, Large Sample, Balanced (#56)
+- [api] `POST /synthetic/generate/` endpoint with in-memory dataset store (#57)
+- [api] `dataset_id` field on `TrainingConfig` for training on synthetic data (#57)
+- [api] `data_source` field on `ModelMetadata` for provenance tracking (#57)
+- [gradio] Synthetic Data tab with preset selection and train-on-synthetic workflow (#58)
+- [web] `/synthetic` page with generation controls, summary stats, and training (#60)
+- [web] Synthetic data source badge on compare page (#60)
+- [marimo] Synthetic data exploration notebook with real vs synthetic comparison (#59)
+
+### Changed
+- [docs] Replace "User Uploads" with "Synthetic Data" in RFC-001 architecture diagrams
+
 ### Fixed
 
 - [web] Number input step validation rejecting valid income, employment length, and loan amount values
