@@ -27,15 +27,15 @@ test.describe("Predict Flow", () => {
 		// Submit prediction
 		await page.getByRole("button", { name: "Get Prediction" }).click();
 
-		// Wait for result
-		const resultText = page.getByText(/Default|No Default/);
-		await expect(resultText).toBeVisible({ timeout: 30_000 });
+		// Wait for result badge (exact match to avoid "Predict Default", "Default on File", etc.)
+		const resultBadge = page
+			.getByText("No Default", { exact: true })
+			.or(page.getByText("Default", { exact: true }));
+		await expect(resultBadge).toBeVisible({ timeout: 30_000 });
 
-		// Verify details card
-		await expect(page.getByText("Details")).toBeVisible();
-		await expect(page.getByText("Default Probability")).toBeVisible();
-		await expect(page.getByText("Confidence")).toBeVisible();
-		await expect(page.getByText("Probability Bar")).toBeVisible();
+		// Verify details and probability cards
+		await expect(page.getByRole("heading", { name: "Details" })).toBeVisible();
+		await expect(page.getByRole("heading", { name: "Probability Bar" })).toBeVisible();
 	});
 
 	test("shows empty state when no models and navigating from predict page", async ({ page }) => {

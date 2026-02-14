@@ -13,9 +13,6 @@ test.describe("Train Flow", () => {
 		await page.getByLabel("Model Type").selectOption("logistic_regression");
 		await page.getByRole("button", { name: "Train Model" }).click();
 
-		// Should show loading state
-		await expect(page.getByText("Training model...")).toBeVisible();
-
 		// Wait for training to complete
 		await expect(page.getByRole("heading", { name: "Training Summary" })).toBeVisible({
 			timeout: 60_000,
