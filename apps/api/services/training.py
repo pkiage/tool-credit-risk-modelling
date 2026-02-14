@@ -114,13 +114,32 @@ def train_model(
         >>> assert result.model_id
         >>> assert 0 <= result.optimal_threshold <= 1
     """
-    # Load dataset with optional feature subsetting
-    if dataset_path is None:
-        dataset_path = "data/processed/cr_loan_w2.csv"
+    # Load dataset — from synthetic store or CSV
+    if config.dataset_id is not None:
+        from apps.api.services.synthetic_store import get_dataset
 
-    X, y, feature_cols = load_dataset_from_csv(
-        dataset_path, selected_features=config.selected_features
-    )
+        dataset = get_dataset(config.dataset_id)
+        if dataset is None:
+            raise ValueError(
+                f"Synthetic dataset '{config.dataset_id}' not found or expired"
+            )
+        X, y, feature_cols = dataset
+        # Apply feature subsetting if selected_features is specified
+        if config.selected_features is not None:
+            valid = [f for f in config.selected_features if f in feature_cols]
+            if not valid:
+                raise ValueError(
+                    "None of the selected features exist in synthetic dataset"
+                )
+            indices = [feature_cols.index(f) for f in valid]
+            X = X[:, indices]
+            feature_cols = valid
+    else:
+        if dataset_path is None:
+            dataset_path = "data/processed/cr_loan_w2.csv"
+        X, y, feature_cols = load_dataset_from_csv(
+            dataset_path, selected_features=config.selected_features
+        )
 
     # Generate descriptive model ID: type, test size, feature count, unique suffix
     test_pct = int(config.test_size * 100)
@@ -176,6 +195,7 @@ def train_model(
         roc_auc=metrics.roc_auc,
         accuracy=metrics.accuracy,
         created_at=timestamp,
+        data_source="synthetic" if config.dataset_id is not None else "real",
     )
 
     # Build training result

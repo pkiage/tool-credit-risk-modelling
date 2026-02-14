@@ -43,6 +43,7 @@ export interface TrainingConfig {
 	random_state: number;
 	undersample: boolean;
 	cv_folds: number;
+	dataset_id?: string;
 }
 
 export interface ThresholdResult {
@@ -128,6 +129,7 @@ export interface ModelMetadata {
 	roc_auc: number;
 	accuracy: number;
 	created_at: string;
+	data_source: "real" | "synthetic";
 }
 
 // === API response types ===

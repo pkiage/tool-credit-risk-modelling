@@ -110,7 +110,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok", "service": settings.app_name}
 
     # Include routers
-    from apps.api.routers import auth, feature_selection, models, predict, train
+    from apps.api.routers import (
+        auth,
+        feature_selection,
+        models,
+        predict,
+        synthetic,
+        train,
+    )
 
     app.include_router(auth.router, prefix="/auth", tags=["auth"])
     app.include_router(train.router, prefix="/train", tags=["training"])
@@ -120,6 +127,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         feature_selection.router,
         prefix="/feature-selection",
         tags=["feature-selection"],
+    )
+    app.include_router(
+        synthetic.router,
+        prefix="/synthetic",
+        tags=["synthetic"],
     )
 
     return app
