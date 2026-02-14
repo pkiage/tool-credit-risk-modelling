@@ -1,5 +1,7 @@
 """Constants for credit risk modeling."""
 
+from typing import Any
+
 # Feature definitions based on cr_loan_w2.csv dataset
 
 NUMERIC_FEATURES: list[str] = [
@@ -180,6 +182,133 @@ IV_THRESHOLD_STRONG: float = 0.5
 # Boruta defaults
 BORUTA_DEFAULT_N_ITERATIONS: int = 100
 BORUTA_DEFAULT_CONFIDENCE_LEVEL: float = 0.95
+
+# ---------------------------------------------------------------------------
+# Synthetic data generation defaults
+# ---------------------------------------------------------------------------
+# Approximate real-dataset distributions for synthetic generation.
+# Derived from cr_loan_w2.csv (29,459 rows).
+
+NUMERIC_FEATURE_DEFAULTS: dict[str, dict[str, float]] = {
+    "person_age": {
+        "mean": 27.7001,
+        "std": 6.1654,
+        "min": 20.0,
+        "max": 84.0,
+    },
+    "person_income": {
+        "mean": 65803.7326,
+        "std": 51331.0957,
+        "min": 4000.0,
+        "max": 2039784.0,
+    },
+    "person_emp_length": {
+        "mean": 4.7584,
+        "std": 3.9807,
+        "min": 0.0,
+        "max": 41.0,
+    },
+    "loan_amnt": {
+        "mean": 9583.6009,
+        "std": 6314.421,
+        "min": 500.0,
+        "max": 35000.0,
+    },
+    "loan_int_rate": {
+        "mean": 11.0115,
+        "std": 3.2405,
+        "min": 5.42,
+        "max": 23.22,
+    },
+    "loan_percent_income": {
+        "mean": 0.1701,
+        "std": 0.1068,
+        "min": 0.0,
+        "max": 0.83,
+    },
+    "cb_person_cred_hist_length": {
+        "mean": 5.7881,
+        "std": 4.0307,
+        "min": 2.0,
+        "max": 30.0,
+    },
+}
+
+CATEGORICAL_FEATURE_DEFAULTS: dict[str, dict[str, float]] = {
+    "person_home_ownership": {
+        "MORTGAGE": 0.4114,
+        "OTHER": 0.0032,
+        "OWN": 0.08,
+        "RENT": 0.5054,
+    },
+    "loan_intent": {
+        "DEBTCONSOLIDATION": 0.1596,
+        "EDUCATION": 0.1986,
+        "HOMEIMPROVEMENT": 0.1117,
+        "MEDICAL": 0.185,
+        "PERSONAL": 0.1701,
+        "VENTURE": 0.1749,
+    },
+    "loan_grade": {
+        "A": 0.3317,
+        "B": 0.3188,
+        "C": 0.1978,
+        "D": 0.1125,
+        "E": 0.0299,
+        "F": 0.0073,
+        "G": 0.002,
+    },
+    "cb_person_default_on_file": {
+        "N": 0.8231,
+        "Y": 0.1769,
+    },
+}
+
+# Correlation matrix for numeric features (preserves inter-feature relationships).
+# Row/column order matches NUMERIC_FEATURES.
+NUMERIC_CORRELATION_MATRIX: list[list[float]] = [
+    # fmt: off
+    [1.0, 0.1404, 0.174, 0.0558, 0.012, -0.0407, 0.8774],
+    [0.1404, 1.0, 0.1616, 0.3276, -0.0011, -0.2987, 0.1217],
+    [0.174, 0.1616, 1.0, 0.1092, -0.0556, -0.0601, 0.1498],
+    [0.0558, 0.3276, 0.1092, 1.0, 0.1468, 0.5725, 0.0455],
+    [0.012, -0.0011, -0.0556, 0.1468, 1.0, 0.1202, 0.0167],
+    [-0.0407, -0.2987, -0.0601, 0.5725, 0.1202, 1.0, -0.0303],
+    [0.8774, 0.1217, 0.1498, 0.0455, 0.0167, -0.0303, 1.0],
+    # fmt: on
+]
+
+# Named presets for synthetic data generation.
+# Keys are human-readable names; values are partial SyntheticConfig dicts.
+SYNTHETIC_PRESETS: dict[str, dict[str, Any]] = {
+    "Stress Test": {
+        "n_samples": 5000,
+        "default_rate": 0.50,
+        "distributions": [
+            {"feature": "person_income", "mean_shift": -15000.0, "std_scale": 1.5},
+            {
+                "feature": "loan_int_rate",
+                "mean_shift": 4.0,
+                "std_scale": 1.2,
+            },
+            {
+                "feature": "loan_grade",
+                "category_weights": {
+                    "A": 0.05,
+                    "B": 0.10,
+                    "C": 0.20,
+                    "D": 0.25,
+                    "E": 0.20,
+                    "F": 0.15,
+                    "G": 0.05,
+                },
+            },
+        ],
+    },
+    "Low Default": {"n_samples": 5000, "default_rate": 0.05},
+    "Large Sample": {"n_samples": 50000, "default_rate": 0.22},
+    "Balanced": {"n_samples": 5000, "default_rate": 0.50},
+}
 
 # Chart color palette (shared across all notebooks and apps)
 COLOR_PRIMARY: str = "#636EFA"

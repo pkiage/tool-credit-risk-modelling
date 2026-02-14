@@ -18,6 +18,7 @@ from shared.logic.preprocessing import (
     loan_application_to_feature_vector,
     undersample_majority_class,
 )
+from shared.logic.synthetic import generate_synthetic_dataset
 from shared.logic.threshold import evaluate_threshold, find_optimal_threshold
 
 __all__ = [
@@ -37,6 +38,8 @@ __all__ = [
     "encode_loan_intent",
     "loan_application_to_feature_vector",
     "undersample_majority_class",
+    # Synthetic
+    "generate_synthetic_dataset",
     # Threshold
     "evaluate_threshold",
     "find_optimal_threshold",
