@@ -7,6 +7,7 @@ const links = [
 	{ href: "/train", label: "Train" },
 	{ href: "/predict", label: "Predict" },
 	{ href: "/compare", label: "Compare" },
+	{ href: "/synthetic", label: "Synthetic" },
 ];
 
 export function Nav() {

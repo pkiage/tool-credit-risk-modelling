@@ -206,6 +206,11 @@ export default function ComparePage() {
 							<div className="min-w-0 flex-1">
 								<span className="block truncate font-medium text-foreground">
 									{model.model_type}
+									{model.data_source === "synthetic" && (
+										<span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+											Synthetic
+										</span>
+									)}
 								</span>
 								<span className="block truncate font-mono text-xs text-foreground-muted">
 									{model.model_id.slice(0, 8)}

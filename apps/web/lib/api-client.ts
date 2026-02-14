@@ -4,6 +4,8 @@ import type {
 	PersistResponse,
 	PredictionRequest,
 	PredictionResponse,
+	SyntheticConfig,
+	SyntheticGenerateResponse,
 	TrainingConfig,
 	TrainingResult,
 } from "./types";
@@ -101,6 +103,14 @@ export const api = {
 	persistModel: async (modelId: string): Promise<PersistResponse> => {
 		return request<PersistResponse>(`/models/${modelId}/persist`, {
 			method: "POST",
+		});
+	},
+
+	generateSynthetic: async (config: SyntheticConfig): Promise<SyntheticGenerateResponse> => {
+		return request<SyntheticGenerateResponse>("/synthetic/generate/", {
+			method: "POST",
+			body: JSON.stringify(config),
+			timeout: TRAINING_TIMEOUT,
 		});
 	},
 };
