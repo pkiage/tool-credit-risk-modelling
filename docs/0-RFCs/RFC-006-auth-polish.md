@@ -2,10 +2,12 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Implemented |
+| Status | Partially Superseded |
 | Author(s) | pkiage |
-| Updated | 2026-02-02 |
+| Updated | 2026-02-14 |
 | Depends On | [RFC-001](RFC-001-CreditRiskPlatformArchitecture.md), [RFC-002](RFC-002-api-layer.md) |
+
+> **Note (2026-02-14):** The authentication portions of this RFC were implemented and then intentionally removed from the Web and Gradio layers per [ADR-013](../1-ADRs/ADR-013-remove-web-authentication.md) and [ADR-014](../1-ADRs/ADR-014-remove-gradio-authentication.md). The API retains its auth module but defaults to `require_auth=false`. Non-auth features (CORS, rate limiting, model persistence, error handling) remain implemented. See the ADRs for rationale and re-enablement path.
 
 ## Objective
 
@@ -460,3 +462,4 @@ class Settings(BaseSettings):
 | Date | Author | Changes |
 |------|--------|---------|
 | 2025-01-31 | — | Initial draft |
+| 2026-02-14 | Claude | Mark partially superseded; auth removed per ADR-013/ADR-014 |
