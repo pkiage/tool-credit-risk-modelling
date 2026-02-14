@@ -115,6 +115,26 @@ class CreditRiskAPI:
         response.raise_for_status()
         return response.json()
 
+    def generate_synthetic(self, config: dict[str, Any]) -> dict[str, Any]:
+        """Generate a synthetic dataset.
+
+        Args:
+            config: Generation configuration matching SyntheticConfig schema.
+
+        Returns:
+            SyntheticGenerateResponse as a dictionary.
+
+        Raises:
+            httpx.HTTPStatusError: If the API returns an error status.
+        """
+        response = self.client.post(
+            f"{self.base_url}/synthetic/generate/",
+            json=config,
+            headers=self._headers(),
+        )
+        response.raise_for_status()
+        return response.json()
+
     def feature_selection(self, request: dict[str, Any]) -> dict[str, Any]:
         """Run automatic feature selection.
 
