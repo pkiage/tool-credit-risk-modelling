@@ -174,3 +174,7 @@ apps/gradio/flagged/
 .claudeignore
 .claude/
 .prompts/
+
+# Other
+visual-assets-plan.md
+visual-assets-shot-list.md
