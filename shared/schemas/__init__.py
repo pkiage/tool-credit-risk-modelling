@@ -20,6 +20,12 @@ from shared.schemas.prediction import (
     PredictionResponse,
     PredictionResult,
 )
+from shared.schemas.synthetic import (
+    SyntheticConfig,
+    SyntheticDataset,
+    SyntheticDistribution,
+    SyntheticGenerateResponse,
+)
 from shared.schemas.training import TrainingConfig, TrainingResult
 
 __all__ = [
@@ -44,6 +50,11 @@ __all__ = [
     "PredictionRequest",
     "PredictionResponse",
     "PredictionResult",
+    # Synthetic
+    "SyntheticConfig",
+    "SyntheticDataset",
+    "SyntheticDistribution",
+    "SyntheticGenerateResponse",
     # Training
     "TrainingConfig",
     "TrainingResult",

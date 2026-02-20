@@ -88,7 +88,7 @@ Three-tier architecture with progressive UI fidelity:
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                      Data Layer                             │
-│         cr_loan_w2.csv | User Uploads | Artifacts           │
+│         cr_loan_w2.csv | Synthetic Data | Artifacts         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -116,7 +116,7 @@ flowchart TB
 
     subgraph "Data Layer"
         CSV["cr_loan_w2.csv"]
-        UPLOAD["User Uploads"]
+        SYNTH["Synthetic Data"]
         ARTIFACTS["Model Artifacts"]
     end
 
@@ -127,7 +127,7 @@ flowchart TB
     API --> SCHEMAS
     API --> LOGIC
     TRAIN --> CSV
-    TRAIN --> UPLOAD
+    TRAIN --> SYNTH
     PREDICT --> ARTIFACTS
 ```
 
@@ -366,12 +366,12 @@ See inline code examples above. Full implementation in:
 
 ### 2. Auth strategy — None for demo, API key, or OAuth?
 
-**Decision: None for Phases 2-3. API key for Phase 4. OAuth if multi-tenant is ever needed.**
+**Decision: API key auth was built in Phase 4 ([RFC-006](RFC-006-auth-polish.md)), then removed from Web ([ADR-013](../1-ADRs/ADR-013-remove-web-authentication.md)) and Gradio ([ADR-014](../1-ADRs/ADR-014-remove-gradio-authentication.md)) layers.**
 
-- The RFC explicitly lists multi-tenant auth as a non-goal. Adding auth now would slow down iteration on the core ML workflows (Marimo, Gradio, Next.js) without protecting anything valuable — the API is local-only and trains on a bundled demo dataset.
-- Phase 4 (when Next.js ships): add a simple API key via `X-API-Key` header, validated in a FastAPI dependency. This is a ~20-line change: one `Settings` field, one `Depends()` function, one middleware. It's enough to prevent accidental public exposure if deployed behind a URL.
-- OAuth/OIDC is only justified if the platform becomes multi-tenant (multiple users, per-user model storage, RBAC). The RFC says this is a non-goal, so don't build toward it unless requirements change.
-- When auth is added, lock down CORS origins at the same time (see RFC-002 Q3).
+- API key authentication was implemented across all layers (API, Web, Gradio) as planned.
+- However, since the API defaults to `require_auth=false` and the platform is a development/demo tool, the Web and Gradio auth layers were removed as they added friction without providing actual security.
+- The API retains its auth module (`apps/api/auth.py`) and can be re-enabled via `CREDIT_RISK_REQUIRE_AUTH=true`. See ADR-013 and ADR-014 for the full rationale and re-enablement path.
+- OAuth/OIDC remains a non-goal unless the platform becomes multi-tenant.
 
 ### 3. Chart library for Next.js — Recharts, Plotly.js, or Nivo?
 
@@ -409,3 +409,4 @@ See inline code examples above. Full implementation in:
 |------|--------|---------|
 | 2025-01-30 | Claude | Initial draft |
 | 2026-02-01 | Claude | Update status to Accepted, sync TrainingResult schema with implementation |
+| 2026-02-14 | Claude | Update auth Q&A to reflect ADR-013/ADR-014 auth removal |

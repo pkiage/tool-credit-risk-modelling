@@ -7,6 +7,7 @@ from apps.api.config import Settings
 from apps.api.main import create_app
 from apps.api.middleware.rate_limit import limiter
 from apps.api.services.model_store import clear_all_models
+from apps.api.services.synthetic_store import clear_all_datasets
 from shared.schemas.loan import LoanApplication
 from shared.schemas.training import TrainingConfig
 
@@ -38,11 +39,13 @@ def client(test_settings: Settings) -> TestClient:
 
 @pytest.fixture(autouse=True)
 def clear_models():
-    """Clear model store and rate limiter before each test."""
+    """Clear model store, synthetic store, and rate limiter before each test."""
     clear_all_models()
+    clear_all_datasets()
     limiter.reset()
     yield
     clear_all_models()
+    clear_all_datasets()
 
 
 @pytest.fixture

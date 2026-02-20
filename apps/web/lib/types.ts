@@ -43,6 +43,7 @@ export interface TrainingConfig {
 	random_state: number;
 	undersample: boolean;
 	cv_folds: number;
+	dataset_id?: string;
 }
 
 export interface ThresholdResult {
@@ -128,6 +129,36 @@ export interface ModelMetadata {
 	roc_auc: number;
 	accuracy: number;
 	created_at: string;
+	data_source: "real" | "synthetic";
+}
+
+// === Synthetic data types ===
+
+export interface SyntheticDistribution {
+	feature: string;
+	mean_shift: number;
+	std_scale: number;
+	category_weights: Record<string, number> | null;
+}
+
+export interface SyntheticConfig {
+	n_samples: number;
+	default_rate: number;
+	distributions: SyntheticDistribution[];
+	random_seed: number | null;
+}
+
+export interface SyntheticDataset {
+	n_samples: number;
+	n_features: number;
+	default_rate_actual: number;
+	feature_names: string[];
+	summary_stats: Record<string, Record<string, number>>;
+}
+
+export interface SyntheticGenerateResponse {
+	dataset_id: string;
+	metadata: SyntheticDataset;
 }
 
 // === API response types ===

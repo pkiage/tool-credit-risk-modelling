@@ -4,7 +4,7 @@
 |-------|-------|
 | Status | Implemented |
 | Author(s) | Paul / Claude |
-| Updated | 2026-02-01 |
+| Updated | 2026-02-14 |
 | Depends On | RFC-001 |
 
 ## Objective
@@ -49,14 +49,21 @@ apps/api/
 ├── dependencies.py         # Request-scoped dependencies
 ├── routers/
 │   ├── __init__.py
+│   ├── auth.py             # /auth (verify key)
 │   ├── train.py            # POST /train
 │   ├── predict.py          # POST /predict
-│   └── models.py           # GET/POST /models
+│   ├── models.py           # GET/POST /models
+│   ├── feature_selection.py # POST /feature-selection
+│   └── synthetic.py        # POST /synthetic/generate
 ├── services/
 │   ├── __init__.py
 │   ├── training.py         # Training orchestration
 │   ├── inference.py        # Prediction logic
-│   └── audit.py            # Audit event emission
+│   ├── audit.py            # Audit event emission
+│   ├── model_store.py      # In-memory model storage
+│   ├── persistent_model_store.py # Filesystem persistence
+│   ├── feature_selection_service.py # Feature selection logic
+│   └── synthetic_store.py  # Synthetic data generation
 └── tests/
     ├── conftest.py
     ├── test_train.py
@@ -71,6 +78,8 @@ apps/api/
 | `POST` | `/predict` | `PredictionRequest` | `PredictionResponse` | Run inference |
 | `GET` | `/models` | — | `list[ModelSummary]` | List session models |
 | `POST` | `/models/{id}/persist` | — | `PersistResponse` | Save artifact |
+| `POST` | `/feature-selection` | `FeatureSelectionRequest` | `FeatureSelectionResult` | Run feature selection |
+| `POST` | `/synthetic/generate` | `SyntheticGenerateRequest` | `SyntheticGenerateResponse` | Generate synthetic data |
 | `GET` | `/health` | — | `{"status": "ok"}` | Health check |
 
 ### Training Flow
@@ -292,3 +301,4 @@ After implementation:
 |------|--------|---------|
 | 2025-01-31 | — | Initial draft |
 | 2026-02-01 | Claude | Update status to Accepted, all open questions resolved |
+| 2026-02-14 | Claude | Add feature-selection and synthetic endpoints, update directory structure |

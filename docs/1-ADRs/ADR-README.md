@@ -16,10 +16,11 @@ This directory contains Architecture Decision Records (ADRs) for the Credit Risk
 | [ADR-008](ADR-008-monorepo-structure.md) | Monorepo Structure | Accepted | 2026-02-02 | [#21](https://github.com/pkiage/tool-credit-risk-modelling/pull/21) |
 | [ADR-009](ADR-009-cloud-run-deployment.md) | Cloud Run Deployment | Accepted | 2026-02-07 | [#30](https://github.com/pkiage/tool-credit-risk-modelling/pull/30) |
 | [ADR-010](ADR-010-feature-selection.md) | Training Feature Selection | Accepted | 2026-02-07 | [#31](https://github.com/pkiage/tool-credit-risk-modelling/pull/31) |
-| [ADR-011](ADR-011-nextjs-cloud-run.md) | Next.js Deployment on Cloud Run | Proposed | 2026-02-07 | [#37](https://github.com/pkiage/tool-credit-risk-modelling/pull/37) |
+| [ADR-011](ADR-011-nextjs-cloud-run.md) | Next.js Deployment on Cloud Run | Accepted | 2026-02-07 | [#37](https://github.com/pkiage/tool-credit-risk-modelling/pull/37) |
 | [ADR-012](ADR-012-automatic-feature-selection.md) | Automatic Feature Selection Methods | Accepted | 2026-02-07 | [#38](https://github.com/pkiage/tool-credit-risk-modelling/pull/38), [#39](https://github.com/pkiage/tool-credit-risk-modelling/pull/39) |
-| [ADR-013](ADR-013-remove-web-authentication.md) | Remove Web Authentication Layer | Proposed | 2026-02-08 | [#44](https://github.com/pkiage/tool-credit-risk-modelling/pull/44) |
-| [ADR-014](ADR-014-remove-gradio-authentication.md) | Remove Gradio Authentication Layer | Proposed | 2026-02-08 | [#45](https://github.com/pkiage/tool-credit-risk-modelling/pull/45) |
+| [ADR-013](ADR-013-remove-web-authentication.md) | Remove Web Authentication Layer | Accepted | 2026-02-08 | [#44](https://github.com/pkiage/tool-credit-risk-modelling/pull/44) |
+| [ADR-014](ADR-014-remove-gradio-authentication.md) | Remove Gradio Authentication Layer | Accepted | 2026-02-08 | [#45](https://github.com/pkiage/tool-credit-risk-modelling/pull/45) |
+| [ADR-015](ADR-015-dark-mode-accessibility.md) | Dark Mode and Accessibility Standards | Accepted | 2026-02-08 | [#46](https://github.com/pkiage/tool-credit-risk-modelling/pull/46), [#48](https://github.com/pkiage/tool-credit-risk-modelling/pull/48) |
 
 ## Creating a New ADR
 

@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PredictionForm } from "@/components/forms/prediction-form";
 import type { ModelMetadata } from "@/lib/types";
@@ -13,6 +12,7 @@ const mockModels: ModelMetadata[] = [
 		roc_auc: 0.85,
 		accuracy: 0.82,
 		created_at: "2025-01-01T00:00:00Z",
+		data_source: "real",
 	},
 	{
 		model_id: "model-002",
@@ -21,6 +21,7 @@ const mockModels: ModelMetadata[] = [
 		roc_auc: 0.9,
 		accuracy: 0.88,
 		created_at: "2025-01-02T00:00:00Z",
+		data_source: "real",
 	},
 ];
 
@@ -58,12 +59,14 @@ describe("PredictionForm", () => {
 		expect(screen.getByRole("button", { name: /Predicting/i })).toBeDisabled();
 	});
 
-	it("calls onSubmit with valid data", async () => {
-		const user = userEvent.setup();
+	it("calls onSubmit with valid data", () => {
 		const onSubmit = vi.fn();
 		render(<PredictionForm models={mockModels} onSubmit={onSubmit} />);
 
-		await user.click(screen.getByRole("button", { name: "Get Prediction" }));
+		const form = screen
+			.getByRole("button", { name: "Get Prediction" })
+			.closest("form") as HTMLFormElement;
+		fireEvent.submit(form);
 
 		expect(onSubmit).toHaveBeenCalledWith(
 			"model-001",
@@ -74,18 +77,20 @@ describe("PredictionForm", () => {
 		);
 	});
 
-	it("displays validation errors and blocks submit", async () => {
-		const user = userEvent.setup();
+	it("displays validation errors and blocks submit", () => {
 		const onSubmit = vi.fn();
 
-		// Mock validation to return errors (avoids jsdom number input limitations)
+		// Mock validation to return errors (avoids number input limitations)
 		vi.spyOn(validation, "validateLoanApplication").mockReturnValueOnce({
 			person_age: "Age must be a whole number between 18 and 120",
 		});
 
 		render(<PredictionForm models={mockModels} onSubmit={onSubmit} />);
 
-		await user.click(screen.getByRole("button", { name: "Get Prediction" }));
+		const form = screen
+			.getByRole("button", { name: "Get Prediction" })
+			.closest("form") as HTMLFormElement;
+		fireEvent.submit(form);
 
 		expect(onSubmit).not.toHaveBeenCalled();
 		expect(screen.getByText(/Age must be/)).toBeInTheDocument();
