@@ -25,7 +25,7 @@ api = [
     "joblib>=1.4",
 ]
 dev = [
-    "pytest>=8.3",
+    "pytest>=9.0.3",
     "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
